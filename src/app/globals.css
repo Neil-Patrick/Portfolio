@@ -1,26 +1,81 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   Theming
+   - No data-theme on <html>  -> follow the OS ("system").
+   - data-theme="light|dark"  -> forced by the ThemeSwitcher.
+   Every color token below uses light-dark(LIGHT, DARK), which resolves
+   from color-scheme. Components never need `dark:` classes.
+   ========================================================================== */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light dark;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* ==========================================================================
+   Design tokens (PLACEHOLDER palette: neutral until the game-like style
+   is designed). Contrast checked against WCAG AA in both themes.
+   ========================================================================== */
+
+@theme {
+  /* Remove Tailwind's default palette so only these tokens can be used. */
+  --color-*: initial;
+
+  --color-canvas: light-dark(#ffffff, #0d0f14); /* page background */
+  --color-surface: light-dark(#f3f4f6, #171a21); /* cards, panels */
+  --color-ink: light-dark(#111318, #eceef2); /* primary text */
+  --color-ink-muted: light-dark(#525866, #a3a9b5); /* secondary text */
+  --color-line: light-dark(#8a909c, #5a6170); /* borders, dividers */
+  --color-accent: light-dark(#3346c4, #93a4ff); /* links, active states */
+  --color-on-accent: light-dark(#ffffff, #0d0f14); /* text on accent */
+  --color-focus: var(--color-accent); /* focus rings */
+
+  /* Fluid display size for the hero heading. */
+  --text-display: clamp(2.25rem, 1.5rem + 4vw, 4.5rem);
+  --text-display--line-height: 1.1;
+
+  /* Sticky header height; also offsets anchor scrolling. */
+  --spacing-header: 4rem;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Page-width wrapper with fluid side gutters. */
+@utility container-page {
+  width: 100%;
+  max-width: var(--container-5xl);
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 2rem);
+}
+
+@layer base {
+  html {
+    scroll-padding-top: var(--spacing-header);
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
