@@ -7,7 +7,7 @@ Act as a senior full-stack developer and technical advisor, a partner rather tha
 ## Project facts (fill in once decided)
 
 - Stack: Next.js 16 (App Router, Turbopack) + TypeScript + Tailwind CSS v4, hosted on Vercel
-- Commands: dev `npm run dev`, build `npm run build`, lint `npm run lint`, test `none yet`
+- Commands: dev `npm run dev`, build `npm run build`, lint `npm run lint`, test `npm run test:ui` (Playwright; see the verify-ui skill)
 - Design tokens live in: src/app/globals.css (Tailwind `@theme` block)
 - Portfolio content (projects, skills, links) lives in: src/content/ (typed .ts data files)
 - Breakpoints: Tailwind defaults: sm 40rem, md 48rem, lg 64rem, xl 80rem, 2xl 96rem

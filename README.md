@@ -33,8 +33,16 @@ No environment variables are needed yet. When they are, put them in `.env.local`
 | `npm run build` | Create an optimized production build               |
 | `npm run start` | Serve the production build locally                 |
 | `npm run lint`  | Check code with ESLint                             |
+| `npm run test:ui` | Run UI checks in headless Chromium (Playwright)  |
 
-There is no automated test suite yet.
+## Testing
+
+`npm run test:ui` runs `tests/ui/verify.spec.ts` against the dev server (it reuses one already running on port 3000):
+
+- At 320, 768, 1024 and 1440px, in light and dark: no horizontal scroll, no console errors (including hydration warnings), and no axe WCAG 2.1 AA violations. A full-page screenshot of each is saved to `test-results/screenshots/`.
+- Behaviour: the theme switcher sets, persists and clears the theme; the mobile menu opens, closes with Escape and closes on link click; every section in `src/content/site.ts` exists on the page.
+
+First run on a new machine: `npx playwright install chromium`. Checks run in Chromium only, so Safari, Firefox and real devices still need a manual look.
 
 ## Project structure
 
@@ -53,6 +61,7 @@ src/
   lib/
     theme.ts      Theme constants, applyTheme(), inline init script
 public/           Static assets (images, icons)
+tests/ui/         Playwright UI checks
 ```
 
 Text in `[square brackets]` in `src/content/` is placeholder content.
