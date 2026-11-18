@@ -1,4 +1,8 @@
-/** Technical skills, grouped as on the CV. Proficiency tiers come later (ask before adding). */
+/**
+ * Technical skills, grouped as on the CV, plus Node.js, Express, Laravel, and Sass
+ * from the CV's project lines. Names must match project stack entries exactly;
+ * logos live in tech.ts. Proficiency tiers come later (ask before adding).
+ */
 
 export type SkillGroup = { name: string; skills: string[] };
 
@@ -9,11 +13,11 @@ export const skillGroups: SkillGroup[] = [
   },
   {
     name: "Frameworks and libraries",
-    skills: ["Next.js", "React", "React Router", "Tailwind CSS", "Bootstrap"],
+    skills: ["Next.js", "React", "React Router", "Tailwind CSS", "Bootstrap", "Sass (SCSS)"],
   },
   {
-    name: "Databases and backend services",
-    skills: ["MySQL", "PostgreSQL", "Supabase", "Turso (libSQL)"],
+    name: "Backend and databases",
+    skills: ["MySQL", "PostgreSQL", "Supabase", "Turso (libSQL)", "Node.js", "Express", "Laravel"],
   },
   { name: "Hosting and deployment", skills: ["Vercel"] },
   { name: "Tools and platforms", skills: ["Git", "GitHub", "Visual Studio", "VS Code"] },

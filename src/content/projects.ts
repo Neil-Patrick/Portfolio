@@ -51,7 +51,7 @@ export const projects: Project[] = [
     description:
       "An anonymous message board. Write a message to someone, optionally attach a song from Spotify, and anyone can browse the messages or search them by recipient name. A captcha keeps spam out.",
     started: "2025-05",
-    stack: ["Next.js", "TypeScript", "SCSS", "Turso (libSQL)", "Spotify Web API", "Cloudflare Turnstile"],
+    stack: ["Next.js", "TypeScript", "Sass (SCSS)", "Turso (libSQL)", "Spotify Web API", "Cloudflare Turnstile"],
     links: [
       { label: "Live site", href: "https://untold-diaries.vercel.app" },
       { label: "Source", href: "https://github.com/nathsuki73/untold-diaries" },

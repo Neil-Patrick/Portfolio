@@ -56,7 +56,7 @@ export default function CredentialsPage() {
           </span>
         </a>
 
-        <ul className="grid gap-x-8 sm:grid-cols-2">
+        <ul className="grid gap-x-8 sm:grid-cols-2 xl:grid-cols-3">
           {certifications.map((cert) => (
             <li key={cert.name} className="py-2">
               <a
@@ -82,7 +82,7 @@ export default function CredentialsPage() {
               {formatMonth(group.modules[0].date)} to{" "}
               {formatMonth(group.modules[group.modules.length - 1].date)}
             </p>
-            <ul className="grid gap-x-8 gap-y-1 sm:grid-cols-2">
+            <ul className="grid gap-x-8 gap-y-1 sm:grid-cols-2 xl:grid-cols-3">
               {group.modules.map((module) => (
                 <li key={module.name}>{module.name}</li>
               ))}

@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: section.label };
 export default function ContactPage() {
   return (
     <SectionPage section={section}>
-      <ul className="grid max-w-xl gap-5">
+      <ul className="grid gap-5 md:grid-cols-2">
         {site.contactLinks.map((link) => (
           <li key={link.label} className="rounded-md border border-line-strong bg-surface">
             <a

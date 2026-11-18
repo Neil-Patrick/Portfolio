@@ -241,3 +241,89 @@ test("chart fits a 320px phone without overflow", async ({ page }) => {
   expect(figure.x).toBeGreaterThanOrEqual(0);
   expect(figure.x + figure.width).toBeLessThanOrEqual(320);
 });
+
+/* ---------- Behaviour: skills ↔ projects ---------- */
+
+test("every project tool is a skill or a known service", async () => {
+  const { projects } = await import("../../src/content/projects");
+  const { skillGroups } = await import("../../src/content/skills");
+  const skills = new Set(skillGroups.flatMap((group) => group.skills));
+  const services = new Set(["Spotify Web API", "Cloudflare Turnstile"]);
+  const unknown = projects.flatMap((project) =>
+    project.stack.filter((tool) => !skills.has(tool) && !services.has(tool)).map((tool) => `${project.name}: ${tool}`),
+  );
+  expect(unknown, "stack names must match skills.ts exactly").toEqual([]);
+});
+
+test("every skill shows an icon, and every logo loads", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/skills");
+  await page.waitForLoadState("networkidle");
+  const { skillGroups } = await import("../../src/content/skills");
+  const total = skillGroups.flatMap((group) => group.skills).length;
+
+  const chips = page.locator('main li[id^="skill-"]');
+  await expect(chips).toHaveCount(total);
+  for (const chip of await chips.all()) {
+    await expect(chip.locator("[data-tech-icon]").first()).toBeAttached();
+  }
+  // Only skills deliberately without a devicon logo use the fallback glyph.
+  const fallbacks = await chips
+    .filter({ has: page.locator('[data-tech-icon="fallback"]') })
+    .allInnerTexts();
+  // Button chips also contain a project count, so compare only the name (first line).
+  expect(fallbacks.map((t) => t.split("\n")[0].trim()).sort()).toEqual(["SQL", "Turso (libSQL)"]);
+
+  const broken = await page.evaluate(() =>
+    [...document.querySelectorAll<HTMLImageElement>("img[data-tech-icon]")]
+      .filter((img) => !img.complete || img.naturalWidth === 0)
+      .map((img) => img.src),
+  );
+  expect(broken, "logos that failed to load").toEqual([]);
+});
+
+test("selecting a skill lists the projects that use it", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/skills");
+  await page.waitForLoadState("networkidle");
+  const typescript = page.getByRole("button", { name: /^TypeScript/ });
+  const panel = page.getByRole("complementary", { name: "Projects using the selected skill" }).getByTestId("skill-usage");
+
+  await expect(panel).toContainText("Pick a highlighted skill");
+  await typescript.click();
+  await expect(typescript).toHaveAttribute("aria-pressed", "true");
+  await expect(page).toHaveURL(/#skill-typescript$/);
+  await expect(panel).toContainText("Used in 3 projects");
+  for (const name of ["Flood Forecast", "GADvance", "Untold Diaries"]) {
+    await expect(panel.getByRole("link", { name })).toBeVisible();
+  }
+
+  await panel.getByRole("link", { name: "GADvance" }).click();
+  await expect(page).toHaveURL(/\/projects#gadvance$/);
+
+  // Clicking the selected skill again clears the selection.
+  await page.goto("/skills#skill-typescript");
+  await page.waitForLoadState("networkidle");
+  await expect(typescript).toHaveAttribute("aria-pressed", "true");
+  await typescript.click();
+  await expect(typescript).toHaveAttribute("aria-pressed", "false");
+  await expect(panel).toContainText("Pick a highlighted skill");
+});
+
+test("a project's tool chip opens the Skills page with that skill selected", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/projects");
+  await page.locator("#flood-forecast").getByRole("link", { name: "Python", exact: true }).click();
+  await expect(page).toHaveURL(/\/skills#skill-python$/);
+  await expect(page.getByRole("button", { name: /^Python/ })).toHaveAttribute("aria-pressed", "true");
+});
+
+test("on a phone, the usage panel opens under the selected skill's group", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.goto("/skills");
+  await page.waitForLoadState("networkidle");
+  await page.getByRole("button", { name: /^MySQL/ }).click();
+  const group = page.locator("section", { has: page.getByRole("heading", { name: "Backend and databases" }) });
+  await expect(group.getByTestId("skill-usage")).toBeVisible();
+  await expect(group.getByTestId("skill-usage")).toContainText("Used in 2 projects");
+});

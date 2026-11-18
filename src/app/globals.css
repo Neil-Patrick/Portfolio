@@ -39,6 +39,9 @@
   --color-on-accent: light-dark(#ffffff, #0d1724); /* text on accent */
   --color-focus: var(--color-accent); /* focus rings */
 
+  /* Light tile behind dark brand logos, only in dark mode (src/content/tech.ts). */
+  --color-logo-backing: light-dark(transparent, #e6edf5);
+
   /* Chart marks only. Chart text always uses the ink tokens. */
   --color-series-cert: light-dark(#00897b, #1a9e8f);
   --color-series-project: light-dark(#a35c00, #c98425);
@@ -66,9 +69,9 @@
 /* Page-width wrapper with fluid side gutters. */
 @utility container-page {
   width: 100%;
-  max-width: var(--container-5xl);
+  max-width: var(--container-7xl);
   margin-inline: auto;
-  padding-inline: clamp(1rem, 4vw, 2rem);
+  padding-inline: clamp(1rem, 4vw, 3rem);
 }
 
 @layer base {

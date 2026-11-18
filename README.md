@@ -9,7 +9,8 @@ Personal portfolio website.
 - [Tailwind CSS v4](https://tailwindcss.com)
 - ESLint (`eslint-config-next`)
 - IBM Plex Sans via `next/font` (one family for everything)
-- No UI, icon, or chart libraries: icons are inline SVG and the home chart is hand-built SVG
+- [devicon](https://devicon.dev) (MIT) for technology logos on skills and project tools
+- No UI or chart libraries: UI icons are inline SVG and the home chart is hand-built SVG
 - Hosted on [Vercel](https://vercel.com)
 
 ## Requirements
@@ -47,6 +48,7 @@ No environment variables are needed yet. When they are, put them in `.env.local`
 - Behaviour:
   - Navigation: every section exists on the home page; each home preview link opens its page with the right title; the desktop header links every page and marks the current one; the mobile menu opens, closes with Escape (returning focus) and on link click; the footer reaches every page.
   - Theme: the switcher sets, persists and clears the theme; a first-time visitor gets System.
+  - Skills and projects: every project tool is a skill or a known service; every skill shows an icon and every logo loads; selecting a skill lists its projects, updates the URL hash, and links to the project; a project's tool chip opens the Skills page with that skill selected; on phones the panel opens under the selected group.
   - Chart: one marker per timeline item and a table row for each; Home, End and arrow keys move the selection; clicking selects the nearest item; the chart fits a 320px screen.
 
 First run on a new machine: `npx playwright install chromium`. Checks run in Chromium only, so Safari, Firefox and real devices still need a manual look.
@@ -67,6 +69,8 @@ src/
     LearningChart.tsx  Home chart: cumulative timeline, readout, table view
     ThemeSwitcher.tsx  Light / dark / system control
     Section.tsx        Home preview section with heading and a link to its page
+    SkillExplorer.tsx  Skills page: skill chips, "Used in" panel, hash-based selection
+    TechIcon.tsx       Logo for a skill or tool (color, single-color, or fallback glyph)
     SectionPage.tsx    Shared shell for section pages (h1, back link, body)
   content/
     site.ts       Site info and section list: label, route, summary, detail, link text
@@ -74,14 +78,18 @@ src/
     credentials.ts  Education, featured certification, Credly badges, TESDA modules
     skills.ts      Skill groups (from the CV)
     projects.ts    Projects: description, start month, stack, links
+    tech.ts        Logo for each skill/tool name (devicon imports)
   lib/
     theme.ts      Theme constants, applyTheme(), inline init script
     timeline.ts   Builds the chart's dated points from the content files
+    skill-usage.ts  Links skills and projects by name (which projects use a skill)
 public/           Static assets (images, icons)
 tests/ui/         Playwright UI checks
 ```
 
 Text in `[square brackets]` in `src/content/` is placeholder content.
+
+**Adding a skill:** add its name to a group in `src/content/skills.ts`. For a logo, find it on [devicon.dev](https://devicon.dev), import its `-original.svg` in `src/content/tech.ts`, and add one line to `techIcons` (use `mono: true` for black-by-brand logos, `darkBacking: true` for dark ones). If a project uses it, write the same name in that project's `stack` in `projects.ts` and the two connect automatically.
 
 **Dev server note:** on this Windows setup, Turbopack sometimes keeps serving an old build of `globals.css` after an edit. If a style change doesn't show up, stop and restart `npm run dev`.
 
@@ -101,4 +109,6 @@ Text in `[square brackets]` in `src/content/` is placeholder content.
 - **Theming without a library:** an inline `<head>` script applies a saved light/dark choice before first paint (no flash), following the Next.js "preventing flash before hydration" guide. "System" removes `data-theme` so CSS follows the OS live. The choice is stored in `localStorage` and synced across tabs. `next-themes` was considered and skipped: it would be an extra dependency for about 40 lines of code.
 - **Home preview + section pages:** the home page shows a short preview of every section with a link to its page; each section has its own static route with the full content. Sections keep their `#id` anchors on the home page.
 - **One folder per section page, not a `[section]` dynamic route:** each page will grow its own layout (project grid, credentials list, contact form). They share `SectionPage` for now to stay DRY.
+- **Brand logos from devicon:** full-color logos make skills scannable. devicon is a regular dependency so adding a skill's logo is one import line; only the imported SVGs reach visitors (static files, no JS or CDN). Black-by-brand logos (Next.js, Vercel, GitHub, Express) are drawn in the text color through a CSS mask so they work in dark mode, and MySQL's dark blue sits on a light tile in dark mode. SQL, Turso, and Spotify have no devicon logo and use a neutral glyph.
+- **Skills and projects linked by name:** a project's `stack` uses the exact skill names, and `src/lib/skill-usage.ts` derives the connection, so there's no second list to keep in sync (a test fails if a name doesn't match). The selected skill lives in the URL hash (`/skills#skill-python`) so project chips can link straight to it; the hash avoids the Suspense boundary that search params would need.
 - **Plain top navigation:** text links in the header on large screens, a "Menu" disclosure on small ones, plus the same links in the footer. An earlier game-style radial menu was dropped with the pixel theme; a playful interactive piece may return later as its own section.
