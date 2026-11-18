@@ -12,6 +12,7 @@ import {
   type MouseEvent,
   type PointerEvent,
 } from "react";
+import { Close } from "pixelarticons/react/Close.js";
 import { sections } from "@/content/site";
 import { sectionIcons } from "./icons";
 
@@ -133,7 +134,7 @@ export function WheelMenu() {
         aria-expanded={open}
         aria-controls={dialogId}
         onClick={openWheel}
-        className="grid size-11 place-items-center rounded-full border border-line text-ink transition-colors hover:bg-surface"
+        className="pixel-button grid size-11 place-items-center text-ink hover:text-accent"
       >
         <span className="sr-only">Open navigation</span>
         <WheelIcon />
@@ -153,55 +154,46 @@ export function WheelMenu() {
             <button
               type="button"
               onClick={closeWheel}
-              className="pointer-events-auto grid size-11 place-items-center rounded-full border border-line bg-canvas transition-colors hover:bg-surface"
+              className="pixel-button pointer-events-auto grid size-11 place-items-center text-ink hover:text-accent"
             >
               <span className="sr-only">Close navigation</span>
-              <svg
-                width={20}
-                height={20}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                aria-hidden
-                focusable={false}
-              >
-                <path d="M6 6l12 12M18 6L6 18" />
-              </svg>
+              <Close width={20} height={20} aria-hidden focusable={false} />
             </button>
           </div>
         </div>
 
         <div ref={ringRef} className="wheel-ring relative">
-          <div className="wheel-track absolute top-1/2 left-1/2 -translate-1/2 rounded-full" />
+          <div className="wheel-track pixel-round absolute top-1/2 left-1/2 -translate-1/2">
+            <div className="pixel-round-fill bg-panel" />
+          </div>
 
           {/* Hub: arrow sweeps its edge, text stays in the middle. */}
-          <div className="wheel-hub absolute top-1/2 left-1/2 -translate-1/2 rounded-full border border-line bg-canvas">
-            <div
-              data-testid="wheel-arrow-track"
-              className="wheel-arrow absolute inset-0"
-              style={{ rotate: `${arrowAngle}deg` }}
-            >
-              <svg
-                data-testid="wheel-arrow"
-                viewBox="0 0 16 10"
-                className="absolute top-1.5 left-1/2 h-2.5 w-4 -translate-x-1/2 text-accent sm:top-2 sm:h-3.5 sm:w-5"
-                aria-hidden
-                focusable={false}
+          <div className="wheel-hub pixel-round absolute top-1/2 left-1/2 -translate-1/2">
+            <div className="pixel-round-fill bg-canvas">
+              <div
+                data-testid="wheel-arrow-track"
+                className="wheel-arrow absolute inset-0"
+                style={{ rotate: `${arrowAngle}deg` }}
               >
-                <path d="M8 0 16 10H0z" fill="currentColor" />
-              </svg>
-            </div>
-            <div
-              data-testid="wheel-readout"
-              aria-hidden
-              className="wheel-readout absolute top-1/2 left-1/2 -translate-1/2 text-center"
-            >
-              <p className="text-xs font-semibold tracking-wider uppercase sm:text-sm">
-                {activeSection.label}
-              </p>
-              <p className="mt-1 hidden text-sm text-ink-muted sm:block">{activeSection.tagline}</p>
+                <svg
+                  data-testid="wheel-arrow"
+                  viewBox="0 0 7 4"
+                  shapeRendering="crispEdges"
+                  className="absolute top-3 left-1/2 h-2 w-3.5 -translate-x-1/2 text-gold sm:top-4 sm:h-3 sm:w-5"
+                  aria-hidden
+                  focusable={false}
+                >
+                  <path d="M3 0h1v1h1v1h1v1h1v1H0V3h1V2h1V1h1z" fill="currentColor" />
+                </svg>
+              </div>
+              <div
+                data-testid="wheel-readout"
+                aria-hidden
+                className="wheel-readout absolute top-1/2 left-1/2 -translate-1/2 text-center"
+              >
+                <p className="font-display text-sm sm:text-lg">{activeSection.label}</p>
+                <p className="mt-1 hidden text-sm text-ink-muted sm:block">{activeSection.tagline}</p>
+              </div>
             </div>
           </div>
 
@@ -222,15 +214,15 @@ export function WheelMenu() {
                       onClick={closeWheel}
                       onFocus={() => aim(i)}
                       style={{ "--i": i, "--count": sections.length } as CSSProperties}
-                      className="wheel-item group absolute top-1/2 left-1/2 aspect-square rounded-full"
+                      className="wheel-item group absolute top-1/2 left-1/2 aspect-square"
                     >
                       <span
-                        className={`wheel-face grid size-full place-content-center justify-items-center gap-1 rounded-full border-2 bg-surface text-ink-muted group-data-highlighted:bg-canvas group-data-highlighted:text-ink group-data-highlighted:ring-4 group-data-highlighted:ring-accent/40 ${
-                          current ? "border-accent" : "border-line"
+                        className={`wheel-face pixel-slot grid size-full place-content-center justify-items-center gap-1 ${
+                          current ? "text-accent" : "text-ink"
                         }`}
                       >
-                        <SectionIcon className="size-7 sm:size-9" />
-                        <span aria-hidden className="wheel-caption text-xs font-medium">
+                        <SectionIcon className="size-8 sm:size-10" aria-hidden focusable={false} />
+                        <span aria-hidden className="wheel-caption font-display text-xs text-ink">
                           {section.label}
                         </span>
                       </span>
@@ -247,17 +239,20 @@ export function WheelMenu() {
   );
 }
 
-/** A ring with six nodes, hinting at the radial menu. */
+/** Six pixel nodes in a ring, hinting at the radial menu. */
 function WheelIcon() {
-  const nodes = Array.from({ length: 6 }, (_, i) => {
-    const angle = (i * Math.PI) / 3 - Math.PI / 2;
-    return { cx: 12 + 8 * Math.cos(angle), cy: 12 + 8 * Math.sin(angle) };
-  });
+  const nodes = [
+    [10, 2],
+    [17, 6],
+    [17, 14],
+    [10, 18],
+    [3, 14],
+    [3, 6],
+  ];
   return (
-    <svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden focusable={false}>
-      <circle cx={12} cy={12} r={8} strokeOpacity={0.4} />
-      {nodes.map((n, i) => (
-        <circle key={i} cx={n.cx.toFixed(2)} cy={n.cy.toFixed(2)} r={2} fill="currentColor" stroke="none" />
+    <svg width={24} height={24} viewBox="0 0 24 24" fill="currentColor" shapeRendering="crispEdges" aria-hidden focusable={false}>
+      {nodes.map(([x, y]) => (
+        <rect key={`${x}-${y}`} x={x} y={y} width={4} height={4} />
       ))}
     </svg>
   );

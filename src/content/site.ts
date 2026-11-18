@@ -8,6 +8,8 @@ export const site = {
   role: "[Your role or tagline]",
   intro: "[One or two sentences introducing yourself.]",
   description: "[Short description of the site for search engines.]",
+  /** Shown on the home profile card's "hotbar". Up to 5. */
+  featuredSkills: ["[Skill]", "[Skill]", "[Skill]", "[Skill]", "[Skill]"],
 };
 
 export type SectionId =

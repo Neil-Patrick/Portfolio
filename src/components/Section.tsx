@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 type SectionProps = {
   id: string;
   title: string;
-  /** When set, adds a "View all" link to the section's own page. */
+  /** When set, adds an "Open" button to the section's own page. */
   href?: string;
   children: ReactNode;
 };
@@ -13,18 +13,18 @@ type SectionProps = {
 export function Section({ id, title, href, children }: SectionProps) {
   const headingId = `${id}-heading`;
   return (
-    <section id={id} aria-labelledby={headingId} className="border-t border-line py-16 sm:py-24">
+    <section id={id} aria-labelledby={headingId} className="py-12 sm:py-16">
       <div className="container-page">
-        <h2 id={headingId} className="mb-6 text-3xl font-bold tracking-tight sm:text-4xl">
+        <h2 id={headingId} className="mb-4 text-3xl sm:text-4xl">
           {title}
         </h2>
         {children}
         {href && (
           <Link
             href={href}
-            className="mt-6 inline-flex min-h-11 items-center gap-2 font-medium text-accent hover:underline"
+            className="pixel-button mt-6 inline-flex min-h-11 items-center px-4 font-display hover:text-accent"
           >
-            View all {title} <span aria-hidden>→</span>
+            Open {title}
           </Link>
         )}
       </div>

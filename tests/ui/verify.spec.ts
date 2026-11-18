@@ -124,10 +124,10 @@ test("every section in site.ts exists on the home page", async ({ page }) => {
   }
 });
 
-test("each home section's View all link opens its page", async ({ page }) => {
+test("each home section's Open link opens its page", async ({ page }) => {
   for (const section of sections.filter((s) => s.href !== "/")) {
     await page.goto("/");
-    await page.getByRole("link", { name: `View all ${section.label}` }).click();
+    await page.getByRole("link", { name: `Open ${section.label}` }).click();
     await expect(page).toHaveURL(new RegExp(`${section.href}$`));
     await expect(page.getByRole("heading", { level: 1, name: section.label })).toBeVisible();
     await expect(page).toHaveTitle(new RegExp(`^${section.label} \|`));

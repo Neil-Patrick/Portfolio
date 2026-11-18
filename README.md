@@ -8,6 +8,8 @@ Personal portfolio website.
 - TypeScript
 - [Tailwind CSS v4](https://tailwindcss.com)
 - ESLint (`eslint-config-next`)
+- [pixelarticons](https://pixelarticons.com) (MIT) for pixel-art icons
+- Fonts via `next/font`: Pixelify Sans (headings, labels) and Atkinson Hyperlegible Next (body)
 - Hosted on [Vercel](https://vercel.com)
 
 ## Requirements
@@ -42,7 +44,7 @@ No environment variables are needed yet. When they are, put them in `.env.local`
 - Layout checks: no horizontal scroll, no console errors (including hydration warnings), and no axe WCAG 2.1 AA violations. Screenshots go to `test-results/screenshots/`.
   - Home page at 320, 768, 1024 and 1440px, in light and dark.
   - Each section page, and the open wheel menu, at 320 and 1440px in light and dark. The wheel check also confirms every item is on screen and at least 44px.
-- Behaviour: the theme switcher sets, persists and clears the theme; the wheel opens, moves with arrow keys, closes with Escape or an outside click, returns focus, and navigates; the arrow never overlaps the hub text; mouse aiming highlights and opens the aimed section; captions show on a touch phone; each home "View all" link opens its page with the right title; every section in `src/content/site.ts` exists on the home page.
+- Behaviour: the theme switcher sets, persists and clears the theme; the wheel opens, moves with arrow keys, closes with Escape or an outside click, returns focus, and navigates; the arrow never overlaps the hub text; mouse aiming highlights and opens the aimed section; captions show on a touch phone; each home "Open" link opens its page with the right title; every section in `src/content/site.ts` exists on the home page.
 
 First run on a new machine: `npx playwright install chromium`. Checks run in Chromium only, so Safari, Firefox and real devices still need a manual look.
 
@@ -55,13 +57,13 @@ src/
     page.tsx      Home: hero + a short preview <Section> per entry in site.ts
     about/ credentials/ skills/ projects/ contact/
                   One page.tsx per section (full detail)
-    globals.css   Design tokens (Tailwind @theme), theming, base styles
+    globals.css   Design tokens (Tailwind @theme), pixel chrome utilities, theming, base styles
   components/
     SiteHeader.tsx     Sticky top bar: name, theme switcher, wheel button
     WheelMenu.tsx      Radial navigation in a native <dialog>
-    icons.tsx          Section icons (inline SVG, from Lucide, ISC license)
+    icons.tsx          Section icon map (pixelarticons)
     ThemeSwitcher.tsx  Light / dark / system control
-    Section.tsx        Home preview section with heading and "View all" link
+    Section.tsx        Home preview section with heading and "Open" link
     SectionPage.tsx    Shared shell for section pages (h1, back link, body)
   content/
     site.ts       Site info and section list: label, route, summary, detail
@@ -74,6 +76,8 @@ tests/ui/         Playwright UI checks
 
 Text in `[square brackets]` in `src/content/` is placeholder content.
 
+**Dev server note:** on this Windows setup, Turbopack sometimes keeps serving an old build of `globals.css` after an edit. If a style change doesn't show up, stop and restart `npm run dev`.
+
 ## Deploy
 
 1. Push the repository to GitHub.
@@ -84,8 +88,9 @@ Text in `[square brackets]` in `src/content/` is placeholder content.
 
 - **Tailwind over Sass:** design tokens are defined once in `@theme`, so every utility class uses them, and only the classes actually used get shipped.
 - **Content as data:** projects, skills, and links live in `src/content/`, separate from UI components.
-- **Semantic color tokens only:** Tailwind's default palette is removed (`--color-*: initial`). Components use role names (`bg-canvas`, `text-ink`, `border-line`, `bg-accent`) and never `dark:` classes. Each token is `light-dark(LIGHT, DARK)`, so restyling means editing `globals.css` only. The current palette is a neutral placeholder.
+- **Visual direction: an inventory screen.** Pixel-game UI language (framed panels, sunken item slots, raised buttons that press in, a gold selected-slot outline) on a clean, readable base. The pixel font is for headings and labels only; body text uses Atkinson Hyperlegible Next. Day mode is overcast sky and stone panels, night mode is indigo with an enchant-purple accent. Pixel chrome is three Tailwind utilities in `globals.css` (`pixel-panel`, `pixel-slot`, `pixel-button`), built from box-shadows, so there's no UI library. Motion is stepped like sprite frames and switched off under reduced motion.
+- **Semantic color tokens only:** Tailwind's default palette is removed (`--color-*: initial`). Components use role names (`bg-canvas`, `bg-panel`, `text-ink`, `border-frame`, `bg-accent`) and never `dark:` classes. Each token is `light-dark(LIGHT, DARK)`, so restyling means editing `globals.css` only. Every text and background pair passes WCAG AA; on the day `slot` color only `ink` passes, so text inside slots uses `ink`.
 - **Theming without a library:** an inline `<head>` script applies a saved light/dark choice before first paint (no flash), following the Next.js "preventing flash before hydration" guide. "System" removes `data-theme` so CSS follows the OS live. The choice is stored in `localStorage` and synced across tabs. `next-themes` was considered and skipped: it would be an extra dependency for about 40 lines of code.
-- **Home preview + section pages:** the home page shows a short preview of every section with a "View all" link; each section has its own static route with the full content. Sections keep their `#id` anchors on the home page.
+- **Home preview + section pages:** the home page shows a short preview of every section with a "Open" link; each section has its own static route with the full content. Sections keep their `#id` anchors on the home page.
 - **One folder per section page, not a `[section]` dynamic route:** each page will grow its own layout (project grid, credentials list, contact form). They share `SectionPage` for now to stay DRY.
 - **Wheel navigation:** a button in the top bar opens a ring of sections, on every screen size. It is a native modal `<dialog>`, so focus trapping, Escape, and the inert page come from the browser with no library. Items are placed on the circle with CSS transforms (`--i`, `--count`, `--spacing-wheel-radius`). Items are icons. Their names stay available to screen readers, are shown in the hub when highlighted, and appear as captions on touch screens, which have no hover. An arrow on the hub's edge aims at the highlighted item and never covers the hub text. The mouse aims by direction, like a controller stick, and clicking anywhere on the ring opens the aimed item. Arrow keys move around the ring, and the current page is marked with `aria-current`. The open animation uses the motion tokens and only fades under reduced motion. Nav items come from `src/content/site.ts`, so the nav style can still be swapped without touching pages.
