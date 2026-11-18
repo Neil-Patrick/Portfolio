@@ -10,7 +10,10 @@ Personal portfolio website.
 - ESLint (`eslint-config-next`)
 - IBM Plex Sans via `next/font` (one family for everything)
 - [devicon](https://devicon.dev) (MIT) for technology logos on the Technologies page and project tech stacks
-- No UI or chart libraries: UI icons are inline SVG and the home chart is hand-built SVG
+- [Motion](https://motion.dev) (MIT) for scroll reveals, count-ups, hover/tilt effects, and page transitions
+- [Lenis](https://lenis.darkroom.engineering) (MIT) for smooth scrolling
+- [three.js](https://threejs.org) + [React Three Fiber](https://r3f.docs.pmnd.rs) (MIT) for the 3D neural network in the home hero (lazy-loaded)
+- No UI or chart libraries: UI icons are inline SVG and the career timeline is hand-built SVG
 - Hosted on [Vercel](https://vercel.com)
 
 ## Requirements
@@ -26,7 +29,13 @@ npm install
 
 ## Environment config
 
-No environment variables are needed yet. When they are, put them in `.env.local` (git-ignored) and add the same variables in the Vercel project settings.
+Copy `.env.example` to `.env.local` (git-ignored) and fill it in. Add the same variables in Vercel under Project Settings > Environment Variables.
+
+| Variable | Needed for | Without it |
+| --- | --- | --- |
+| `GITHUB_TOKEN` | The home page GitHub section: contribution calendar, commit and PR counts, repositories contributed to, languages by code size | The section shows public stats only (repos, followers, primary languages) |
+
+`GITHUB_TOKEN` is read only on the server (`src/lib/github.ts`) and never reaches the browser. Use a **fine-grained personal access token** with *Public repositories (read-only)* access and no extra permissions. GitHub data is cached for hours, so the page stays static and GitHub is called a few times a day at most.
 
 ## Commands
 
@@ -49,7 +58,11 @@ No environment variables are needed yet. When they are, put them in `.env.local`
   - Navigation: every section exists on the home page; each home preview link opens its page with the right title; the desktop header links every page and marks the current one; the mobile menu opens, closes with Escape (returning focus) and on link click; the footer reaches every page.
   - Theme: the switcher sets, persists and clears the theme; a first-time visitor gets System.
   - Technologies and projects: every project tool is a listed technology or a known service; every technology shows an icon and every logo loads; selecting a technology lists its projects, updates the URL hash, and links to the project; a project's tool chip opens the Technologies page with it selected; on phones the panel opens under the selected group.
+  - Hero and motion: the hero shows the 3D canvas or its static fallback behind readable text; with full motion the page animates, scrolls, and hovers without errors, every revealed element ends fully visible, and the career timeline finishes drawing; with Lenis on, anchor links still land below the sticky header.
+  - GitHub: the section shows the contribution calendar and counters (with a token) or the public fallback (without).
   - Chart: one marker per timeline item and a table row for each; Home, End and arrow keys move the selection; clicking selects the nearest item; the chart fits a 320px screen.
+
+Tests run with reduced motion by default (`playwright.config.ts`), so layout and accessibility checks see the settled page; the "full motion" tests switch animations back on.
 
 First run on a new machine: `npx playwright install chromium`. Checks run in Chromium only, so Safari, Firefox and real devices still need a manual look.
 
@@ -66,7 +79,13 @@ src/
   components/
     SiteHeader.tsx     Sticky top bar: name, page links, theme switcher; "Menu" disclosure on small screens
     SiteFooter.tsx     Plain page links + contact links
-    LearningChart.tsx  Home chart: cumulative timeline, readout, table view
+    LearningChart.tsx  Career timeline: cumulative chart, readout, table view
+    GitHubActivity.tsx      GitHub section (server: fetches cached stats)
+    GitHubActivityView.tsx  Counters, contribution heatmap, language bars (animated)
+    hero/              3D neural network (NeuralNetwork), lazy loader + pause logic
+                       (HeroBackground), static fallback, name entrance (HeroIntro)
+    motion/            MotionRoot (reduced-motion config + Lenis), Reveal, CountUp,
+                       Tilt/Magnetic, PageTransition
     ThemeSwitcher.tsx  Light / dark / system control
     Section.tsx        Home preview section with heading and a link to its page
     SkillExplorer.tsx  Technologies page: chips, "Used in" panel, hash-based selection
@@ -82,6 +101,7 @@ src/
   lib/
     theme.ts      Theme constants, applyTheme(), inline init script
     timeline.ts   Builds the chart's dated points from the content files
+    github.ts     Cached GitHub stats (GraphQL with token, REST fallback)
     skill-usage.ts  Links technologies and projects by name (which projects use each one)
 public/           Static assets (images, icons)
 tests/ui/         Playwright UI checks
@@ -103,7 +123,10 @@ Text in `[square brackets]` in `src/content/` is placeholder content.
 
 - **Tailwind over Sass:** design tokens are defined once in `@theme`, so every utility class uses them, and only the classes actually used get shipped.
 - **Content as data:** projects, technologies, and links live in `src/content/`, separate from UI components.
-- **Visual direction: a calm data report.** Neil is moving into data and AI, so the site reads like a well-designed report about his work. The one signature element is the home chart: every certification and project plotted over time as a cumulative learning curve, built from the content files. Everything else stays quiet: IBM Plex Sans, a cool off-white or deep navy canvas, one teal accent, borders instead of shadows, no decorative motion. The only animation is the chart revealing itself once on load, switched off under reduced motion.
+- **Visual direction: work shown as data, brought to life.** A full-bleed home hero with a 3D neural network (nodes, links, and pulses of "data" moving along them, leaning toward the cursor), a career timeline built from the real credentials and projects, and live GitHub activity. Deep navy or off-white canvas, one teal accent, IBM Plex Sans, no divider lines: sections separate through space and alternating full-width bands.
+- **Motion with guardrails:** Motion handles reveals, count-ups, tilt, the name entrance, and page transitions; Lenis smooths scrolling. Under `prefers-reduced-motion: reduce`, Lenis is off, the 3D scene is a still frame, and a CSS rule shows every `[data-reveal]` element as-is (CSS rather than JS branching, so server and client HTML match and nothing hydrates differently). Without JavaScript, a `<noscript>` style does the same.
+- **3D kept off the critical path:** three.js and React Three Fiber load only on the client after the page is interactive (`next/dynamic`, about 240 KB gzipped, separate chunk), never on other pages. The scene pauses when the hero is off-screen or the tab is hidden, caps the pixel ratio at 1.5, and uses half the nodes on phones. A static SVG version of the same network shows first and whenever WebGL is unavailable.
+- **GitHub data, cached and honest:** fetched on the server with `'use cache'` + `cacheLife('hours')`, so the home page is prerendered and refreshes in the background. Every number comes from the API; without a token the section says what it can't show. The heatmap uses one hue (the accent) from light to dark instead of GitHub's greens, with a legend and a monthly-totals table.
 - **Hand-built chart, no library:** one chart doesn't justify a charting dependency. Gridlines and the step line are SVG with non-scaling strokes; markers and axis labels are HTML positioned in percentages, so nothing distorts at any width. Certifications are circles and projects squares (identity never relies on color alone), the two series colors passed a colorblind-safety and contrast validator in both themes, and a table view lists every point. Mouse, tap, and arrow keys all drive one readout line instead of a floating tooltip.
 - **Semantic color tokens only:** Tailwind's default palette is removed (`--color-*: initial`). Components use role names (`bg-canvas`, `bg-surface`, `text-ink`, `border-line-strong`, `text-accent`) and never `dark:` classes. Each token is `light-dark(LIGHT, DARK)`, so restyling means editing `globals.css` only. Every text and background pair passes WCAG AA, and control borders (`line-strong`) pass 3:1.
 - **Theming without a library:** an inline `<head>` script applies a saved light/dark choice before first paint (no flash), following the Next.js "preventing flash before hydration" guide. "System" removes `data-theme` so CSS follows the OS live. The choice is stored in `localStorage` and synced across tabs. `next-themes` was considered and skipped: it would be an extra dependency for about 40 lines of code.

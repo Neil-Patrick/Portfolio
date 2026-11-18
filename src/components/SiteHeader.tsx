@@ -1,5 +1,6 @@
 "use client";
 
+import { useMotionValueEvent, useScroll } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
@@ -11,13 +12,17 @@ const pages = sections.filter((section) => section.href !== "/");
 /**
  * Top bar: name (home link), page links, theme switcher. Below `lg` the links
  * and theme switcher move into a disclosure menu. Links come from `sections`
- * in src/content/site.ts.
+ * in src/content/site.ts. Transparent with no line at the top of the page, so the
+ * home hero runs edge to edge; once scrolled it becomes a blurred surface.
  */
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const menuId = useId();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
+  const [scrolled, setScrolled] = useState(false);
+  const { scrollY } = useScroll();
+  useMotionValueEvent(scrollY, "change", (y) => setScrolled(y > 8));
 
   useEffect(() => {
     if (!open) return;
@@ -51,7 +56,11 @@ export function SiteHeader() {
   );
 
   return (
-    <header className="sticky top-0 z-10 border-b border-line bg-surface">
+    <header
+      className={`sticky top-0 z-20 transition-colors duration-300 ${
+        scrolled || open ? "bg-surface/85 backdrop-blur-md" : "bg-transparent"
+      }`}
+    >
       <div className="container-page flex h-header items-center justify-between gap-4">
         <Link href="/" className="inline-flex min-h-11 min-w-0 items-center font-semibold">
           <span className="truncate">{site.name}</span>
@@ -95,7 +104,7 @@ export function SiteHeader() {
       <div
         id={menuId}
         hidden={!open}
-        className="max-h-[calc(100dvh-var(--spacing-header))] overflow-y-auto border-t border-line lg:hidden"
+        className="max-h-[calc(100dvh-var(--spacing-header))] overflow-y-auto bg-surface lg:hidden"
       >
         <div className="container-page flex flex-col gap-4 py-4">
           <nav aria-label="Primary">{links("flex flex-col", "flex min-h-11 items-center")}</nav>

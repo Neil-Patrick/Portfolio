@@ -12,6 +12,9 @@ export default defineConfig({
   fullyParallel: true,
   use: {
     baseURL: "http://localhost:3000",
+    // Checks see the settled page (no half-faded text, still 3D frame). The
+    // "full motion" tests in verify.spec.ts switch this back on.
+    contextOptions: { reducedMotion: "reduce" },
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {

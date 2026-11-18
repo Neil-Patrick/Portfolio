@@ -10,7 +10,9 @@ export const site = {
     "I'm a Computer Science student at Laguna State Polytechnic University, graduating in 2027. I build web apps with TypeScript and Next.js, and I'm moving toward data and AI work.",
   description:
     "Neil Patrick Pajadan, a Computer Science student in Laguna, Philippines, building web apps and moving toward data and AI.",
-  /** Shown on the home profile card's "hotbar". Up to 5. */
+  /** GitHub login for the home page activity section (stats come from the GitHub API). */
+  githubUsername: "Neil-Patrick",
+  /** Featured technologies in the home page preview. Up to 5. */
   featuredSkills: ["Python", "SQL", "PostgreSQL", "TypeScript", "Next.js"],
   /** Footer and Contact page. Phone number deliberately left off the public site. */
   contactLinks: [

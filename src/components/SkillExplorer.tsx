@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { TechIcon } from "./TechIcon";
@@ -13,7 +14,8 @@ export type ExplorerSkill = {
 
 type Props = { groups: { name: string; skills: ExplorerSkill[] }[] };
 
-const chipBase = "inline-flex min-h-11 items-center gap-2 rounded-sm border px-3 py-1.5";
+const chipBase =
+  "inline-flex min-h-11 items-center gap-2 rounded-sm border px-3 py-1.5";
 
 /**
  * Skill groups with logos. Skills used in a listed project are toggle buttons;
@@ -29,7 +31,9 @@ export function SkillExplorer({ groups }: Props) {
   useEffect(() => {
     const fromHash = () => {
       const anchor = decodeURIComponent(window.location.hash.slice(1));
-      const match = allSkills.find((skill) => skill.anchor === anchor && skill.projects.length > 0);
+      const match = allSkills.find(
+        (skill) => skill.anchor === anchor && skill.projects.length > 0,
+      );
       if (match) setSelected(match.name);
     };
     fromHash();
@@ -52,7 +56,9 @@ export function SkillExplorer({ groups }: Props) {
     <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_20rem] xl:grid-cols-[minmax(0,1fr)_22rem]">
       <div className="grid gap-10 md:grid-cols-2">
         {groups.map((group, i) => {
-          const groupHasSelection = group.skills.some((skill) => skill.name === selected);
+          const groupHasSelection = group.skills.some(
+            (skill) => skill.name === selected,
+          );
           return (
             <section key={group.name} aria-labelledby={`skill-group-${i}`}>
               <h2 id={`skill-group-${i}`} className="mb-4 text-xl">
@@ -60,7 +66,11 @@ export function SkillExplorer({ groups }: Props) {
               </h2>
               <ul className="flex flex-wrap gap-3">
                 {group.skills.map((skill) => (
-                  <li key={skill.name} id={skill.anchor} className="scroll-mt-28">
+                  <li
+                    key={skill.name}
+                    id={skill.anchor}
+                    className="scroll-mt-28"
+                  >
                     {skill.projects.length > 0 ? (
                       <button
                         type="button"
@@ -77,13 +87,16 @@ export function SkillExplorer({ groups }: Props) {
                         <span
                           aria-hidden
                           className={`rounded-xs px-1.5 text-xs font-semibold tabular-nums ${
-                            selected === skill.name ? "bg-on-accent text-accent" : "bg-canvas text-ink-muted"
+                            selected === skill.name
+                              ? "bg-on-accent text-accent"
+                              : "bg-canvas text-ink-muted"
                           }`}
                         >
                           {skill.projects.length}
                         </span>
                         <span className="sr-only">
-                          , used in {skill.projects.length} {skill.projects.length === 1 ? "project" : "projects"}
+                          , used in {skill.projects.length}{" "}
+                          {skill.projects.length === 1 ? "project" : "projects"}
                         </span>
                       </button>
                     ) : (
@@ -105,7 +118,10 @@ export function SkillExplorer({ groups }: Props) {
         })}
       </div>
 
-      <aside aria-label="Projects using the selected technology" className="hidden lg:block">
+      <aside
+        aria-label="Projects using the selected technology"
+        className="hidden lg:block"
+      >
         <div className="sticky top-[calc(var(--spacing-header)+1.5rem)]">
           <UsagePanel skill={current} />
         </div>
@@ -121,35 +137,47 @@ function UsagePanel({ skill }: { skill: ExplorerSkill | null }) {
       data-testid="skill-usage"
       className="rounded-md border border-line-strong bg-surface p-5"
     >
-      {skill ? (
-        <>
-          <p className="flex items-center gap-2 text-lg font-semibold">
-            <TechIcon name={skill.name} />
-            {skill.name}
-          </p>
-          <p className="mt-1 text-ink-muted">
-            Used in {skill.projects.length} {skill.projects.length === 1 ? "project" : "projects"}
-          </p>
-          <ul className="mt-4 grid gap-3">
-            {skill.projects.map((project) => (
-              <li key={project.id}>
-                <Link
-                  href={`/projects#${project.id}`}
-                  className="font-semibold text-accent underline underline-offset-4 hover:no-underline"
-                >
-                  {project.name}
-                </Link>
-                <p className="text-sm text-ink-muted">{project.summary}</p>
-              </li>
-            ))}
-          </ul>
-        </>
-      ) : (
-        <p className="text-ink-muted">
-          Pick a highlighted technology to see the projects that use it. The number on each one is how
-          many projects it appears in.
-        </p>
-      )}
+      {/* Cross-fade between selections; instant with reduced motion. */}
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={skill?.name ?? "none"}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.18 }}
+        >
+          {skill ? (
+            <>
+              <p className="flex items-center gap-2 text-lg font-semibold">
+                <TechIcon name={skill.name} />
+                {skill.name}
+              </p>
+              <p className="mt-1 text-ink-muted">
+                Used in {skill.projects.length}{" "}
+                {skill.projects.length === 1 ? "project" : "projects"}
+              </p>
+              <ul className="mt-4 grid gap-3">
+                {skill.projects.map((project) => (
+                  <li key={project.id}>
+                    <Link
+                      href={`/projects#${project.id}`}
+                      className="font-semibold text-accent underline underline-offset-4 hover:no-underline"
+                    >
+                      {project.name}
+                    </Link>
+                    <p className="text-sm text-ink-muted">{project.summary}</p>
+                  </li>
+                ))}
+              </ul>
+            </>
+          ) : (
+            <p className="text-ink-muted">
+              Pick a highlighted technology to see the projects that use it. The
+              number on each one is how many projects it appears in.
+            </p>
+          )}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }

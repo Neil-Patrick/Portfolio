@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "lenis/dist/lenis.css";
 
 /* ==========================================================================
    Theming
@@ -42,6 +43,13 @@
   /* Light tile behind dark brand logos, only in dark mode (src/content/tech.ts). */
   --color-logo-backing: light-dark(transparent, #e6edf5);
 
+  /* Contribution heatmap: one hue (accent), light to dark, over the band surface. */
+  --color-heat-0: var(--color-line);
+  --color-heat-1: color-mix(in oklab, var(--color-accent) 30%, var(--color-surface));
+  --color-heat-2: color-mix(in oklab, var(--color-accent) 55%, var(--color-surface));
+  --color-heat-3: color-mix(in oklab, var(--color-accent) 78%, var(--color-surface));
+  --color-heat-4: var(--color-accent);
+
   /* Chart marks only. Chart text always uses the ink tokens. */
   --color-series-cert: light-dark(#00897b, #1a9e8f);
   --color-series-project: light-dark(#a35c00, #c98425);
@@ -57,9 +65,12 @@
   /* Sticky header height; also offsets anchor scrolling. */
   --spacing-header: 4rem;
 
-  /* Motion. Used only for the chart's one-time draw; respects reduced motion. */
+  /* Motion. Component animations use Motion (motion.dev) with these values; all respect reduced motion. */
   --duration-draw: 1200ms;
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Page width: wide enough to use large screens, with generous fluid gutters. */
+  --container-page: 110rem;
 }
 
 @theme inline {
@@ -69,9 +80,9 @@
 /* Page-width wrapper with fluid side gutters. */
 @utility container-page {
   width: 100%;
-  max-width: var(--container-7xl);
+  max-width: var(--container-page);
   margin-inline: auto;
-  padding-inline: clamp(1rem, 4vw, 3rem);
+  padding-inline: clamp(1rem, 5vw, 6rem);
 }
 
 @layer base {
@@ -100,27 +111,36 @@
   }
 }
 
+/* Native smooth scrolling only when Lenis isn't running (Lenis is off under reduced motion). */
 @media (prefers-reduced-motion: no-preference) {
-  html {
+  html:not(.lenis) {
     scroll-behavior: smooth;
   }
 }
 
-/* ==========================================================================
-   Learning chart (src/components/LearningChart.tsx)
-   The page's one orchestrated moment: line and markers are revealed left to
-   right on load, like the record being written. Without motion they're simply there.
-   ========================================================================== */
-
-@media (prefers-reduced-motion: no-preference) {
-  .chart-reveal {
-    clip-path: inset(-12px 100% -12px -12px);
-    animation: chart-reveal var(--duration-draw) var(--ease-out-soft) forwards;
+/* Reduced motion: anything Motion would fade, slide, or wipe in is simply shown.
+   (CSS instead of JS branching keeps server and client markup identical.) */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
   }
 }
 
-@keyframes chart-reveal {
-  to {
-    clip-path: inset(-12px -12px -12px -12px);
+/* Contribution heatmap cells fill in diagonally once the grid is in view
+   (src/components/GitHubActivityView.tsx sets --d per cell and data-shown on the grid). */
+@media (prefers-reduced-motion: no-preference) {
+  .heat-cell {
+    opacity: 0;
+    scale: 0.4;
+    transition:
+      opacity 300ms var(--ease-out-soft),
+      scale 300ms var(--ease-out-soft);
+    transition-delay: calc(var(--d, 0) * 6ms);
+  }
+  [data-shown] > .heat-cell {
+    opacity: 1;
+    scale: 1;
   }
 }

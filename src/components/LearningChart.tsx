@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useInView } from "motion/react";
 import Link from "next/link";
 import { useId, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { formatMonth } from "@/content/credentials";
@@ -26,6 +27,7 @@ type Props = { points: TimelinePoint[] };
 export function LearningChart({ points }: Props) {
   const [selected, setSelected] = useState(points.length - 1);
   const plotRef = useRef<HTMLDivElement>(null);
+  const plotInView = useInView(plotRef, { once: true, amount: 0.4 });
   const captionId = useId();
 
   // ---- Scales (percent of the plot area) ----
@@ -101,7 +103,7 @@ export function LearningChart({ points }: Props) {
     <figure aria-labelledby={captionId} className="rounded-md border border-line-strong bg-surface p-4 sm:p-6">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <figcaption id={captionId}>
-          <span className="block font-semibold">Learning record</span>
+          <span className="block font-semibold">Career timeline</span>
           <span className="block text-ink-muted tabular-nums">
             {certCount} certifications and {projectCount} projects since {formatMonth(points[0].date)}
           </span>
@@ -119,7 +121,7 @@ export function LearningChart({ points }: Props) {
       </div>
 
       {/* Plot with axis gutters: y labels on the left, year labels underneath. */}
-      <div className="relative h-56 pb-7 pl-8 sm:h-72 sm:pl-9">
+      <div className="relative h-56 pb-7 pl-8 sm:h-72 sm:pl-9 xl:h-96">
         {/* Y axis labels */}
         <div aria-hidden className="absolute top-0 bottom-7 left-0 w-6 sm:w-7">
           {yTicks.map((tick) => (
@@ -166,8 +168,18 @@ export function LearningChart({ points }: Props) {
             style={{ left: `${currentPos.left}%` }}
           />
 
-          {/* Line and markers share one wrapper so they're revealed together. */}
-          <div aria-hidden className="chart-reveal absolute inset-0">
+          {/* Line and markers share one wrapper so they're revealed together, left to right,
+              the first time the chart scrolls into view (instantly with reduced motion). */}
+          <motion.div
+            aria-hidden
+            data-reveal
+            className="absolute inset-0"
+            initial={{ clipPath: "inset(-12px 100% -12px -12px)" }}
+            // Triggered by the plot entering view, not this element: a fully clipped
+            // element never counts as "in view" to IntersectionObserver.
+            animate={plotInView ? { clipPath: "inset(-12px -12px -12px -12px)" } : undefined}
+            transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+          >
             <svg className="absolute inset-0 size-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
               <path
                 d={path}
@@ -187,7 +199,7 @@ export function LearningChart({ points }: Props) {
                 className="absolute -translate-x-1/2 -translate-y-1/2"
               />
             ))}
-          </div>
+          </motion.div>
 
           {/* X axis: year boundaries */}
           <div aria-hidden className="absolute inset-x-0 -bottom-7 h-6">

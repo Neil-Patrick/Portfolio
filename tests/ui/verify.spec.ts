@@ -327,3 +327,88 @@ test("on a phone, the usage panel opens under the selected technology's group", 
   await expect(group.getByTestId("skill-usage")).toBeVisible();
   await expect(group.getByTestId("skill-usage")).toContainText("Used in 2 projects");
 });
+
+/* ---------- Behaviour: motion, hero, GitHub ---------- */
+
+test("hero shows the network (3D canvas or static fallback) behind readable text", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await page.waitForLoadState("networkidle");
+  const hero = page.locator("#home");
+  await expect(hero.locator("[data-hero-canvas], [data-hero-fallback]").first()).toBeAttached();
+  await expect(hero.getByRole("heading", { level: 1 })).toHaveText("Neil Patrick Pajadan");
+  const axe = await new AxeBuilder({ page }).include("#home").withTags(["wcag2aa"]).analyze();
+  expect(axe.violations.map((v) => v.id)).toEqual([]);
+});
+
+test("GitHub section shows live stats or the documented fallback", async ({ page }) => {
+  await page.goto("/");
+  const section = page.locator("#github");
+  await expect(section.getByRole("heading", { name: "GitHub activity" })).toBeVisible();
+  const heatmap = section.getByTestId("heatmap");
+  if ((await heatmap.count()) > 0) {
+    // Token configured: full calendar (52-53 weeks) and activity counters.
+    expect(await heatmap.locator("[data-day]").count()).toBeGreaterThanOrEqual(364);
+    await expect(section.getByText("Contributions in the last year")).toBeVisible();
+  } else {
+    // No token: public stats, or an explicit "unavailable" message if GitHub is unreachable.
+    await expect(
+      section.getByText(/Public repositories|GitHub stats are unavailable/).first(),
+    ).toBeVisible();
+  }
+});
+
+test("with full motion: home animates, scrolls, and hovers without errors", async ({ page }) => {
+  const errors = collectErrors(page);
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await page.waitForLoadState("networkidle");
+  await page.waitForTimeout(1500); // hero entrance + 3D scene start
+
+  // Scroll the whole page so every reveal, counter, and heatmap runs.
+  for (let i = 0; i < 12; i++) {
+    await page.mouse.wheel(0, 700);
+    await page.waitForTimeout(150);
+  }
+  await page.waitForTimeout(800);
+  const card = page.locator("#projects a").first();
+  await card.scrollIntoViewIfNeeded();
+  await card.hover();
+  await page.waitForTimeout(300);
+
+  // Everything revealed by now is fully visible.
+  const hidden = await page.evaluate(
+    () =>
+      [...document.querySelectorAll<HTMLElement>("[data-reveal]")].filter(
+        (el) => Number(getComputedStyle(el).opacity) < 0.99,
+      ).length,
+  );
+  expect(hidden, "elements still hidden after scrolling").toBe(0);
+  // The career timeline's wipe finished (its line and markers are uncovered).
+  const chartClip = await page
+    .locator("figure [data-reveal]")
+    .first()
+    .evaluate((el) => getComputedStyle(el).clipPath);
+  expect(chartClip, "career timeline revealed").not.toContain("100%");
+  expect(errors, "console errors").toEqual([]);
+});
+
+test("with full motion: anchor links land below the sticky header", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await page.waitForLoadState("networkidle");
+  // Jump via an in-page anchor, the way footer/home links use hashes.
+  await page.evaluate(() => {
+    const link = document.createElement("a");
+    link.href = "#technologies";
+    link.textContent = "test anchor";
+    document.body.append(link);
+    link.click();
+  });
+  await page.waitForTimeout(1600); // Lenis eases to the target
+  const top = await page.locator("#technologies").evaluate((el) => el.getBoundingClientRect().top);
+  expect(top, "section top sits just below the 64px header").toBeGreaterThanOrEqual(40);
+  expect(top).toBeLessThanOrEqual(120);
+});
