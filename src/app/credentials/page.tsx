@@ -1,4 +1,6 @@
+import { Award } from "lucide-react";
 import type { Metadata } from "next";
+import { Icon } from "@/components/icons";
 import { SectionPage } from "@/components/SectionPage";
 import {
   certificationGroups,
@@ -45,7 +47,7 @@ export default function CredentialsPage() {
           className="rounded-md border border-line-strong bg-surface mb-8 flex items-center gap-5 p-5 hover:border-accent sm:p-6"
         >
           <span className="grid size-14 shrink-0 place-items-center rounded-md bg-canvas text-accent">
-            <AwardIcon />
+            <Icon icon={Award} size={28} />
           </span>
           <span>
             <span className="block text-xl font-semibold">{featured.name}</span>
@@ -91,25 +93,5 @@ export default function CredentialsPage() {
         ))}
       </section>
     </SectionPage>
-  );
-}
-
-function AwardIcon() {
-  return (
-    <svg
-      width={28}
-      height={28}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.75}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-      focusable={false}
-    >
-      <circle cx="12" cy="8" r="6" />
-      <path d="M15.5 12.9 17 22l-5-3-5 3 1.5-9.1" />
-    </svg>
   );
 }

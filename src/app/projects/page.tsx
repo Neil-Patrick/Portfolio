@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import { CalendarDays, ExternalLink } from "lucide-react";
 import Link from "next/link";
+import { GitHubLogo, Icon } from "@/components/icons";
 import { SectionPage } from "@/components/SectionPage";
 import { TechIcon } from "@/components/TechIcon";
 import { formatMonth } from "@/content/credentials";
@@ -39,7 +41,8 @@ export default function ProjectsPage() {
               <h2 id={`project-${project.id}`} className="text-2xl sm:text-3xl">
                 {project.name}
               </h2>
-              <p className="mt-1 text-sm text-ink-muted tabular-nums">
+              <p className="mt-1 flex items-center gap-2 text-sm text-ink-muted tabular-nums">
+                <Icon icon={CalendarDays} />
                 Started {formatMonth(`${project.started}-01`)}
               </p>
               <p className="mt-3 max-w-prose text-lg">{project.description}</p>
@@ -49,8 +52,10 @@ export default function ProjectsPage() {
                   <li key={link.href}>
                     <a
                       href={link.href}
-                      className="inline-flex min-h-11 items-center rounded-sm border border-line-strong bg-canvas px-4 font-semibold hover:border-accent hover:text-accent"
+                      className="inline-flex min-h-11 items-center gap-2 rounded-sm border border-line-strong bg-canvas px-4 font-semibold hover:border-accent hover:text-accent"
                     >
+                      {/* Repository links get the GitHub mark; everything else is an outside site. */}
+                      {link.href.startsWith("https://github.com/") ? <GitHubLogo /> : <Icon icon={ExternalLink} />}
                       {link.label}
                       <span className="sr-only"> for {project.name}</span>
                     </a>

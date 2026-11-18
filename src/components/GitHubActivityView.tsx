@@ -1,9 +1,27 @@
 "use client";
 
+import {
+  Activity,
+  BookMarked,
+  BookPlus,
+  CalendarRange,
+  CircleDot,
+  Code2,
+  Flame,
+  FolderGit2,
+  GitCommitHorizontal,
+  GitFork,
+  GitPullRequest,
+  Star,
+  Trophy,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import { motion, useInView } from "motion/react";
 import { useRef } from "react";
 import type { GitHubActivity, GitHubStats, Streak } from "@/lib/github";
 import { GitHubCalendar } from "./GitHubCalendar";
+import { GitHubLogo, Icon } from "./icons";
 import { CountUp } from "./motion/CountUp";
 
 const shortDate = (date: string, withYear = false) =>
@@ -19,18 +37,18 @@ const plural = (count: number, word: string, many = `${word}s`) =>
 
 export function GitHubActivityView({ stats }: { stats: GitHubStats }) {
   const { activity } = stats;
-  const counters = activity
+  const counters: { label: string; value: number; icon: LucideIcon }[] = activity
     ? [
-        { label: "Contributions in the last year", value: activity.total },
-        { label: "Commits in the last year", value: activity.commits },
-        { label: "Pull requests", value: activity.pullRequests },
-        { label: "Issues", value: activity.issues },
-        { label: "Stars earned", value: activity.stars },
-        { label: "Repositories contributed to", value: activity.reposContributedTo },
+        { label: "Contributions in the last year", value: activity.total, icon: Activity },
+        { label: "Commits in the last year", value: activity.commits, icon: GitCommitHorizontal },
+        { label: "Pull requests", value: activity.pullRequests, icon: GitPullRequest },
+        { label: "Issues", value: activity.issues, icon: CircleDot },
+        { label: "Stars earned", value: activity.stars, icon: Star },
+        { label: "Repositories contributed to", value: activity.reposContributedTo, icon: BookMarked },
       ]
     : [
-        { label: "Public repositories", value: stats.publicRepos },
-        { label: "Followers", value: stats.followers },
+        { label: "Public repositories", value: stats.publicRepos, icon: FolderGit2 },
+        { label: "Followers", value: stats.followers, icon: Users },
       ];
 
   return (
@@ -42,7 +60,10 @@ export function GitHubActivityView({ stats }: { stats: GitHubStats }) {
             <dd className="text-4xl font-semibold sm:text-5xl">
               <CountUp value={counter.value} />
             </dd>
-            <dt className="mt-1 text-ink-muted">{counter.label}</dt>
+            <dt className="mt-1 flex items-start gap-2 text-ink-muted">
+              <Icon icon={counter.icon} className="mt-0.5" />
+              {counter.label}
+            </dt>
           </div>
         ))}
       </dl>
@@ -63,11 +84,9 @@ export function GitHubActivityView({ stats }: { stats: GitHubStats }) {
         {stats.languages.length > 0 && <Languages stats={stats} />}
       </div>
 
-      <a
-        href={stats.url}
-        className="inline-flex min-h-11 w-fit items-center font-semibold text-accent underline underline-offset-4 hover:no-underline"
-      >
-        View my GitHub profile
+      <a href={stats.url} className="group inline-flex min-h-11 w-fit items-center gap-2 font-semibold text-accent">
+        <GitHubLogo />
+        <span className="underline underline-offset-4 group-hover:no-underline">View my GitHub profile</span>
       </a>
     </div>
   );
@@ -90,7 +109,10 @@ function Streaks({ activity }: { activity: GitHubActivity }) {
         <p className="text-4xl font-semibold sm:text-5xl">
           <CountUp value={activity.allTime.total} />
         </p>
-        <p className="mt-1 font-semibold">Total contributions</p>
+        <p className="mt-1 flex items-center justify-center gap-2 font-semibold">
+          <Icon icon={CalendarRange} className="text-accent" />
+          Total contributions
+        </p>
         <p className="text-sm text-ink-muted">{shortDate(activity.allTime.since, true)} – present</p>
       </div>
       <StreakRing current={current} longest={longest} />
@@ -98,7 +120,10 @@ function Streaks({ activity }: { activity: GitHubActivity }) {
         <p className="text-4xl font-semibold sm:text-5xl">
           <CountUp value={longest.length} />
         </p>
-        <p className="mt-1 font-semibold">Longest streak</p>
+        <p className="mt-1 flex items-center justify-center gap-2 font-semibold">
+          <Icon icon={Trophy} className="text-accent" />
+          Longest streak
+        </p>
         <p className="text-sm text-ink-muted">{range(longest)}</p>
       </div>
     </div>
@@ -128,7 +153,8 @@ function StreakRing({ current, longest }: { current: Streak; longest: Streak }) 
             style={{ "--offset": 100 - percent } as React.CSSProperties}
           />
         </svg>
-        <span className="absolute inset-0 flex items-center justify-center text-4xl font-semibold sm:text-5xl">
+        <span className="absolute inset-0 flex flex-col items-center justify-center text-4xl font-semibold sm:text-5xl">
+          <Icon icon={Flame} className="mb-1 text-accent" />
           <CountUp value={current.length} />
         </span>
       </div>
@@ -160,7 +186,8 @@ function ThisMonth({ month }: { month: GitHubActivity["month"] }) {
         <div className="grid gap-8">
           {month.commitsByRepo.length > 0 && (
             <div>
-              <p className="mb-3 text-ink-muted">
+              <p className="mb-3 flex items-center gap-2 text-ink-muted">
+                <Icon icon={GitCommitHorizontal} />
                 Created {plural(month.commits, "commit")} in {plural(month.commitsByRepo.length, "repository", "repositories")}
               </p>
               <ul className="grid gap-3">
@@ -180,7 +207,8 @@ function ThisMonth({ month }: { month: GitHubActivity["month"] }) {
           )}
           {month.reposCreated.length > 0 && (
             <div>
-              <p className="mb-2 text-ink-muted">
+              <p className="mb-2 flex items-center gap-2 text-ink-muted">
+                <Icon icon={BookPlus} />
                 Created {plural(month.reposCreated.length, "repository", "repositories")}
               </p>
               <ul>
@@ -190,7 +218,12 @@ function ThisMonth({ month }: { month: GitHubActivity["month"] }) {
                       <a href={repo.url} className="text-accent underline underline-offset-2 hover:no-underline">
                         {repo.name}
                       </a>
-                      {repo.isFork && <span className="ml-2 text-ink-muted">(fork)</span>}
+                      {repo.isFork && (
+                        <span className="ml-2 inline-flex items-center gap-1 align-middle text-ink-muted">
+                          <Icon icon={GitFork} />
+                          fork
+                        </span>
+                      )}
                     </span>
                     <span className="flex items-center gap-4 text-ink-muted">
                       {repo.language && (
@@ -218,7 +251,10 @@ function ThisMonth({ month }: { month: GitHubActivity["month"] }) {
 function Languages({ stats }: { stats: GitHubStats }) {
   return (
     <div>
-      <h3 className="mb-1 text-lg">Most used languages</h3>
+      <h3 className="mb-1 flex items-center gap-2 text-lg">
+        <Icon icon={Code2} className="text-accent" />
+        Most used languages
+      </h3>
       <p className="mb-4 text-sm text-ink-muted">
         {stats.languagesBasis === "bytes"
           ? "Share of code across the repositories I've contributed to."

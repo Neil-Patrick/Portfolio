@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { GitHubActivity } from "@/components/GitHubActivity";
+import { ContactIcon } from "@/components/icons";
 import { HeroBackground } from "@/components/hero/HeroBackground";
 import { HeroIntro } from "@/components/hero/HeroIntro";
 import { LearningChart } from "@/components/LearningChart";
@@ -74,8 +75,9 @@ const previews: Record<Exclude<SectionId, "home">, ReactNode> = {
   ),
   contact: (
     <p className="text-2xl">
-      <a href={email.href} className="text-accent underline underline-offset-4 hover:no-underline">
-        {email.text}
+      <a href={email.href} className="group inline-flex items-center gap-3 text-accent">
+        <ContactIcon label={email.label} />
+        <span className="break-all underline underline-offset-4 group-hover:no-underline">{email.text}</span>
       </a>
     </p>
   ),

@@ -1,6 +1,8 @@
 "use client";
 
+import { Monitor, Moon, Sun } from "lucide-react";
 import { useId, useLayoutEffect, useSyncExternalStore } from "react";
+import { Icon } from "./icons";
 import {
   THEME_STORAGE_KEY,
   applyTheme,
@@ -51,9 +53,9 @@ function subscribe(notify: () => void) {
 /* ---- UI ---- */
 
 const OPTIONS: { value: ThemePreference; label: string; icon: React.ReactNode }[] = [
-  { value: "light", label: "Light", icon: <SunIcon /> },
-  { value: "dark", label: "Dark", icon: <MoonIcon /> },
-  { value: "system", label: "System", icon: <MonitorIcon /> },
+  { value: "light", label: "Light", icon: <Icon icon={Sun} /> },
+  { value: "dark", label: "Dark", icon: <Icon icon={Moon} /> },
+  { value: "system", label: "System", icon: <Icon icon={Monitor} /> },
 ];
 
 /** Three-way theme toggle as a bordered segmented control. */
@@ -87,46 +89,5 @@ export function ThemeSwitcher() {
         </label>
       ))}
     </fieldset>
-  );
-}
-
-/* ---- Icons (inline SVG, decorative) ---- */
-
-const iconProps = {
-  width: 18,
-  height: 18,
-  viewBox: "0 0 24 24",
-  fill: "none",
-  stroke: "currentColor",
-  strokeWidth: 2,
-  strokeLinecap: "round",
-  strokeLinejoin: "round",
-  "aria-hidden": true,
-  focusable: false,
-} as const;
-
-function SunIcon() {
-  return (
-    <svg {...iconProps}>
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
-    </svg>
-  );
-}
-
-function MoonIcon() {
-  return (
-    <svg {...iconProps}>
-      <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
-    </svg>
-  );
-}
-
-function MonitorIcon() {
-  return (
-    <svg {...iconProps}>
-      <rect x="2" y="3" width="20" height="14" rx="2" />
-      <path d="M8 21h8M12 17v4" />
-    </svg>
   );
 }

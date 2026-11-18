@@ -1,10 +1,12 @@
 "use client";
 
+import { BadgeCheck, FolderGit2, Table2 } from "lucide-react";
 import { motion, useInView } from "motion/react";
 import Link from "next/link";
 import { useId, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { formatMonth } from "@/content/credentials";
 import type { TimelinePoint } from "@/lib/timeline";
+import { Icon } from "./icons";
 
 /**
  * Cumulative timeline of certifications and projects.
@@ -235,18 +237,21 @@ export function LearningChart({ points }: Props) {
         <span className="text-ink-muted">{current.detail}</span>
         {current.href &&
           (current.kind === "project" ? (
-            <Link href={current.href} className="text-accent underline underline-offset-2">
+            <Link href={current.href} className="inline-flex items-center gap-1.5 self-center text-accent underline underline-offset-2">
+              <Icon icon={FolderGit2} />
               See project
             </Link>
           ) : (
-            <a href={current.href} className="text-accent underline underline-offset-2">
+            <a href={current.href} className="inline-flex items-center gap-1.5 self-center text-accent underline underline-offset-2">
+              <Icon icon={BadgeCheck} />
               Verify on Credly
             </a>
           ))}
       </p>
 
       <details className="mt-3">
-        <summary className="inline-flex min-h-11 cursor-pointer items-center text-accent">
+        <summary className="inline-flex min-h-11 cursor-pointer items-center gap-2 text-accent">
+          <Icon icon={Table2} />
           Show as table
         </summary>
         <div className="mt-2 overflow-x-auto">

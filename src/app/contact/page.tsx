@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ContactIcon } from "@/components/icons";
 import { SectionPage } from "@/components/SectionPage";
 import { getSection, site } from "@/content/site";
 
@@ -16,7 +17,10 @@ export default function ContactPage() {
               href={link.href}
               className="flex min-h-11 flex-col gap-1 px-5 py-4 hover:text-accent sm:flex-row sm:items-baseline sm:justify-between"
             >
-              <span className="text-lg font-semibold">{link.label}</span>
+              <span className="inline-flex items-center gap-2 text-lg font-semibold">
+                <ContactIcon label={link.label} />
+                {link.label}
+              </span>
               <span className="break-all text-ink-muted">{link.text}</span>
             </a>
           </li>

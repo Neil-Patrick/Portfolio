@@ -1,8 +1,10 @@
 "use client";
 
+import { Table2 } from "lucide-react";
 import { useInView } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import type { ContributionCalendar, ContributionDay } from "@/lib/github";
+import { Icon } from "./icons";
 
 const HEAT = ["bg-heat-0", "bg-heat-1", "bg-heat-2", "bg-heat-3", "bg-heat-4"];
 
@@ -147,7 +149,10 @@ function Grid({ weeks }: { weeks: ContributionDay[][] }) {
       </div>
 
       <details className="mt-2">
-        <summary className="inline-flex min-h-11 cursor-pointer items-center text-accent">Show monthly totals</summary>
+        <summary className="inline-flex min-h-11 cursor-pointer items-center gap-2 text-accent">
+          <Icon icon={Table2} />
+          Show monthly totals
+        </summary>
         <table className="mt-2 text-sm">
           <caption className="sr-only">Contributions per month</caption>
           <thead className="text-ink-muted">

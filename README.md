@@ -9,11 +9,12 @@ Personal portfolio website.
 - [Tailwind CSS v4](https://tailwindcss.com)
 - ESLint (`eslint-config-next`)
 - IBM Plex Sans via `next/font` (one family for everything)
-- [devicon](https://devicon.dev) (MIT) for technology logos on the Technologies page and project tech stacks
+- [devicon](https://devicon.dev) (MIT) for technology logos, plus the GitHub and LinkedIn marks on contact links
+- [Lucide](https://lucide.dev) (`lucide-react`, ISC) for UI icons: navigation, contact links, theme switcher, GitHub stats; only the imported icons ship
 - [Motion](https://motion.dev) (MIT) for scroll reveals, count-ups, hover/tilt effects, and page transitions
 - [Lenis](https://lenis.darkroom.engineering) (MIT) for smooth scrolling
 - [three.js](https://threejs.org) + [React Three Fiber](https://r3f.docs.pmnd.rs) (MIT) for the 3D neural network in the home hero (lazy-loaded)
-- No UI or chart libraries: UI icons are inline SVG and the career timeline is hand-built SVG
+- No UI or chart libraries: the career timeline and heatmap are hand-built
 - Hosted on [Vercel](https://vercel.com)
 
 ## Requirements
@@ -91,6 +92,7 @@ src/
     Section.tsx        Home preview section with heading and a link to its page
     SkillExplorer.tsx  Technologies page: chips, "Used in" panel, hash-based selection
     TechIcon.tsx       Logo for a technology or tool (color, single-color, or fallback glyph)
+    icons.tsx          Shared icon defaults (Icon) and the page / contact-link icon maps
     SectionPage.tsx    Shared shell for section pages (h1, back link, body)
   content/
     site.ts       Site info and section list: label, route, summary, detail, link text

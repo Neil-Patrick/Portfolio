@@ -1,3 +1,4 @@
+import { Database, Waypoints } from "lucide-react";
 import Image from "next/image";
 import { databaseGlyph, techIcons } from "@/content/tech";
 
@@ -13,34 +14,17 @@ export function TechIcon({ name }: { name: string }) {
   const icon = techIcons[name];
 
   if (!icon) {
+    // Database glyph for SQL-like tools, a "connected service" glyph for services.
+    const Glyph = databaseGlyph.has(name) ? Database : Waypoints;
     return (
-      <svg
-        width={SIZE}
-        height={SIZE}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
+      <Glyph
+        size={SIZE}
         strokeWidth={1.75}
-        strokeLinecap="round"
         aria-hidden
         focusable={false}
         data-tech-icon="fallback"
         className="shrink-0 text-ink-muted"
-      >
-        {databaseGlyph.has(name) ? (
-          <>
-            <ellipse cx="12" cy="6" rx="7" ry="3" />
-            <path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3" />
-          </>
-        ) : (
-          // Neutral "connected service" glyph: two linked nodes.
-          <>
-            <circle cx="7" cy="12" r="3" />
-            <circle cx="17" cy="12" r="3" />
-            <path d="M10 12h4" />
-          </>
-        )}
-      </svg>
+      />
     );
   }
 

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { sections, site } from "@/content/site";
+import { ContactIcon, SectionIcon } from "./icons";
 
-const linkClass = "inline-flex min-h-11 items-center text-ink-muted hover:text-ink hover:underline";
+const linkClass = "inline-flex min-h-11 items-center gap-2 text-ink-muted hover:text-ink hover:underline";
 
 /** Plain page links and contact links on every page. */
 export function SiteFooter() {
@@ -16,6 +17,7 @@ export function SiteFooter() {
             {sections.map((section) => (
               <li key={section.id}>
                 <Link href={section.href} className={linkClass}>
+                  <SectionIcon id={section.id} />
                   {section.label}
                 </Link>
               </li>
@@ -31,6 +33,7 @@ export function SiteFooter() {
             {site.contactLinks.map((link) => (
               <li key={link.label}>
                 <a href={link.href} className={linkClass}>
+                  <ContactIcon label={link.label} />
                   {link.label}
                 </a>
               </li>

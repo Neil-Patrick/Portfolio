@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { ContactIcon } from "../icons";
 import { Magnetic } from "../motion/Tilt";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -57,9 +58,10 @@ export function HeroIntro({ name, role, intro, links }: Props) {
               <Magnetic>
                 <a
                   href={link.href}
-                  className="inline-flex min-h-11 items-center font-semibold text-accent underline underline-offset-4 hover:no-underline"
+                  className="group inline-flex min-h-11 items-center gap-2 font-semibold text-accent"
                 >
-                  {link.label}
+                  <ContactIcon label={link.label} />
+                  <span className="underline underline-offset-4 group-hover:no-underline">{link.label}</span>
                 </a>
               </Magnetic>
             </li>

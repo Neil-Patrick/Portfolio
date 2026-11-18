@@ -22,6 +22,7 @@ import html from "devicon/icons/html5/html5-original.svg";
 import java from "devicon/icons/java/java-original.svg";
 import javascript from "devicon/icons/javascript/javascript-original.svg";
 import laravel from "devicon/icons/laravel/laravel-original.svg";
+import linkedin from "devicon/icons/linkedin/linkedin-original.svg";
 import mysql from "devicon/icons/mysql/mysql-original.svg";
 import nextjs from "devicon/icons/nextjs/nextjs-plain.svg"; // plain = N cut out of the disc, for the mono mask
 import nodejs from "devicon/icons/nodejs/nodejs-original.svg";
@@ -71,6 +72,8 @@ export const techIcons: Record<string, TechIconData> = {
   Vercel: { src: vercel, mono: true },
   Git: { src: git },
   GitHub: { src: github, mono: true },
+  // Contact links (not technologies; listed so the same logo component draws them)
+  LinkedIn: { src: linkedin },
   "Visual Studio": { src: visualstudio },
   "VS Code": { src: vscode },
   Figma: { src: figma },
