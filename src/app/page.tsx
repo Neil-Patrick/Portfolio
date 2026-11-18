@@ -104,16 +104,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section aria-label="Career timeline" className="py-16 sm:py-24">
-        <div className="container-page">
-          <LearningChart points={timeline} />
-        </div>
-      </section>
-
-      <Section id="github" title="GitHub activity" band>
-        <GitHubActivity />
-      </Section>
-
       {(Object.keys(previews) as (keyof typeof previews)[]).map((id) => {
         const section = getSection(id);
         return (
@@ -129,6 +119,18 @@ export default function HomePage() {
           </Section>
         );
       })}
+
+      {/* Data sections close the page, just before the footer. Bands keep alternating:
+          contact (canvas) → timeline (surface) → GitHub (canvas). */}
+      <section aria-label="Career timeline" className="bg-surface py-16 sm:py-24">
+        <div className="container-page">
+          <LearningChart points={timeline} />
+        </div>
+      </section>
+
+      <Section id="github" title="GitHub activity">
+        <GitHubActivity />
+      </Section>
     </>
   );
 }
