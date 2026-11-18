@@ -5,6 +5,7 @@ import { TechIcon } from "@/components/TechIcon";
 import { formatMonth } from "@/content/credentials";
 import { projects } from "@/content/projects";
 import { getSection } from "@/content/site";
+import { techIcons } from "@/content/tech";
 import { isSkill, skillAnchor } from "@/lib/skill-usage";
 
 const section = getSection("projects");
@@ -49,7 +50,7 @@ export default function ProjectsPage() {
             </div>
 
             <div>
-              <h3 className="mb-3 text-base text-ink-muted">Built with</h3>
+              <h3 className="mb-3 text-base text-ink-muted">Tech Stack</h3>
               <ul className="flex flex-wrap gap-2">
                 {project.stack.map((tool) => (
                   <li key={tool}>
@@ -71,6 +72,13 @@ export default function ProjectsPage() {
                   </li>
                 ))}
               </ul>
+              {/* Legend for the neutral glyph, only on cards that use it. */}
+              {project.stack.some((tool) => !isSkill(tool) && !techIcons[tool]) && (
+                <p className="mt-3 flex items-center gap-2 text-sm text-ink-muted">
+                  <TechIcon name="Service" />
+                  Service only, not a skill
+                </p>
+              )}
             </div>
           </article>
         ))}
