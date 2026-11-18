@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { NEW_TAB_NOTE, isExternal, linkTarget } from "@/lib/links";
 import { ContactIcon } from "../icons";
 import { Magnetic } from "../motion/Tilt";
 
@@ -58,10 +59,12 @@ export function HeroIntro({ name, role, intro, links }: Props) {
               <Magnetic>
                 <a
                   href={link.href}
+                  {...linkTarget(link.href)}
                   className="group inline-flex min-h-11 items-center gap-2 font-semibold text-accent"
                 >
                   <ContactIcon label={link.label} />
                   <span className="underline underline-offset-4 group-hover:no-underline">{link.label}</span>
+                  {isExternal(link.href) && <span className="sr-only">{NEW_TAB_NOTE}</span>}
                 </a>
               </Magnetic>
             </li>

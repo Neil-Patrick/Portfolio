@@ -1,5 +1,6 @@
 import { site } from "@/content/site";
 import { getGitHubStats } from "@/lib/github";
+import { NEW_TAB_NOTE, newTab } from "@/lib/links";
 import { GitHubActivityView } from "./GitHubActivityView";
 
 /** Fetches (cached) GitHub stats on the server and hands plain data to the animated view. */
@@ -11,8 +12,9 @@ export async function GitHubActivity() {
     return (
       <p className="text-ink-muted">
         GitHub stats are unavailable right now.{" "}
-        <a href={profileUrl} className="text-accent underline underline-offset-4">
+        <a href={profileUrl} {...newTab} className="text-accent underline underline-offset-4">
           See my GitHub profile
+          <span className="sr-only">{NEW_TAB_NOTE}</span>
         </a>
         .
       </p>

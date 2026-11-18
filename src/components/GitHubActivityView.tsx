@@ -21,6 +21,7 @@ import { motion, useInView } from "motion/react";
 import { useRef } from "react";
 import type { GitHubActivity, GitHubStats, Streak } from "@/lib/github";
 import { GitHubCalendar } from "./GitHubCalendar";
+import { NEW_TAB_NOTE, newTab } from "@/lib/links";
 import { GitHubLogo, Icon } from "./icons";
 import { CountUp } from "./motion/CountUp";
 
@@ -84,9 +85,10 @@ export function GitHubActivityView({ stats }: { stats: GitHubStats }) {
         {stats.languages.length > 0 && <Languages stats={stats} />}
       </div>
 
-      <a href={stats.url} className="group inline-flex min-h-11 w-fit items-center gap-2 font-semibold text-accent">
+      <a href={stats.url} {...newTab} className="group inline-flex min-h-11 w-fit items-center gap-2 font-semibold text-accent">
         <GitHubLogo />
         <span className="underline underline-offset-4 group-hover:no-underline">View my GitHub profile</span>
+        <span className="sr-only">{NEW_TAB_NOTE}</span>
       </a>
     </div>
   );
@@ -194,8 +196,9 @@ function ThisMonth({ month }: { month: GitHubActivity["month"] }) {
                 {month.commitsByRepo.map((repo) => (
                   <li key={repo.name}>
                     <div className="mb-1 flex flex-wrap justify-between gap-x-4 text-sm">
-                      <a href={repo.url} className="text-accent underline underline-offset-2 hover:no-underline">
+                      <a href={repo.url} {...newTab} className="text-accent underline underline-offset-2 hover:no-underline">
                         {repo.name}
+                        <span className="sr-only">{NEW_TAB_NOTE}</span>
                       </a>
                       <span className="text-ink-muted tabular-nums">{plural(repo.count, "commit")}</span>
                     </div>
@@ -215,8 +218,9 @@ function ThisMonth({ month }: { month: GitHubActivity["month"] }) {
                 {month.reposCreated.map((repo) => (
                   <li key={repo.name} className="grid min-h-11 content-center gap-0.5 py-1 text-sm">
                     <span>
-                      <a href={repo.url} className="text-accent underline underline-offset-2 hover:no-underline">
+                      <a href={repo.url} {...newTab} className="text-accent underline underline-offset-2 hover:no-underline">
                         {repo.name}
+                        <span className="sr-only">{NEW_TAB_NOTE}</span>
                       </a>
                       {repo.isFork && (
                         <span className="ml-2 inline-flex items-center gap-1 align-middle text-ink-muted">

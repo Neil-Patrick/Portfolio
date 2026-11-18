@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { sections, site } from "@/content/site";
+import { NEW_TAB_NOTE, isExternal, linkTarget } from "@/lib/links";
 import { ContactIcon, SectionIcon } from "./icons";
 
 const linkClass = "inline-flex min-h-11 items-center gap-2 text-ink-muted hover:text-ink hover:underline";
@@ -32,9 +33,10 @@ export function SiteFooter() {
           <ul aria-labelledby="footer-contact" className="flex flex-wrap gap-x-6">
             {site.contactLinks.map((link) => (
               <li key={link.label}>
-                <a href={link.href} className={linkClass}>
+                <a href={link.href} {...linkTarget(link.href)} className={linkClass}>
                   <ContactIcon label={link.label} />
                   {link.label}
+                  {isExternal(link.href) && <span className="sr-only">{NEW_TAB_NOTE}</span>}
                 </a>
               </li>
             ))}

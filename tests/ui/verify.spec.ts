@@ -428,14 +428,17 @@ test("with full motion: anchor links land below the sticky header", async ({ pag
   expect(top).toBeLessThanOrEqual(120);
 });
 
-test("links to other sites open in a new tab, safely", async ({ page }) => {
-  for (const path of ["/projects", "/credentials"]) {
+test("links to other sites open in a new tab, safely; email links don't", async ({ page }) => {
+  for (const path of ["/", "/about", "/credentials", "/technologies", "/projects", "/contact"]) {
     await page.goto(path);
-    const external = page.locator('main a[href^="http"]');
+    const external = page.locator('a[href^="http"]');
     expect(await external.count(), `${path} has outside links`).toBeGreaterThan(0);
     for (const link of await external.all()) {
       await expect(link).toHaveAttribute("target", "_blank");
       await expect(link).toHaveAttribute("rel", /noopener/);
+    }
+    for (const link of await page.locator('a[href^="mailto:"]').all()) {
+      await expect(link).not.toHaveAttribute("target", "_blank");
     }
   }
 });
