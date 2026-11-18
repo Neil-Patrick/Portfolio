@@ -7,6 +7,7 @@ import { TechIcon } from "@/components/TechIcon";
 import { formatMonth } from "@/content/credentials";
 import { projects } from "@/content/projects";
 import { getSection } from "@/content/site";
+import { NEW_TAB_NOTE, newTab } from "@/lib/links";
 import { isSkill, skillAnchor } from "@/lib/skill-usage";
 
 const section = getSection("projects");
@@ -52,12 +53,17 @@ export default function ProjectsPage() {
                   <li key={link.href}>
                     <a
                       href={link.href}
+                      {...newTab}
                       className="inline-flex min-h-11 items-center gap-2 rounded-sm border border-line-strong bg-canvas px-4 font-semibold hover:border-accent hover:text-accent"
                     >
                       {/* Repository links get the GitHub mark; everything else is an outside site. */}
                       {link.href.startsWith("https://github.com/") ? <GitHubLogo /> : <Icon icon={ExternalLink} />}
                       {link.label}
-                      <span className="sr-only"> for {project.name}</span>
+                      <span className="sr-only">
+                        {" "}
+                        for {project.name}
+                        {NEW_TAB_NOTE}
+                      </span>
                     </a>
                   </li>
                 ))}

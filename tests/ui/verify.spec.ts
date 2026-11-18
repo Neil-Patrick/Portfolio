@@ -427,3 +427,15 @@ test("with full motion: anchor links land below the sticky header", async ({ pag
   expect(top, "section top sits just below the 64px header").toBeGreaterThanOrEqual(40);
   expect(top).toBeLessThanOrEqual(120);
 });
+
+test("links to other sites open in a new tab, safely", async ({ page }) => {
+  for (const path of ["/projects", "/credentials"]) {
+    await page.goto(path);
+    const external = page.locator('main a[href^="http"]');
+    expect(await external.count(), `${path} has outside links`).toBeGreaterThan(0);
+    for (const link of await external.all()) {
+      await expect(link).toHaveAttribute("target", "_blank");
+      await expect(link).toHaveAttribute("rel", /noopener/);
+    }
+  }
+});

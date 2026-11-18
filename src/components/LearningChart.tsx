@@ -5,6 +5,7 @@ import { motion, useInView } from "motion/react";
 import Link from "next/link";
 import { useId, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { formatMonth } from "@/content/credentials";
+import { NEW_TAB_NOTE, newTab } from "@/lib/links";
 import type { TimelinePoint } from "@/lib/timeline";
 import { Icon } from "./icons";
 
@@ -242,9 +243,14 @@ export function LearningChart({ points }: Props) {
               See project
             </Link>
           ) : (
-            <a href={current.href} className="inline-flex items-center gap-1.5 self-center text-accent underline underline-offset-2">
+            <a
+              href={current.href}
+              {...newTab}
+              className="inline-flex items-center gap-1.5 self-center text-accent underline underline-offset-2"
+            >
               <Icon icon={BadgeCheck} />
               Verify on Credly
+              <span className="sr-only">{NEW_TAB_NOTE}</span>
             </a>
           ))}
       </p>

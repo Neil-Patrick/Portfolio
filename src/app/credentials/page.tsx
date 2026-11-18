@@ -10,6 +10,7 @@ import {
   formatMonth,
 } from "@/content/credentials";
 import { getSection } from "@/content/site";
+import { NEW_TAB_NOTE, newTab } from "@/lib/links";
 
 const section = getSection("credentials");
 
@@ -44,6 +45,7 @@ export default function CredentialsPage() {
         {/* The credential that matters most for data and AI roles, shown first and larger. */}
         <a
           href={featured.url}
+          {...newTab}
           className="rounded-md border border-line-strong bg-surface mb-8 flex items-center gap-5 p-5 hover:border-accent sm:p-6"
         >
           <span className="grid size-14 shrink-0 place-items-center rounded-md bg-canvas text-accent">
@@ -56,6 +58,7 @@ export default function CredentialsPage() {
               {featured.expires && `, valid until ${formatMonth(featured.expires)}`}
             </span>
           </span>
+          <span className="sr-only">{NEW_TAB_NOTE}</span>
         </a>
 
         <ul className="grid gap-x-8 sm:grid-cols-2 xl:grid-cols-3">
@@ -63,12 +66,14 @@ export default function CredentialsPage() {
             <li key={cert.name} className="py-2">
               <a
                 href={cert.url}
+                {...newTab}
                 className="inline-flex min-h-11 flex-col justify-center hover:text-accent"
               >
                 <span className="font-medium">{cert.name}</span>
                 <span className="text-sm text-ink-muted tabular-nums">
                   {cert.issuer}, {formatMonth(cert.date)}
                 </span>
+                <span className="sr-only">{NEW_TAB_NOTE}</span>
               </a>
             </li>
           ))}
