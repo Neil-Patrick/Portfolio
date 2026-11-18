@@ -10,6 +10,12 @@ export const site = {
   description: "[Short description of the site for search engines.]",
   /** Shown on the home profile card's "hotbar". Up to 5. */
   featuredSkills: ["[Skill]", "[Skill]", "[Skill]", "[Skill]", "[Skill]"],
+  /** Contact links shown in the footer. PLACEHOLDER: replace labels and hrefs with real ones. */
+  contactLinks: [
+    { label: "[Email]", href: "mailto:you@example.com" },
+    { label: "[LinkedIn]", href: "https://www.linkedin.com/" },
+    { label: "[GitHub]", href: "https://github.com/" },
+  ],
 };
 
 export type SectionId =

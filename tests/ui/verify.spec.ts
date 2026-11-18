@@ -240,3 +240,13 @@ test("clicking outside the ring closes the wheel", async ({ page }) => {
   await page.mouse.click(10, 890);
   await expect(wheel(page)).toBeHidden();
 });
+
+test("footer links reach every page without using the wheel", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  const footerNav = page.getByRole("navigation", { name: "Pages" });
+  for (const section of sections) {
+    await page.goto("/about");
+    await footerNav.getByRole("link", { name: section.label, exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`${section.href === "/" ? "/" : section.href}$`));
+  }
+});

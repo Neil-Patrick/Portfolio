@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Atkinson_Hyperlegible_Next, Pixelify_Sans } from "next/font/google";
+import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { site } from "@/content/site";
 import { themeInitScript } from "@/lib/theme";
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <main id="main" tabIndex={-1} className="flex-1 outline-none">
           {children}
         </main>
+        <SiteFooter />
       </body>
     </html>
   );

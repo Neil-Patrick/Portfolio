@@ -44,7 +44,7 @@ No environment variables are needed yet. When they are, put them in `.env.local`
 - Layout checks: no horizontal scroll, no console errors (including hydration warnings), and no axe WCAG 2.1 AA violations. Screenshots go to `test-results/screenshots/`.
   - Home page at 320, 768, 1024 and 1440px, in light and dark.
   - Each section page, and the open wheel menu, at 320 and 1440px in light and dark. The wheel check also confirms every item is on screen and at least 44px.
-- Behaviour: the theme switcher sets, persists and clears the theme; the wheel opens, moves with arrow keys, closes with Escape or an outside click, returns focus, and navigates; the arrow never overlaps the hub text; mouse aiming highlights and opens the aimed section; captions show on a touch phone; each home "Open" link opens its page with the right title; every section in `src/content/site.ts` exists on the home page.
+- Behaviour: the theme switcher sets, persists and clears the theme; the wheel opens, moves with arrow keys, closes with Escape or an outside click, returns focus, and navigates; the arrow never overlaps the hub text; mouse aiming highlights and opens the aimed section; captions show on a touch phone; each home "Open" link opens its page with the right title; every section in `src/content/site.ts` exists on the home page; the footer links reach every page.
 
 First run on a new machine: `npx playwright install chromium`. Checks run in Chromium only, so Safari, Firefox and real devices still need a manual look.
 
@@ -60,6 +60,7 @@ src/
     globals.css   Design tokens (Tailwind @theme), pixel chrome utilities, theming, base styles
   components/
     SiteHeader.tsx     Sticky top bar: name, theme switcher, wheel button
+    SiteFooter.tsx     Plain page links + contact links (fallback to the wheel)
     WheelMenu.tsx      Radial navigation in a native <dialog>
     icons.tsx          Section icon map (pixelarticons)
     ThemeSwitcher.tsx  Light / dark / system control
