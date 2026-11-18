@@ -16,7 +16,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: site.name,
+  // Section pages set `title: "About"` etc. and get "About | [Your Name]".
+  title: { default: site.name, template: `%s | ${site.name}` },
   description: site.description,
 };
 
@@ -26,6 +27,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       // The inline theme script sets data-theme before React hydrates.
       suppressHydrationWarning
+      // Smooth anchor scrolling, but instant jumps on route changes (Next.js reads this).
+      data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>

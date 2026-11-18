@@ -16,44 +16,108 @@ function collectErrors(page: Page) {
   return errors;
 }
 
-/* ---------- Layout, console, and accessibility at every width × color scheme ---------- */
+/** Fails on horizontal scroll, axe WCAG 2.1 AA violations, or collected console errors. */
+async function checkPage(page: Page, errors: string[]) {
+  const overflow = await page.evaluate(() => {
+    const root = document.documentElement;
+    return root.scrollWidth - root.clientWidth;
+  });
+  expect(overflow, "page scrolls horizontally").toBeLessThanOrEqual(0);
 
+  const axe = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .analyze();
+  const violations = axe.violations.map(
+    (v) => `${v.id} (${v.impact}): ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`,
+  );
+  expect(violations, "accessibility violations").toEqual([]);
+
+  expect(errors, "console errors").toEqual([]);
+}
+
+async function openPage(page: Page, path: string, width: number, scheme: (typeof SCHEMES)[number]) {
+  await page.setViewportSize({ width, height: 900 });
+  await page.emulateMedia({ colorScheme: scheme });
+  await page.goto(path);
+  await page.waitForLoadState("networkidle");
+}
+
+const wheelTrigger = (page: Page) => page.getByRole("button", { name: "Open navigation" });
+const wheel = (page: Page) => page.getByRole("dialog", { name: "Navigation" });
+
+/* ---------- Layout, console, and accessibility ---------- */
+
+// Home: every width × scheme.
 for (const width of WIDTHS) {
   for (const scheme of SCHEMES) {
-    test(`layout ${width}px ${scheme}`, async ({ page }) => {
+    test(`layout home ${width}px ${scheme}`, async ({ page }) => {
       const errors = collectErrors(page);
-      await page.setViewportSize({ width, height: 900 });
-      await page.emulateMedia({ colorScheme: scheme });
-      await page.goto("/");
-      await page.waitForLoadState("networkidle");
+      await openPage(page, "/", width, scheme);
+      await page.screenshot({ path: `${SCREENSHOT_DIR}/home-${width}-${scheme}.png`, fullPage: true });
+      await checkPage(page, errors);
+    });
+  }
+}
 
-      await page.screenshot({ path: `${SCREENSHOT_DIR}/${width}-${scheme}.png`, fullPage: true });
-
-      const overflow = await page.evaluate(() => {
-        const root = document.documentElement;
-        return root.scrollWidth - root.clientWidth;
+// Section pages: smallest and largest width × scheme.
+for (const section of sections.filter((s) => s.href !== "/")) {
+  for (const width of [320, 1440]) {
+    for (const scheme of SCHEMES) {
+      test(`layout ${section.id} ${width}px ${scheme}`, async ({ page }) => {
+        const errors = collectErrors(page);
+        await openPage(page, section.href, width, scheme);
+        await expect(page.getByRole("heading", { level: 1, name: section.label })).toBeVisible();
+        await page.screenshot({
+          path: `${SCREENSHOT_DIR}/${section.id}-${width}-${scheme}.png`,
+          fullPage: true,
+        });
+        await checkPage(page, errors);
       });
-      expect(overflow, "page scrolls horizontally").toBeLessThanOrEqual(0);
+    }
+  }
+}
 
-      const axe = await new AxeBuilder({ page })
-        .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
-        .analyze();
-      const violations = axe.violations.map(
-        (v) => `${v.id} (${v.impact}): ${v.nodes.map((n) => n.target.join(" ")).join(", ")}`,
-      );
-      expect(violations, "accessibility violations").toEqual([]);
+// Wheel open: smallest and largest width × scheme.
+for (const width of [320, 1440]) {
+  for (const scheme of SCHEMES) {
+    test(`layout wheel open ${width}px ${scheme}`, async ({ page }) => {
+      const errors = collectErrors(page);
+      await openPage(page, "/", width, scheme);
+      await wheelTrigger(page).click();
+      await expect(wheel(page)).toBeVisible();
+      // Let the open transition finish before measuring and capturing.
+      await page.waitForTimeout(400);
+      await page.screenshot({ path: `${SCREENSHOT_DIR}/wheel-${width}-${scheme}.png` });
 
-      expect(errors, "console errors").toEqual([]);
+      // Every ring item must be fully inside the viewport.
+      for (const link of await wheel(page).getByRole("link").all()) {
+        const box = (await link.boundingBox())!;
+        expect(box.x, "item off the left edge").toBeGreaterThanOrEqual(0);
+        expect(box.y, "item off the top edge").toBeGreaterThanOrEqual(0);
+        expect(box.x + box.width, "item off the right edge").toBeLessThanOrEqual(width);
+        expect(box.width, "touch target").toBeGreaterThanOrEqual(44);
+      }
+      await checkPage(page, errors);
     });
   }
 }
 
 /* ---------- Behaviour ---------- */
 
-test("every section in site.ts exists on the page", async ({ page }) => {
+test("every section in site.ts exists on the home page", async ({ page }) => {
   await page.goto("/");
   for (const section of sections) {
     await expect(page.locator(`#${section.id}`), `#${section.id}`).toHaveCount(1);
+  }
+});
+
+test("each home section's View all link opens its page", async ({ page }) => {
+  for (const section of sections.filter((s) => s.href !== "/")) {
+    await page.goto("/");
+    await page.getByRole("link", { name: `View all ${section.label}` }).click();
+    await expect(page).toHaveURL(new RegExp(`${section.href}$`));
+    await expect(page.getByRole("heading", { level: 1, name: section.label })).toBeVisible();
+    await expect(page).toHaveTitle(new RegExp(`^${section.label} \|`));
   }
 });
 
@@ -79,25 +143,47 @@ test("theme switcher sets, persists, and clears the theme", async ({ page }) => 
   await expect(radio("System")).toBeChecked();
 });
 
-test("mobile menu opens, closes with Escape, and closes on link click", async ({ page }) => {
+test("wheel opens, moves with arrow keys, closes with Escape, and navigates", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await page.goto("/");
-  const toggle = page.getByRole("button", { name: /menu/i });
-  const panelLink = page
-    .getByRole("navigation", { name: "Primary" })
-    .getByRole("link", { name: "Contact" });
+  const trigger = wheelTrigger(page);
+  const item = (name: string) => wheel(page).getByRole("link", { name, exact: true });
 
-  await expect(toggle).toHaveAttribute("aria-expanded", "false");
-  await toggle.click();
-  await expect(toggle).toHaveAttribute("aria-expanded", "true");
-  await expect(panelLink).toBeVisible();
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  await trigger.click();
+  await expect(trigger).toHaveAttribute("aria-expanded", "true");
+  await expect(wheel(page)).toBeVisible();
+  // Focus starts on the current page's item.
+  await expect(item("Home")).toBeFocused();
+  await expect(item("Home")).toHaveAttribute("aria-current", "page");
+
+  await page.keyboard.press("ArrowRight");
+  await expect(item("About")).toBeFocused();
+  await page.keyboard.press("ArrowLeft");
+  await page.keyboard.press("ArrowLeft");
+  await expect(item("Contact")).toBeFocused(); // wraps around
 
   await page.keyboard.press("Escape");
-  await expect(toggle).toHaveAttribute("aria-expanded", "false");
-  await expect(toggle).toBeFocused();
+  await expect(wheel(page)).toBeHidden();
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  await expect(trigger).toBeFocused();
 
-  await toggle.click();
-  await panelLink.click();
-  await expect(toggle).toHaveAttribute("aria-expanded", "false");
-  await expect(page).toHaveURL(/#contact$/);
+  await trigger.click();
+  await item("Projects").click();
+  await expect(page).toHaveURL(/\/projects$/);
+  await expect(wheel(page)).toBeHidden();
+  await expect(page.getByRole("heading", { level: 1, name: "Projects" })).toBeVisible();
+
+  await trigger.click();
+  await expect(item("Projects")).toHaveAttribute("aria-current", "page");
+  await expect(item("Projects")).toBeFocused();
+});
+
+test("clicking outside the ring closes the wheel", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await wheelTrigger(page).click();
+  await expect(wheel(page)).toBeVisible();
+  await page.mouse.click(10, 890);
+  await expect(wheel(page)).toBeHidden();
 });

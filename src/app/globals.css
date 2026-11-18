@@ -42,6 +42,15 @@
 
   /* Sticky header height; also offsets anchor scrolling. */
   --spacing-header: 4rem;
+
+  /* Wheel menu: ring radius and item size, fluid from 320px phones up. */
+  --spacing-wheel-radius: clamp(7rem, 4rem + 14vw, 11rem);
+  --spacing-wheel-item: clamp(5.5rem, 4.5rem + 4vw, 7rem);
+
+  /* Motion tokens. Every animation uses these and respects reduced motion. */
+  --duration-fast: 120ms;
+  --duration-base: 220ms;
+  --ease-out-quick: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @theme inline {
@@ -77,5 +86,62 @@
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
+  }
+}
+
+/* ==========================================================================
+   Wheel menu (src/components/WheelMenu.tsx)
+   Items sit on a circle: rotate to the item's angle, push out by the radius,
+   then rotate back so the label stays upright.
+   ========================================================================== */
+
+@layer components {
+  .wheel-dialog {
+    opacity: 0;
+    transition:
+      opacity var(--duration-base) var(--ease-out-quick),
+      overlay var(--duration-base) allow-discrete,
+      display var(--duration-base) allow-discrete;
+  }
+  .wheel-dialog[open] {
+    opacity: 1;
+  }
+  @starting-style {
+    .wheel-dialog[open] {
+      opacity: 0;
+    }
+  }
+
+  .wheel-ring {
+    width: calc(2 * var(--spacing-wheel-radius) + var(--spacing-wheel-item));
+    aspect-ratio: 1;
+  }
+
+  .wheel-item {
+    --angle: calc(var(--i) * 360deg / var(--count));
+    width: var(--spacing-wheel-item);
+    transform: translate(-50%, -50%) rotate(var(--angle))
+      translateY(calc(-1 * var(--spacing-wheel-radius))) rotate(calc(-1 * var(--angle)));
+  }
+}
+
+/* Scale the ring in only when motion is welcome; otherwise it just fades. */
+@media (prefers-reduced-motion: no-preference) {
+  .wheel-ring {
+    transition: scale var(--duration-base) var(--ease-out-quick);
+  }
+  .wheel-dialog:not([open]) .wheel-ring {
+    scale: 0.85;
+  }
+  @starting-style {
+    .wheel-dialog[open] .wheel-ring {
+      scale: 0.85;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wheel-dialog {
+    transition-duration: 1ms;
   }
 }

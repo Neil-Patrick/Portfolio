@@ -15,8 +15,8 @@ export default function HomePage() {
       {sections
         .filter((section) => section.id !== "home")
         .map((section) => (
-          <Section key={section.id} id={section.id} title={section.label}>
-            <p className="max-w-prose text-ink-muted">{section.placeholder}</p>
+          <Section key={section.id} id={section.id} title={section.label} href={section.href}>
+            <p className="max-w-prose text-ink-muted">{section.summary}</p>
           </Section>
         ))}
     </>
