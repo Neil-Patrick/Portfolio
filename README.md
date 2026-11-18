@@ -69,6 +69,9 @@ src/
   content/
     site.ts       Site info and section list: label, route, summary, detail
                   (drives the wheel, home order, and section pages)
+    credentials.ts  Education, featured certification, Credly badges, TESDA modules
+    skills.ts      Skill groups (from the CV)
+    projects.ts    Projects: description, stack, links
   lib/
     theme.ts      Theme constants, applyTheme(), inline init script
 public/           Static assets (images, icons)
