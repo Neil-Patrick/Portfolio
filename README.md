@@ -29,13 +29,13 @@ npm install
 
 ## Environment config
 
-Copy `.env.example` to `.env.local` (git-ignored) and fill it in. Add the same variables in Vercel under Project Settings > Environment Variables.
+Create a `.env.local` file (git-ignored; env files are never committed) with the variables below. Add the same variables in Vercel under Project Settings > Environment Variables.
 
 | Variable | Needed for | Without it |
 | --- | --- | --- |
-| `GITHUB_TOKEN` | The home page GitHub section: contribution calendar, commit and PR counts, repositories contributed to, languages by code size | The section shows public stats only (repos, followers, primary languages) |
+| `GITHUB_TOKEN` | The home page GitHub section: stats (commits, PRs, issues, stars, repositories contributed to), all-time total and streaks, a contribution calendar per year, this month's activity, languages by code size | The section shows public stats only (repos, followers, primary languages) |
 
-`GITHUB_TOKEN` is read only on the server (`src/lib/github.ts`) and never reaches the browser. Use a **fine-grained personal access token** with *Public repositories (read-only)* access and no extra permissions. GitHub data is cached for hours, so the page stays static and GitHub is called a few times a day at most.
+`GITHUB_TOKEN` is read only on the server (`src/lib/github.ts`) and never reaches the browser. Use a **fine-grained personal access token** with *Public repositories (read-only)* access and no extra permissions. GitHub data is cached for hours, so the page stays static and GitHub is called a few times a day at most (two GraphQL queries per refresh). Only repositories the token can read are counted, so a repository it can't see is left out of this month's activity and the language totals.
 
 ## Commands
 
@@ -59,7 +59,7 @@ Copy `.env.example` to `.env.local` (git-ignored) and fill it in. Add the same v
   - Theme: the switcher sets, persists and clears the theme; a first-time visitor gets System.
   - Technologies and projects: every project tool is a listed technology or a known service; every technology shows an icon and every logo loads; selecting a technology lists its projects, updates the URL hash, and links to the project; a project's tool chip opens the Technologies page with it selected; on phones the panel opens under the selected group.
   - Hero and motion: the hero shows the 3D canvas or its static fallback behind readable text; with full motion the page animates, scrolls, and hovers without errors, every revealed element ends fully visible, and the career timeline finishes drawing; with Lenis on, anchor links still land below the sticky header.
-  - GitHub: the section shows the contribution calendar and counters (with a token) or the public fallback (without).
+  - GitHub: the section shows counters, streaks, and the contribution calendar, and the year buttons swap the calendar (with a token); or the public fallback (without).
   - Chart: one marker per timeline item and a table row for each; Home, End and arrow keys move the selection; clicking selects the nearest item; the chart fits a 320px screen.
 
 Tests run with reduced motion by default (`playwright.config.ts`), so layout and accessibility checks see the settled page; the "full motion" tests switch animations back on.
@@ -81,7 +81,8 @@ src/
     SiteFooter.tsx     Plain page links + contact links
     LearningChart.tsx  Career timeline: cumulative chart, readout, table view
     GitHubActivity.tsx      GitHub section (server: fetches cached stats)
-    GitHubActivityView.tsx  Counters, contribution heatmap, language bars (animated)
+    GitHubActivityView.tsx  Counters, streaks (ring), this month's activity, language bars
+    GitHubCalendar.tsx      Contribution heatmap with year buttons, readout, monthly table
     hero/              3D neural network (NeuralNetwork), lazy loader + pause logic
                        (HeroBackground), static fallback, name entrance (HeroIntro)
     motion/            MotionRoot (reduced-motion config + Lenis), Reveal, CountUp,
@@ -126,7 +127,7 @@ Text in `[square brackets]` in `src/content/` is placeholder content.
 - **Visual direction: work shown as data, brought to life.** A full-bleed home hero with a 3D neural network (nodes, links, and pulses of "data" moving along them, leaning toward the cursor), a career timeline built from the real credentials and projects, and live GitHub activity. Deep navy or off-white canvas, one teal accent, IBM Plex Sans, no divider lines: sections separate through space and alternating full-width bands.
 - **Motion with guardrails:** Motion handles reveals, count-ups, tilt, the name entrance, and page transitions; Lenis smooths scrolling. Under `prefers-reduced-motion: reduce`, Lenis is off, the 3D scene is a still frame, and a CSS rule shows every `[data-reveal]` element as-is (CSS rather than JS branching, so server and client HTML match and nothing hydrates differently). Without JavaScript, a `<noscript>` style does the same.
 - **3D kept off the critical path:** three.js and React Three Fiber load only on the client after the page is interactive (`next/dynamic`, about 240 KB gzipped, separate chunk), never on other pages. The scene pauses when the hero is off-screen or the tab is hidden, caps the pixel ratio at 1.5, and uses half the nodes on phones. A static SVG version of the same network shows first and whenever WebGL is unavailable.
-- **GitHub data, cached and honest:** fetched on the server with `'use cache'` + `cacheLife('hours')`, so the home page is prerendered and refreshes in the background. Every number comes from the API; without a token the section says what it can't show. The heatmap uses one hue (the accent) from light to dark instead of GitHub's greens, with a legend and a monthly-totals table.
+- **GitHub data, cached and honest:** fetched on the server with `'use cache'` + `cacheLife('hours')`, so the home page is prerendered and refreshes in the background. Every number comes from the API; without a token the section says what it can't show. The heatmap uses one hue (the accent) from light to dark instead of GitHub's greens, with a legend and a monthly-totals table. Streaks are computed from the yearly calendars; a day with no contributions yet doesn't break the current streak, and on a tie the most recent longest streak is shown. The current-streak ring fills toward the longest streak, which is said in text beside it. There is deliberately no letter grade (as some GitHub stats cards show): it's a third-party score, not data.
 - **Hand-built chart, no library:** one chart doesn't justify a charting dependency. Gridlines and the step line are SVG with non-scaling strokes; markers and axis labels are HTML positioned in percentages, so nothing distorts at any width. Certifications are circles and projects squares (identity never relies on color alone), the two series colors passed a colorblind-safety and contrast validator in both themes, and a table view lists every point. Mouse, tap, and arrow keys all drive one readout line instead of a floating tooltip.
 - **Semantic color tokens only:** Tailwind's default palette is removed (`--color-*: initial`). Components use role names (`bg-canvas`, `bg-surface`, `text-ink`, `border-line-strong`, `text-accent`) and never `dark:` classes. Each token is `light-dark(LIGHT, DARK)`, so restyling means editing `globals.css` only. Every text and background pair passes WCAG AA, and control borders (`line-strong`) pass 3:1.
 - **Theming without a library:** an inline `<head>` script applies a saved light/dark choice before first paint (no flash), following the Next.js "preventing flash before hydration" guide. "System" removes `data-theme` so CSS follows the OS live. The choice is stored in `localStorage` and synced across tabs. `next-themes` was considered and skipped: it would be an extra dependency for about 40 lines of code.

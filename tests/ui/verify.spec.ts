@@ -47,6 +47,7 @@ async function openPage(page: Page, path: string, width: number, scheme: (typeof
 
 const chartPlot = (page: Page) => page.getByRole("group", { name: /Timeline plot/ });
 const chartReadout = (page: Page) => page.getByTestId("chart-readout");
+const chartFigure = (page: Page) => page.getByRole("figure", { name: /^Career timeline/ });
 
 /* ---------- Layout, console, and accessibility ---------- */
 
@@ -207,7 +208,7 @@ test("chart plots every timeline item and lists them all in the table", async ({
   );
 
   await page.getByText("Show as table").click();
-  await expect(page.locator("figure table tbody tr")).toHaveCount(timeline.length);
+  await expect(chartFigure(page).locator("table tbody tr")).toHaveCount(timeline.length);
 });
 
 test("chart selection works with keyboard and pointer", async ({ page }) => {
@@ -237,7 +238,7 @@ test("chart selection works with keyboard and pointer", async ({ page }) => {
 test("chart fits a 320px phone without overflow", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 800 });
   await page.goto("/");
-  const figure = (await page.locator("figure").boundingBox())!;
+  const figure = (await chartFigure(page).boundingBox())!;
   expect(figure.x).toBeGreaterThanOrEqual(0);
   expect(figure.x + figure.width).toBeLessThanOrEqual(320);
 });
@@ -349,7 +350,21 @@ test("GitHub section shows live stats or the documented fallback", async ({ page
   if ((await heatmap.count()) > 0) {
     // Token configured: full calendar (52-53 weeks) and activity counters.
     expect(await heatmap.locator("[data-day]").count()).toBeGreaterThanOrEqual(364);
-    await expect(section.getByText("Contributions in the last year")).toBeVisible();
+    await expect(section.getByText("Contributions in the last year", { exact: true })).toBeVisible();
+    await expect(section.getByText("Current streak", { exact: true })).toBeVisible();
+    await expect(section.getByText("Longest streak", { exact: true })).toBeVisible();
+
+    // Year buttons swap the calendar; exactly one is pressed.
+    const years = section.getByRole("group", { name: "Calendar year" }).getByRole("button");
+    if ((await years.count()) > 1) {
+      const second = years.nth(1);
+      const year = (await second.innerText()).trim();
+      await second.click();
+      await expect(second).toHaveAttribute("aria-pressed", "true");
+      await expect(section.locator("#heatmap-caption")).toContainText(`in ${year}`);
+      await expect(section.locator('[aria-pressed="true"]')).toHaveCount(1);
+      expect(await heatmap.locator(`[data-day^="${year}-"]`).count()).toBeGreaterThan(0);
+    }
   } else {
     // No token: public stats, or an explicit "unavailable" message if GitHub is unreachable.
     await expect(
@@ -386,8 +401,8 @@ test("with full motion: home animates, scrolls, and hovers without errors", asyn
   );
   expect(hidden, "elements still hidden after scrolling").toBe(0);
   // The career timeline's wipe finished (its line and markers are uncovered).
-  const chartClip = await page
-    .locator("figure [data-reveal]")
+  const chartClip = await chartFigure(page)
+    .locator("[data-reveal]")
     .first()
     .evaluate((el) => getComputedStyle(el).clipPath);
   expect(chartClip, "career timeline revealed").not.toContain("100%");

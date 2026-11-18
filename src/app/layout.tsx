@@ -33,7 +33,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         {/* Without JavaScript, entrance animations never run: show their content as-is. */}
         <noscript>
-          <style>{"[data-reveal]{opacity:1!important;transform:none!important}"}</style>
+          <style>{
+              "[data-reveal]{opacity:1!important;transform:none!important}.heat-cell{opacity:1!important;scale:1!important}.streak-ring{stroke-dashoffset:var(--offset)!important}"
+            }</style>
         </noscript>
       </head>
       <body className="flex min-h-full flex-col">

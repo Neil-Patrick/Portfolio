@@ -144,3 +144,18 @@
     scale: 1;
   }
 }
+
+/* Current-streak ring (GitHubActivityView.tsx): --offset is 100 minus the fill percent.
+   It fills from empty once in view; with reduced motion it's simply drawn full. */
+.streak-ring {
+  stroke-dasharray: 100;
+  stroke-dashoffset: var(--offset);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .streak-ring {
+    transition: stroke-dashoffset 1.4s var(--ease-out-soft) 0.2s;
+  }
+  :not([data-shown]) > .streak-ring {
+    stroke-dashoffset: 100;
+  }
+}
