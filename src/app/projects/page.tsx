@@ -5,7 +5,6 @@ import { TechIcon } from "@/components/TechIcon";
 import { formatMonth } from "@/content/credentials";
 import { projects } from "@/content/projects";
 import { getSection } from "@/content/site";
-import { techIcons } from "@/content/tech";
 import { isSkill, skillAnchor } from "@/lib/skill-usage";
 
 const section = getSection("projects");
@@ -17,6 +16,17 @@ const chip = "inline-flex min-h-11 items-center gap-2 rounded-sm border px-3 py-
 export default function ProjectsPage() {
   return (
     <SectionPage section={section}>
+      {/* One legend for every project's tech stack. */}
+      <ul
+        aria-label="Tech stack legend"
+        className="mb-8 flex flex-wrap gap-x-8 gap-y-2 text-sm text-ink-muted"
+      >
+        <li className="flex items-center gap-2">
+          <TechIcon name="Service" />
+          Service only, not a skill
+        </li>
+      </ul>
+
       <div className="space-y-10">
         {projects.map((project) => (
           <article
@@ -72,13 +82,6 @@ export default function ProjectsPage() {
                   </li>
                 ))}
               </ul>
-              {/* Legend for the neutral glyph, only on cards that use it. */}
-              {project.stack.some((tool) => !isSkill(tool) && !techIcons[tool]) && (
-                <p className="mt-3 flex items-center gap-2 text-sm text-ink-muted">
-                  <TechIcon name="Service" />
-                  Service only, not a skill
-                </p>
-              )}
             </div>
           </article>
         ))}

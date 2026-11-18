@@ -12,7 +12,6 @@ import type { StaticImageData } from "next/image";
 
 import bootstrap from "devicon/icons/bootstrap/bootstrap-original.svg";
 import canva from "devicon/icons/canva/canva-original.svg";
-import cloudflare from "devicon/icons/cloudflare/cloudflare-original.svg";
 import csharp from "devicon/icons/csharp/csharp-original.svg";
 import css from "devicon/icons/css3/css3-original.svg";
 import express from "devicon/icons/express/express-original.svg";
@@ -76,8 +75,8 @@ export const techIcons: Record<string, TechIconData> = {
   "VS Code": { src: vscode },
   Figma: { src: figma },
   Canva: { src: canva },
-  // Project services
-  "Cloudflare Turnstile": { src: cloudflare },
+  // Project services (OpenRouter, Spotify Web API, Cloudflare Turnstile) deliberately have
+  // no logo: they all use the neutral service glyph explained by the Projects page legend.
 };
 
 /** Names without a devicon logo that are databases get a database glyph; others a neutral one. */
