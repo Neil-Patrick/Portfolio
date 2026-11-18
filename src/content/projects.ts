@@ -47,11 +47,19 @@ export const projects: Project[] = [
   {
     id: "untold-diaries",
     name: "Untold Diaries",
-    summary: "An anonymous board for messages left unsaid.",
+    summary: "An anonymous board for messages left unsaid, with an AI cat that reacts as you write.",
     description:
-      "An anonymous message board. Write a message to someone, optionally attach a song from Spotify, and anyone can browse the messages or search them by recipient name. A captcha keeps spam out.",
+      "An anonymous message board. Write a message to someone, optionally attach a song from Spotify, and anyone can browse the messages or search them by recipient name. While you write, a \"therapist cat\" powered by an AI model through OpenRouter reacts to your draft with a short, supportive reply. Its prompt keeps replies brief, matches the writer's language (English, Filipino, or Taglish), and points anyone who mentions self-harm toward a crisis hotline; only free models are allowed, with fallback lines when the quota runs out. A captcha keeps spam out.",
     started: "2025-05",
-    stack: ["Next.js", "TypeScript", "Sass (SCSS)", "Turso (libSQL)", "Spotify Web API", "Cloudflare Turnstile"],
+    stack: [
+      "Next.js",
+      "TypeScript",
+      "Sass (SCSS)",
+      "Turso (libSQL)",
+      "OpenRouter",
+      "Spotify Web API",
+      "Cloudflare Turnstile",
+    ],
     links: [
       { label: "Live site", href: "https://untold-diaries.vercel.app" },
       { label: "Source", href: "https://github.com/nathsuki73/untold-diaries" },

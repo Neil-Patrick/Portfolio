@@ -248,7 +248,7 @@ test("every project tool is a skill or a known service", async () => {
   const { projects } = await import("../../src/content/projects");
   const { skillGroups } = await import("../../src/content/skills");
   const skills = new Set(skillGroups.flatMap((group) => group.skills));
-  const services = new Set(["Spotify Web API", "Cloudflare Turnstile"]);
+  const services = new Set(["OpenRouter", "Spotify Web API", "Cloudflare Turnstile"]);
   const unknown = projects.flatMap((project) =>
     project.stack.filter((tool) => !skills.has(tool) && !services.has(tool)).map((tool) => `${project.name}: ${tool}`),
   );
