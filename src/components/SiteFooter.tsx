@@ -1,18 +1,15 @@
 import Link from "next/link";
 import { sections, site } from "@/content/site";
 
-const linkClass = "inline-flex min-h-11 items-center hover:text-accent hover:underline";
+const linkClass = "inline-flex min-h-11 items-center text-ink-muted hover:text-ink hover:underline";
 
-/**
- * Plain-text fallback navigation and contact links, so nobody depends on
- * discovering the wheel menu to get around.
- */
+/** Plain page links and contact links on every page. */
 export function SiteFooter() {
   return (
-    <footer className="mt-12 border-t-3 border-frame bg-panel">
+    <footer className="mt-12 border-t border-line bg-surface">
       <div className="container-page grid gap-8 py-10 sm:grid-cols-2">
         <nav aria-labelledby="footer-pages">
-          <h2 id="footer-pages" className="mb-2 text-lg">
+          <h2 id="footer-pages" className="mb-2 text-base">
             Pages
           </h2>
           <ul className="grid grid-cols-2 gap-x-6 sm:grid-cols-3">
@@ -27,7 +24,7 @@ export function SiteFooter() {
         </nav>
 
         <div>
-          <h2 id="footer-contact" className="mb-2 text-lg">
+          <h2 id="footer-contact" className="mb-2 text-base">
             Get in touch
           </h2>
           <ul aria-labelledby="footer-contact" className="flex flex-wrap gap-x-6">

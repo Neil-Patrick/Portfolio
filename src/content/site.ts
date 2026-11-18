@@ -40,8 +40,8 @@ export type SiteSection = {
   id: SectionId;
   /** Used for the nav item, the home section heading, and the detail page h1. */
   label: string;
-  /** One-line description shown in the wheel menu's center. UI copy; edit freely. */
-  tagline: string;
+  /** Link text from the home preview to this section's page. */
+  cta: string;
   /** Route of the section's own page. Home is "/". */
   href: string;
   /** Short preview shown on the home page. */
@@ -52,11 +52,11 @@ export type SiteSection = {
 
 /** Order here is the order on the home page and in the wheel. */
 export const sections: SiteSection[] = [
-  { id: "home", label: "Home", tagline: "Back to the start.", href: "/", summary: "", detail: "" },
+  { id: "home", label: "Home", cta: "", href: "/", summary: "", detail: "" },
   {
     id: "about",
     label: "About",
-    tagline: "Who I am.",
+    cta: "Read more about me",
     href: "/about",
     summary: "Computer Science student in Laguna, Philippines, moving from web development toward data and AI.",
     detail: "Who I am, what I've built, and where I'm heading.",
@@ -64,15 +64,15 @@ export const sections: SiteSection[] = [
   {
     id: "credentials",
     label: "Credentials",
-    tagline: "Degrees and certifications.",
+    cta: "See all credentials",
     href: "/credentials",
-    summary: "IT Specialist – Artificial Intelligence (Certiport), plus 14 badges from IBM SkillsBuild and Cisco.",
+    summary: "Plus 14 badges from IBM SkillsBuild and Cisco, and TESDA's Visual Graphic Design (NC III) program.",
     detail: "My education and certifications, newest first. Each badge links to its verification page on Credly.",
   },
   {
     id: "skills",
     label: "Skills",
-    tagline: "What I work with.",
+    cta: "See all skills",
     href: "/skills",
     summary: "Python, SQL, TypeScript, and Next.js, with MySQL, PostgreSQL, and Supabase for data.",
     detail: "The languages, frameworks, and tools I work with, grouped by area.",
@@ -80,7 +80,7 @@ export const sections: SiteSection[] = [
   {
     id: "projects",
     label: "Projects",
-    tagline: "Things I've built.",
+    cta: "See all projects",
     href: "/projects",
     summary: "Flood Forecast, GADvance, and Untold Diaries, built with my thesis team.",
     detail: "Team projects with my thesis teammates. We split the work evenly across the whole stack.",
@@ -88,7 +88,7 @@ export const sections: SiteSection[] = [
   {
     id: "contact",
     label: "Contact",
-    tagline: "Get in touch.",
+    cta: "See contact details",
     href: "/contact",
     summary: "Reach me by email or on LinkedIn.",
     detail: "The best ways to reach me.",

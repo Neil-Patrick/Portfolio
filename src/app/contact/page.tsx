@@ -11,12 +11,12 @@ export default function ContactPage() {
     <SectionPage section={section}>
       <ul className="grid max-w-xl gap-5">
         {site.contactLinks.map((link) => (
-          <li key={link.label} className="pixel-panel">
+          <li key={link.label} className="rounded-md border border-line-strong bg-surface">
             <a
               href={link.href}
               className="flex min-h-11 flex-col gap-1 px-5 py-4 hover:text-accent sm:flex-row sm:items-baseline sm:justify-between"
             >
-              <span className="font-display text-lg">{link.label}</span>
+              <span className="text-lg font-semibold">{link.label}</span>
               <span className="break-all text-ink-muted">{link.text}</span>
             </a>
           </li>

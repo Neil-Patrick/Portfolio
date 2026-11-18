@@ -18,7 +18,7 @@ export default function SkillsPage() {
             </h2>
             <ul className="flex flex-wrap gap-3">
               {group.skills.map((skill) => (
-                <li key={skill} className="pixel-slot px-3 py-2 text-ink">
+                <li key={skill} className="rounded-sm border border-line-strong px-3 py-1.5">
                   {skill}
                 </li>
               ))}

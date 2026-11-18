@@ -4,7 +4,7 @@
    Theming
    - No data-theme on <html>  -> follow the OS ("system").
    - data-theme="light|dark"  -> forced by the ThemeSwitcher.
-   Every color token below uses light-dark(DAY, NIGHT), which resolves
+   Every color token below uses light-dark(LIGHT, DARK), which resolves
    from color-scheme. Components never need `dark:` classes.
    ========================================================================== */
 
@@ -19,70 +19,48 @@
 }
 
 /* ==========================================================================
-   Design tokens: "inventory screen" pixel style.
-   Day = overcast sky + stone panels. Night = indigo + enchant purple.
-   Contrast (WCAG AA) checked for every text/background pair. One exception:
-   on day `slot`, only `ink` passes for text, so text inside slots uses ink.
+   Design tokens: "your work, shown as data". A calm data report.
+   Contrast (WCAG AA) checked for every text/background pair on canvas and
+   surface. Chart series colors were validated with the dataviz palette
+   checker (lightness band, chroma, colorblind separation, contrast).
    ========================================================================== */
 
 @theme {
   /* Remove Tailwind's default palette so only these tokens can be used. */
   --color-*: initial;
 
-  --color-canvas: light-dark(#d9e4ea, #16142e); /* page background */
-  --color-panel: light-dark(#c2c8d3, #25224b); /* windows, frames */
-  --color-slot: light-dark(#a8afbe, #302d60); /* sunken item slots */
-  --color-ink: light-dark(#1d1b33, #eceaff); /* primary text */
-  --color-ink-muted: light-dark(#45425f, #b5b0de); /* secondary text */
-  --color-frame: light-dark(#2b2850, #7a75c9); /* pixel outlines (≥3:1 on every surface) */
-  --color-bevel-hi: light-dark(#eef2f6, #3d3978); /* lit edge of raised things */
-  --color-bevel-lo: light-dark(#8c93a6, #1a1838); /* shaded edge of raised things */
-  --color-accent: light-dark(#5e2a9e, #c79bff); /* "enchant": links, active states */
-  --color-on-accent: light-dark(#ffffff, #16142e); /* text on accent */
-  --color-gold: light-dark(#6e4d00, #f2c94c); /* selected / current slot */
+  --color-canvas: light-dark(#f7f8fa, #0d1724); /* page background */
+  --color-surface: light-dark(#eceff3, #152234); /* panels, header, footer */
+  --color-ink: light-dark(#13233a, #e6edf5); /* primary text */
+  --color-ink-muted: light-dark(#4a5a70, #9dadc2); /* secondary text */
+  --color-line: light-dark(#d5dbe3, #22324a); /* decorative dividers only */
+  --color-line-strong: light-dark(#74839a, #5f7390); /* control & panel boundaries (≥3:1) */
+  --color-accent: light-dark(#0b7268, #4fd1c1); /* links, active nav, focus */
+  --color-on-accent: light-dark(#ffffff, #0d1724); /* text on accent */
   --color-focus: var(--color-accent); /* focus rings */
 
-  /* Fluid display size for the hero heading. */
-  --text-display: clamp(2.25rem, 1.5rem + 4vw, 4rem);
-  --text-display--line-height: 1.05;
+  /* Chart marks only. Chart text always uses the ink tokens. */
+  --color-series-cert: light-dark(#00897b, #1a9e8f);
+  --color-series-project: light-dark(#a35c00, #c98425);
 
-  /* One "pixel" of UI chrome: frame and bevel thickness. */
-  --spacing-pixel: 3px;
+  /* Type scale. */
+  --text-display: clamp(2.5rem, 1.75rem + 3vw, 3.75rem);
+  --text-display--line-height: 1.1;
+
+  /* Radii: small for chips and controls, medium for panels. */
+  --radius-sm: 4px;
+  --radius-md: 8px;
 
   /* Sticky header height; also offsets anchor scrolling. */
   --spacing-header: 4rem;
 
-  /* Wheel menu: ring radius and item size, fluid from 320px phones up. */
-  --spacing-wheel-radius: clamp(7rem, 4rem + 14vw, 12rem);
-  --spacing-wheel-item: clamp(4.5rem, 3.5rem + 4vw, 6rem);
-  --spacing-wheel-track: calc(var(--spacing-wheel-item) * 0.7); /* band the items sit on */
-  --spacing-wheel-hub: calc(2 * var(--spacing-wheel-radius) - var(--spacing-wheel-item) - 1rem);
-
-  /* Motion: short, and stepped like sprite frames. All of it respects reduced motion. */
-  --duration-fast: 120ms;
-  --duration-base: 200ms;
-  --ease-sprite: steps(4, end);
+  /* Motion. Used only for the chart's one-time draw; respects reduced motion. */
+  --duration-draw: 1200ms;
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @theme inline {
-  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-pixel), var(--font-body), ui-sans-serif, sans-serif;
-}
-
-:root {
-  /* A circle drawn in pixel steps (32×32 grid), for round pixel shapes. */
-  --pixel-circle: polygon(
-    62.5% 0%, 62.5% 3.125%, 71.875% 3.125%, 71.875% 6.25%, 78.125% 6.25%, 78.125% 9.375%, 81.25% 9.375%, 81.25% 12.5%,
-    84.375% 12.5%, 84.375% 15.625%, 87.5% 15.625%, 87.5% 18.75%, 90.625% 18.75%, 90.625% 21.875%, 93.75% 21.875%, 93.75% 28.125%,
-    96.875% 28.125%, 96.875% 37.5%, 100% 37.5%, 100% 62.5%, 96.875% 62.5%, 96.875% 71.875%, 93.75% 71.875%, 93.75% 78.125%,
-    90.625% 78.125%, 90.625% 81.25%, 87.5% 81.25%, 87.5% 84.375%, 84.375% 84.375%, 84.375% 87.5%, 81.25% 87.5%, 81.25% 90.625%,
-    78.125% 90.625%, 78.125% 93.75%, 71.875% 93.75%, 71.875% 96.875%, 62.5% 96.875%, 62.5% 100%, 37.5% 100%, 37.5% 96.875%,
-    28.125% 96.875%, 28.125% 93.75%, 21.875% 93.75%, 21.875% 90.625%, 18.75% 90.625%, 18.75% 87.5%, 15.625% 87.5%, 15.625% 84.375%,
-    12.5% 84.375%, 12.5% 81.25%, 9.375% 81.25%, 9.375% 78.125%, 6.25% 78.125%, 6.25% 71.875%, 3.125% 71.875%, 3.125% 62.5%,
-    0% 62.5%, 0% 37.5%, 3.125% 37.5%, 3.125% 28.125%, 6.25% 28.125%, 6.25% 21.875%, 9.375% 21.875%, 9.375% 18.75%,
-    12.5% 18.75%, 12.5% 15.625%, 15.625% 15.625%, 15.625% 12.5%, 18.75% 12.5%, 18.75% 9.375%, 21.875% 9.375%, 21.875% 6.25%,
-    28.125% 6.25%, 28.125% 3.125%, 37.5% 3.125%, 37.5% 0%
-  );
+  --font-sans: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
 }
 
 /* Page-width wrapper with fluid side gutters. */
@@ -91,56 +69,6 @@
   max-width: var(--container-5xl);
   margin-inline: auto;
   padding-inline: clamp(1rem, 4vw, 2rem);
-}
-
-/* ==========================================================================
-   Pixel chrome. The outline is four offset shadows, which leaves the corners
-   notched like pixel art. Bevels are inset shadows: lit top-left, shaded
-   bottom-right for raised things, the reverse for sunken slots.
-   ========================================================================== */
-
-@utility pixel-panel {
-  background-color: var(--color-panel);
-  box-shadow:
-    0 calc(-1 * var(--spacing-pixel)) 0 0 var(--color-frame),
-    0 var(--spacing-pixel) 0 0 var(--color-frame),
-    calc(-1 * var(--spacing-pixel)) 0 0 0 var(--color-frame),
-    var(--spacing-pixel) 0 0 0 var(--color-frame),
-    inset var(--spacing-pixel) var(--spacing-pixel) 0 0 var(--color-bevel-hi),
-    inset calc(-1 * var(--spacing-pixel)) calc(-1 * var(--spacing-pixel)) 0 0 var(--color-bevel-lo);
-}
-
-@utility pixel-slot {
-  background-color: var(--color-slot);
-  box-shadow:
-    0 calc(-1 * var(--spacing-pixel)) 0 0 var(--color-frame),
-    0 var(--spacing-pixel) 0 0 var(--color-frame),
-    calc(-1 * var(--spacing-pixel)) 0 0 0 var(--color-frame),
-    var(--spacing-pixel) 0 0 0 var(--color-frame),
-    inset var(--spacing-pixel) var(--spacing-pixel) 0 0 var(--color-bevel-lo),
-    inset calc(-1 * var(--spacing-pixel)) calc(-1 * var(--spacing-pixel)) 0 0 var(--color-bevel-hi);
-}
-
-/* Raised button that visibly presses in: bevel flips and the face drops a pixel. */
-@utility pixel-button {
-  background-color: var(--color-panel);
-  box-shadow:
-    0 calc(-1 * var(--spacing-pixel)) 0 0 var(--color-frame),
-    0 var(--spacing-pixel) 0 0 var(--color-frame),
-    calc(-1 * var(--spacing-pixel)) 0 0 0 var(--color-frame),
-    var(--spacing-pixel) 0 0 0 var(--color-frame),
-    inset var(--spacing-pixel) var(--spacing-pixel) 0 0 var(--color-bevel-hi),
-    inset calc(-1 * var(--spacing-pixel)) calc(-1 * var(--spacing-pixel)) 0 0 var(--color-bevel-lo);
-  &:active {
-    translate: 0 1px;
-    box-shadow:
-      0 calc(-1 * var(--spacing-pixel)) 0 0 var(--color-frame),
-      0 var(--spacing-pixel) 0 0 var(--color-frame),
-      calc(-1 * var(--spacing-pixel)) 0 0 0 var(--color-frame),
-      var(--spacing-pixel) 0 0 0 var(--color-frame),
-      inset var(--spacing-pixel) var(--spacing-pixel) 0 0 var(--color-bevel-lo),
-      inset calc(-1 * var(--spacing-pixel)) calc(-1 * var(--spacing-pixel)) 0 0 var(--color-bevel-hi);
-  }
 }
 
 @layer base {
@@ -152,18 +80,20 @@
     background-color: var(--color-canvas);
     color: var(--color-ink);
     font-family: var(--font-sans);
+    line-height: 1.6;
   }
 
   h1,
   h2,
   h3 {
-    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.2;
   }
 
-  /* Offset clears the pixel frame so the ring never merges with it. */
   :focus-visible {
     outline: 2px solid var(--color-focus);
-    outline-offset: calc(var(--spacing-pixel) + 2px);
+    outline-offset: 2px;
   }
 }
 
@@ -174,119 +104,20 @@
 }
 
 /* ==========================================================================
-   Wheel menu (src/components/WheelMenu.tsx)
-   Items sit on a circle: rotate to the item's angle, push out by the radius,
-   then rotate back so the item stays upright.
+   Learning chart (src/components/LearningChart.tsx)
+   The page's one orchestrated moment: line and markers are revealed left to
+   right on load, like the record being written. Without motion they're simply there.
    ========================================================================== */
 
-@layer components {
-  .wheel-dialog {
-    opacity: 0;
-    transition:
-      opacity var(--duration-base) var(--ease-sprite),
-      overlay var(--duration-base) allow-discrete,
-      display var(--duration-base) allow-discrete;
-  }
-  .wheel-dialog[open] {
-    opacity: 1;
-  }
-  @starting-style {
-    .wheel-dialog[open] {
-      opacity: 0;
-    }
-  }
-
-  .wheel-ring {
-    width: calc(2 * var(--spacing-wheel-radius) + var(--spacing-wheel-item));
-    aspect-ratio: 1;
-  }
-
-  /* Round pixel shapes: an outer layer in the frame color, the fill inset by one pixel. */
-  .pixel-round,
-  .pixel-round > .pixel-round-fill {
-    clip-path: var(--pixel-circle);
-  }
-  .pixel-round {
-    background-color: var(--color-frame);
-  }
-  .pixel-round > .pixel-round-fill {
-    position: absolute;
-    inset: var(--spacing-pixel);
-  }
-
-  /* The band the items sit on, centered on the item radius. */
-  .wheel-track {
-    width: calc(2 * var(--spacing-wheel-radius) + var(--spacing-wheel-track));
-    aspect-ratio: 1;
-  }
-
-  .wheel-hub {
-    width: var(--spacing-wheel-hub);
-    aspect-ratio: 1;
-  }
-
-  /* Center text stays inside the circle the arrow sweeps around. */
-  .wheel-readout {
-    width: calc(var(--spacing-wheel-hub) * 0.66);
-  }
-
-  /* Item captions only where there is no hover to reveal names (touch screens). */
-  .wheel-caption {
-    display: none;
-  }
-  @media (hover: none) {
-    .wheel-caption {
-      display: block;
-    }
-  }
-
-  .wheel-item {
-    --angle: calc(var(--i) * 360deg / var(--count));
-    width: var(--spacing-wheel-item);
-    transform: translate(-50%, -50%) rotate(var(--angle))
-      translateY(calc(-1 * var(--spacing-wheel-radius))) rotate(calc(-1 * var(--angle)));
-  }
-
-}
-
-/* Selected slot: gold outline, like a highlighted inventory slot.
-   Unlayered on purpose so it beats the `pixel-slot` utility's shadow. */
-.wheel-item[data-highlighted] .wheel-face {
-  box-shadow:
-    0 calc(-1 * var(--spacing-pixel)) 0 0 var(--color-gold),
-    0 var(--spacing-pixel) 0 0 var(--color-gold),
-    calc(-1 * var(--spacing-pixel)) 0 0 0 var(--color-gold),
-    var(--spacing-pixel) 0 0 0 var(--color-gold),
-    inset 0 0 0 var(--spacing-pixel) var(--color-gold);
-}
-
-/* Motion only when welcome; otherwise the wheel simply appears. */
 @media (prefers-reduced-motion: no-preference) {
-  .wheel-ring {
-    transition: scale var(--duration-base) var(--ease-sprite);
-  }
-  .wheel-arrow {
-    transition: rotate var(--duration-base) var(--ease-sprite);
-  }
-  /* Scale the inner face, not the link: the link's transform positions it on the ring. */
-  .wheel-face {
-    transition: scale var(--duration-fast) var(--ease-sprite);
-  }
-  .wheel-item[data-highlighted] .wheel-face {
-    scale: 1.1;
-  }
-  .wheel-dialog:not([open]) .wheel-ring {
-    scale: 0.8;
-  }
-  @starting-style {
-    .wheel-dialog[open] .wheel-ring {
-      scale: 0.8;
-    }
+  .chart-reveal {
+    clip-path: inset(-12px 100% -12px -12px);
+    animation: chart-reveal var(--duration-draw) var(--ease-out-soft) forwards;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .wheel-dialog {
-    transition-duration: 1ms;
+@keyframes chart-reveal {
+  to {
+    clip-path: inset(-12px -12px -12px -12px);
   }
 }

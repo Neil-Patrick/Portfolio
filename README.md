@@ -8,8 +8,8 @@ Personal portfolio website.
 - TypeScript
 - [Tailwind CSS v4](https://tailwindcss.com)
 - ESLint (`eslint-config-next`)
-- [pixelarticons](https://pixelarticons.com) (MIT) for pixel-art icons
-- Fonts via `next/font`: Pixelify Sans (headings, labels) and Atkinson Hyperlegible Next (body)
+- IBM Plex Sans via `next/font` (one family for everything)
+- No UI, icon, or chart libraries: icons are inline SVG and the home chart is hand-built SVG
 - Hosted on [Vercel](https://vercel.com)
 
 ## Requirements
@@ -43,8 +43,11 @@ No environment variables are needed yet. When they are, put them in `.env.local`
 
 - Layout checks: no horizontal scroll, no console errors (including hydration warnings), and no axe WCAG 2.1 AA violations. Screenshots go to `test-results/screenshots/`.
   - Home page at 320, 768, 1024 and 1440px, in light and dark.
-  - Each section page, and the open wheel menu, at 320 and 1440px in light and dark. The wheel check also confirms every item is on screen and at least 44px.
-- Behaviour: the theme switcher sets, persists and clears the theme; the wheel opens, moves with arrow keys, closes with Escape or an outside click, returns focus, and navigates; the arrow never overlaps the hub text; mouse aiming highlights and opens the aimed section; captions show on a touch phone; each home "Open" link opens its page with the right title; every section in `src/content/site.ts` exists on the home page; the footer links reach every page.
+  - Each section page at 320 and 1440px, and the open mobile menu at 320px, in light and dark.
+- Behaviour:
+  - Navigation: every section exists on the home page; each home preview link opens its page with the right title; the desktop header links every page and marks the current one; the mobile menu opens, closes with Escape (returning focus) and on link click; the footer reaches every page.
+  - Theme: the switcher sets, persists and clears the theme; a first-time visitor gets System.
+  - Chart: one marker per timeline item and a table row for each; Home, End and arrow keys move the selection; clicking selects the nearest item; the chart fits a 320px screen.
 
 First run on a new machine: `npx playwright install chromium`. Checks run in Chromium only, so Safari, Firefox and real devices still need a manual look.
 
@@ -54,26 +57,26 @@ First run on a new machine: `npx playwright install chromium`. Checks run in Chr
 src/
   app/
     layout.tsx    Root layout: theme script, skip link, header, <main>, title template
-    page.tsx      Home: hero + a short preview <Section> per entry in site.ts
+    page.tsx      Home: hero, learning chart, and a preview <Section> per page
     about/ credentials/ skills/ projects/ contact/
                   One page.tsx per section (full detail)
-    globals.css   Design tokens (Tailwind @theme), pixel chrome utilities, theming, base styles
+    globals.css   Design tokens (Tailwind @theme), theming, base styles, chart reveal
   components/
-    SiteHeader.tsx     Sticky top bar: name, theme switcher, wheel button
-    SiteFooter.tsx     Plain page links + contact links (fallback to the wheel)
-    WheelMenu.tsx      Radial navigation in a native <dialog>
-    icons.tsx          Section icon map (pixelarticons)
+    SiteHeader.tsx     Sticky top bar: name, page links, theme switcher; "Menu" disclosure on small screens
+    SiteFooter.tsx     Plain page links + contact links
+    LearningChart.tsx  Home chart: cumulative timeline, readout, table view
     ThemeSwitcher.tsx  Light / dark / system control
-    Section.tsx        Home preview section with heading and "Open" link
+    Section.tsx        Home preview section with heading and a link to its page
     SectionPage.tsx    Shared shell for section pages (h1, back link, body)
   content/
-    site.ts       Site info and section list: label, route, summary, detail
-                  (drives the wheel, home order, and section pages)
+    site.ts       Site info and section list: label, route, summary, detail, link text
+                  (drives the header, home order, and section pages)
     credentials.ts  Education, featured certification, Credly badges, TESDA modules
     skills.ts      Skill groups (from the CV)
-    projects.ts    Projects: description, stack, links
+    projects.ts    Projects: description, start month, stack, links
   lib/
     theme.ts      Theme constants, applyTheme(), inline init script
+    timeline.ts   Builds the chart's dated points from the content files
 public/           Static assets (images, icons)
 tests/ui/         Playwright UI checks
 ```
@@ -92,9 +95,10 @@ Text in `[square brackets]` in `src/content/` is placeholder content.
 
 - **Tailwind over Sass:** design tokens are defined once in `@theme`, so every utility class uses them, and only the classes actually used get shipped.
 - **Content as data:** projects, skills, and links live in `src/content/`, separate from UI components.
-- **Visual direction: an inventory screen.** Pixel-game UI language (framed panels, sunken item slots, raised buttons that press in, a gold selected-slot outline) on a clean, readable base. The pixel font is for headings and labels only; body text uses Atkinson Hyperlegible Next. Day mode is overcast sky and stone panels, night mode is indigo with an enchant-purple accent. Pixel chrome is three Tailwind utilities in `globals.css` (`pixel-panel`, `pixel-slot`, `pixel-button`), built from box-shadows, so there's no UI library. Motion is stepped like sprite frames and switched off under reduced motion.
-- **Semantic color tokens only:** Tailwind's default palette is removed (`--color-*: initial`). Components use role names (`bg-canvas`, `bg-panel`, `text-ink`, `border-frame`, `bg-accent`) and never `dark:` classes. Each token is `light-dark(LIGHT, DARK)`, so restyling means editing `globals.css` only. Every text and background pair passes WCAG AA; on the day `slot` color only `ink` passes, so text inside slots uses `ink`.
+- **Visual direction: a calm data report.** Neil is moving into data and AI, so the site reads like a well-designed report about his work. The one signature element is the home chart: every certification and project plotted over time as a cumulative learning curve, built from the content files. Everything else stays quiet: IBM Plex Sans, a cool off-white or deep navy canvas, one teal accent, borders instead of shadows, no decorative motion. The only animation is the chart revealing itself once on load, switched off under reduced motion.
+- **Hand-built chart, no library:** one chart doesn't justify a charting dependency. Gridlines and the step line are SVG with non-scaling strokes; markers and axis labels are HTML positioned in percentages, so nothing distorts at any width. Certifications are circles and projects squares (identity never relies on color alone), the two series colors passed a colorblind-safety and contrast validator in both themes, and a table view lists every point. Mouse, tap, and arrow keys all drive one readout line instead of a floating tooltip.
+- **Semantic color tokens only:** Tailwind's default palette is removed (`--color-*: initial`). Components use role names (`bg-canvas`, `bg-surface`, `text-ink`, `border-line-strong`, `text-accent`) and never `dark:` classes. Each token is `light-dark(LIGHT, DARK)`, so restyling means editing `globals.css` only. Every text and background pair passes WCAG AA, and control borders (`line-strong`) pass 3:1.
 - **Theming without a library:** an inline `<head>` script applies a saved light/dark choice before first paint (no flash), following the Next.js "preventing flash before hydration" guide. "System" removes `data-theme` so CSS follows the OS live. The choice is stored in `localStorage` and synced across tabs. `next-themes` was considered and skipped: it would be an extra dependency for about 40 lines of code.
-- **Home preview + section pages:** the home page shows a short preview of every section with a "Open" link; each section has its own static route with the full content. Sections keep their `#id` anchors on the home page.
+- **Home preview + section pages:** the home page shows a short preview of every section with a link to its page; each section has its own static route with the full content. Sections keep their `#id` anchors on the home page.
 - **One folder per section page, not a `[section]` dynamic route:** each page will grow its own layout (project grid, credentials list, contact form). They share `SectionPage` for now to stay DRY.
-- **Wheel navigation:** a button in the top bar opens a ring of sections, on every screen size. It is a native modal `<dialog>`, so focus trapping, Escape, and the inert page come from the browser with no library. Items are placed on the circle with CSS transforms (`--i`, `--count`, `--spacing-wheel-radius`). Items are icons. Their names stay available to screen readers, are shown in the hub when highlighted, and appear as captions on touch screens, which have no hover. An arrow on the hub's edge aims at the highlighted item and never covers the hub text. The mouse aims by direction, like a controller stick, and clicking anywhere on the ring opens the aimed item. Arrow keys move around the ring, and the current page is marked with `aria-current`. The open animation uses the motion tokens and only fades under reduced motion. Nav items come from `src/content/site.ts`, so the nav style can still be swapped without touching pages.
+- **Plain top navigation:** text links in the header on large screens, a "Menu" disclosure on small ones, plus the same links in the footer. An earlier game-style radial menu was dropped with the pixel theme; a playful interactive piece may return later as its own section.

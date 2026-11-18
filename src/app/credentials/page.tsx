@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Trophy } from "pixelarticons/react/Trophy.js";
 import { SectionPage } from "@/components/SectionPage";
 import {
   certificationGroups,
@@ -23,11 +22,11 @@ export default function CredentialsPage() {
         </h2>
         <ul className="grid gap-6 sm:grid-cols-2">
           {education.map((entry) => (
-            <li key={entry.school} className="pixel-panel p-5">
-              <p className="font-display text-lg">{entry.program}</p>
+            <li key={entry.school} className="rounded-md border border-line-strong bg-surface p-5">
+              <p className="text-lg font-semibold">{entry.program}</p>
               <p className="mt-1">{entry.school}</p>
               {entry.note && <p className="mt-1 text-accent">{entry.note}</p>}
-              <p className="mt-2 text-sm text-ink-muted">
+              <p className="mt-2 text-sm text-ink-muted tabular-nums">
                 {entry.location}, {entry.period}
               </p>
             </li>
@@ -40,17 +39,17 @@ export default function CredentialsPage() {
           Certifications
         </h2>
 
-        {/* The credential that matters most for data and AI roles, framed like a rare item. */}
+        {/* The credential that matters most for data and AI roles, shown first and larger. */}
         <a
           href={featured.url}
-          className="pixel-panel mb-8 flex items-center gap-5 p-5 hover:text-accent sm:p-6"
+          className="rounded-md border border-line-strong bg-surface mb-8 flex items-center gap-5 p-5 hover:border-accent sm:p-6"
         >
-          <span className="pixel-slot grid size-16 shrink-0 place-items-center text-gold">
-            <Trophy width={36} height={36} aria-hidden focusable={false} />
+          <span className="grid size-14 shrink-0 place-items-center rounded-md bg-canvas text-accent">
+            <AwardIcon />
           </span>
           <span>
-            <span className="block font-display text-xl">{featured.name}</span>
-            <span className="mt-1 block text-ink-muted">
+            <span className="block text-xl font-semibold">{featured.name}</span>
+            <span className="mt-1 block text-ink-muted tabular-nums">
               {featured.issuer}, {formatMonth(featured.date)}
               {featured.expires && `, valid until ${formatMonth(featured.expires)}`}
             </span>
@@ -65,7 +64,7 @@ export default function CredentialsPage() {
                 className="inline-flex min-h-11 flex-col justify-center hover:text-accent"
               >
                 <span className="font-medium">{cert.name}</span>
-                <span className="text-sm text-ink-muted">
+                <span className="text-sm text-ink-muted tabular-nums">
                   {cert.issuer}, {formatMonth(cert.date)}
                 </span>
               </a>
@@ -78,7 +77,7 @@ export default function CredentialsPage() {
             <h3 id={`cert-group-${i}`} className="text-xl">
               {group.name}
             </h3>
-            <p className="mb-3 text-ink-muted">
+            <p className="mb-3 text-ink-muted tabular-nums">
               {group.issuer}, {group.modules.length} modules,{" "}
               {formatMonth(group.modules[0].date)} to{" "}
               {formatMonth(group.modules[group.modules.length - 1].date)}
@@ -92,5 +91,25 @@ export default function CredentialsPage() {
         ))}
       </section>
     </SectionPage>
+  );
+}
+
+function AwardIcon() {
+  return (
+    <svg
+      width={28}
+      height={28}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.75}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      focusable={false}
+    >
+      <circle cx="12" cy="8" r="6" />
+      <path d="M15.5 12.9 17 22l-5-3-5 3 1.5-9.1" />
+    </svg>
   );
 }
