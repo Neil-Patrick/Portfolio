@@ -23,7 +23,7 @@ export default function ProjectsPage() {
       >
         <li className="flex items-center gap-2">
           <TechIcon name="Service" />
-          Service only, not a skill
+          Service only, not listed under Technologies
         </li>
       </ul>
 
@@ -64,10 +64,10 @@ export default function ProjectsPage() {
               <ul className="flex flex-wrap gap-2">
                 {project.stack.map((tool) => (
                   <li key={tool}>
-                    {/* Skills link to the Skills page with that skill selected. */}
+                    {/* Technologies link to the Technologies page with that one selected. */}
                     {isSkill(tool) ? (
                       <Link
-                        href={`/skills#${skillAnchor(tool)}`}
+                        href={`/technologies#${skillAnchor(tool)}`}
                         className={`${chip} border-line-strong bg-canvas hover:border-accent hover:text-accent`}
                       >
                         <TechIcon name={tool} />

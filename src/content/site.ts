@@ -32,7 +32,7 @@ export type SectionId =
   | "home"
   | "about"
   | "credentials"
-  | "skills"
+  | "technologies"
   | "projects"
   | "contact";
 
@@ -70,10 +70,10 @@ export const sections: SiteSection[] = [
     detail: "My education and certifications, newest first. Each badge links to its verification page on Credly.",
   },
   {
-    id: "skills",
-    label: "Skills",
-    cta: "See all skills",
-    href: "/skills",
+    id: "technologies",
+    label: "Technologies",
+    cta: "See all technologies",
+    href: "/technologies",
     summary: "Python, SQL, TypeScript, and Next.js, with MySQL, PostgreSQL, and Supabase for data.",
     detail: "The languages, frameworks, and tools I work with, grouped by area.",
   },

@@ -32,12 +32,12 @@ const previews: Record<Exclude<SectionId, "home">, ReactNode> = {
       </p>
     </div>
   ),
-  skills: (
+  technologies: (
     <ul className="flex flex-wrap gap-2">
       {site.featuredSkills.map((skill) => (
         <li key={skill}>
           <Link
-            href={`/skills#${skillAnchor(skill)}`}
+            href={`/technologies#${skillAnchor(skill)}`}
             className="inline-flex min-h-11 items-center gap-2 rounded-sm border border-line-strong px-3 py-1 hover:border-accent hover:text-accent"
           >
             <TechIcon name={skill} />

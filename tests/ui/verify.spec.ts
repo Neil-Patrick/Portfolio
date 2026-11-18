@@ -242,9 +242,9 @@ test("chart fits a 320px phone without overflow", async ({ page }) => {
   expect(figure.x + figure.width).toBeLessThanOrEqual(320);
 });
 
-/* ---------- Behaviour: skills ↔ projects ---------- */
+/* ---------- Behaviour: technologies ↔ projects ---------- */
 
-test("every project tool is a skill or a known service", async () => {
+test("every project tool is a listed technology or a known service", async () => {
   const { projects } = await import("../../src/content/projects");
   const { skillGroups } = await import("../../src/content/skills");
   const skills = new Set(skillGroups.flatMap((group) => group.skills));
@@ -255,14 +255,14 @@ test("every project tool is a skill or a known service", async () => {
   expect(unknown, "stack names must match skills.ts exactly").toEqual([]);
 });
 
-test("every skill shows an icon, and every logo loads", async ({ page }) => {
+test("every technology shows an icon, and every logo loads", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/skills");
+  await page.goto("/technologies");
   await page.waitForLoadState("networkidle");
   const { skillGroups } = await import("../../src/content/skills");
   const total = skillGroups.flatMap((group) => group.skills).length;
 
-  const chips = page.locator('main li[id^="skill-"]');
+  const chips = page.locator('main li[id^="tech-"]');
   await expect(chips).toHaveCount(total);
   for (const chip of await chips.all()) {
     await expect(chip.locator("[data-tech-icon]").first()).toBeAttached();
@@ -282,17 +282,17 @@ test("every skill shows an icon, and every logo loads", async ({ page }) => {
   expect(broken, "logos that failed to load").toEqual([]);
 });
 
-test("selecting a skill lists the projects that use it", async ({ page }) => {
+test("selecting a technology lists the projects that use it", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/skills");
+  await page.goto("/technologies");
   await page.waitForLoadState("networkidle");
   const typescript = page.getByRole("button", { name: /^TypeScript/ });
-  const panel = page.getByRole("complementary", { name: "Projects using the selected skill" }).getByTestId("skill-usage");
+  const panel = page.getByRole("complementary", { name: "Projects using the selected technology" }).getByTestId("skill-usage");
 
-  await expect(panel).toContainText("Pick a highlighted skill");
+  await expect(panel).toContainText("Pick a highlighted technology");
   await typescript.click();
   await expect(typescript).toHaveAttribute("aria-pressed", "true");
-  await expect(page).toHaveURL(/#skill-typescript$/);
+  await expect(page).toHaveURL(/#tech-typescript$/);
   await expect(panel).toContainText("Used in 3 projects");
   for (const name of ["Flood Forecast", "GADvance", "Untold Diaries"]) {
     await expect(panel.getByRole("link", { name })).toBeVisible();
@@ -301,26 +301,26 @@ test("selecting a skill lists the projects that use it", async ({ page }) => {
   await panel.getByRole("link", { name: "GADvance" }).click();
   await expect(page).toHaveURL(/\/projects#gadvance$/);
 
-  // Clicking the selected skill again clears the selection.
-  await page.goto("/skills#skill-typescript");
+  // Clicking the selected technology again clears the selection.
+  await page.goto("/technologies#tech-typescript");
   await page.waitForLoadState("networkidle");
   await expect(typescript).toHaveAttribute("aria-pressed", "true");
   await typescript.click();
   await expect(typescript).toHaveAttribute("aria-pressed", "false");
-  await expect(panel).toContainText("Pick a highlighted skill");
+  await expect(panel).toContainText("Pick a highlighted technology");
 });
 
-test("a project's tool chip opens the Skills page with that skill selected", async ({ page }) => {
+test("a project's tool chip opens the Technologies page with it selected", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/projects");
   await page.locator("#flood-forecast").getByRole("link", { name: "Python", exact: true }).click();
-  await expect(page).toHaveURL(/\/skills#skill-python$/);
+  await expect(page).toHaveURL(/\/technologies#tech-python$/);
   await expect(page.getByRole("button", { name: /^Python/ })).toHaveAttribute("aria-pressed", "true");
 });
 
-test("on a phone, the usage panel opens under the selected skill's group", async ({ page }) => {
+test("on a phone, the usage panel opens under the selected technology's group", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 800 });
-  await page.goto("/skills");
+  await page.goto("/technologies");
   await page.waitForLoadState("networkidle");
   await page.getByRole("button", { name: /^MySQL/ }).click();
   const group = page.locator("section", { has: page.getByRole("heading", { name: "Backend and databases" }) });

@@ -5,7 +5,7 @@ import { getSection } from "@/content/site";
 import { skillGroups } from "@/content/skills";
 import { projectsUsing, skillAnchor } from "@/lib/skill-usage";
 
-const section = getSection("skills");
+const section = getSection("technologies");
 
 export const metadata: Metadata = { title: section.label };
 
@@ -19,7 +19,7 @@ const groups = skillGroups.map((group) => ({
   })),
 }));
 
-export default function SkillsPage() {
+export default function TechnologiesPage() {
   return (
     <SectionPage section={section}>
       <SkillExplorer groups={groups} />

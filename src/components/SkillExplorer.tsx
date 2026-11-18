@@ -25,7 +25,7 @@ export function SkillExplorer({ groups }: Props) {
   const allSkills = groups.flatMap((group) => group.skills);
   const [selected, setSelected] = useState<string | null>(null);
 
-  // Pre-select from the hash on arrival (e.g. /skills#skill-python from a project chip).
+  // Pre-select from the hash on arrival (e.g. /technologies#tech-python from a project chip).
   useEffect(() => {
     const fromHash = () => {
       const anchor = decodeURIComponent(window.location.hash.slice(1));
@@ -105,7 +105,7 @@ export function SkillExplorer({ groups }: Props) {
         })}
       </div>
 
-      <aside aria-label="Projects using the selected skill" className="hidden lg:block">
+      <aside aria-label="Projects using the selected technology" className="hidden lg:block">
         <div className="sticky top-[calc(var(--spacing-header)+1.5rem)]">
           <UsagePanel skill={current} />
         </div>
@@ -146,7 +146,7 @@ function UsagePanel({ skill }: { skill: ExplorerSkill | null }) {
         </>
       ) : (
         <p className="text-ink-muted">
-          Pick a highlighted skill to see the projects that use it. The number on each one is how
+          Pick a highlighted technology to see the projects that use it. The number on each one is how
           many projects it appears in.
         </p>
       )}

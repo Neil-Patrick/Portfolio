@@ -18,8 +18,8 @@ export function slug(name: string) {
     .replace(/^-|-$/g, "");
 }
 
-/** Anchor id of a skill chip on the Skills page, and the hash that selects it. */
-export const skillAnchor = (name: string) => `skill-${slug(name)}`;
+/** Anchor id of a chip on the Technologies page, and the hash that selects it. */
+export const skillAnchor = (name: string) => `tech-${slug(name)}`;
 
 export function isSkill(name: string) {
   return skillNames.has(name);
