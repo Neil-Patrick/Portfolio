@@ -42,7 +42,7 @@ No environment variables are needed yet. When they are, put them in `.env.local`
 - Layout checks: no horizontal scroll, no console errors (including hydration warnings), and no axe WCAG 2.1 AA violations. Screenshots go to `test-results/screenshots/`.
   - Home page at 320, 768, 1024 and 1440px, in light and dark.
   - Each section page, and the open wheel menu, at 320 and 1440px in light and dark. The wheel check also confirms every item is on screen and at least 44px.
-- Behaviour: the theme switcher sets, persists and clears the theme; the wheel opens, moves with arrow keys, closes with Escape or an outside click, returns focus, and navigates; each home "View all" link opens its page with the right title; every section in `src/content/site.ts` exists on the home page.
+- Behaviour: the theme switcher sets, persists and clears the theme; the wheel opens, moves with arrow keys, closes with Escape or an outside click, returns focus, and navigates; the arrow never overlaps the hub text; mouse aiming highlights and opens the aimed section; captions show on a touch phone; each home "View all" link opens its page with the right title; every section in `src/content/site.ts` exists on the home page.
 
 First run on a new machine: `npx playwright install chromium`. Checks run in Chromium only, so Safari, Firefox and real devices still need a manual look.
 
@@ -59,6 +59,7 @@ src/
   components/
     SiteHeader.tsx     Sticky top bar: name, theme switcher, wheel button
     WheelMenu.tsx      Radial navigation in a native <dialog>
+    icons.tsx          Section icons (inline SVG, from Lucide, ISC license)
     ThemeSwitcher.tsx  Light / dark / system control
     Section.tsx        Home preview section with heading and "View all" link
     SectionPage.tsx    Shared shell for section pages (h1, back link, body)
@@ -87,4 +88,4 @@ Text in `[square brackets]` in `src/content/` is placeholder content.
 - **Theming without a library:** an inline `<head>` script applies a saved light/dark choice before first paint (no flash), following the Next.js "preventing flash before hydration" guide. "System" removes `data-theme` so CSS follows the OS live. The choice is stored in `localStorage` and synced across tabs. `next-themes` was considered and skipped: it would be an extra dependency for about 40 lines of code.
 - **Home preview + section pages:** the home page shows a short preview of every section with a "View all" link; each section has its own static route with the full content. Sections keep their `#id` anchors on the home page.
 - **One folder per section page, not a `[section]` dynamic route:** each page will grow its own layout (project grid, credentials list, contact form). They share `SectionPage` for now to stay DRY.
-- **Wheel navigation:** a button in the top bar opens a ring of sections, on every screen size. It is a native modal `<dialog>`, so focus trapping, Escape, and the inert page come from the browser with no library. Items are placed on the circle with CSS transforms (`--i`, `--count`, `--spacing-wheel-radius`). Arrow keys move around the ring, and the current page is marked with `aria-current`. The open animation uses the motion tokens and only fades under reduced motion. Nav items come from `src/content/site.ts`, so the nav style can still be swapped without touching pages.
+- **Wheel navigation:** a button in the top bar opens a ring of sections, on every screen size. It is a native modal `<dialog>`, so focus trapping, Escape, and the inert page come from the browser with no library. Items are placed on the circle with CSS transforms (`--i`, `--count`, `--spacing-wheel-radius`). Items are icons. Their names stay available to screen readers, are shown in the hub when highlighted, and appear as captions on touch screens, which have no hover. An arrow on the hub's edge aims at the highlighted item and never covers the hub text. The mouse aims by direction, like a controller stick, and clicking anywhere on the ring opens the aimed item. Arrow keys move around the ring, and the current page is marked with `aria-current`. The open animation uses the motion tokens and only fades under reduced motion. Nav items come from `src/content/site.ts`, so the nav style can still be swapped without touching pages.

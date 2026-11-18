@@ -1,30 +1,57 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useId, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent,
+  type MouseEvent,
+  type PointerEvent,
+} from "react";
 import { sections } from "@/content/site";
+import { sectionIcons } from "./icons";
+
+/** Degrees between neighbouring items; item 0 sits at 12 o'clock, then clockwise. */
+const STEP = 360 / sections.length;
+/** Pointer this close to the center doesn't aim (like a controller stick's dead zone). */
+const DEAD_ZONE_PX = 24;
+
+/** Turn from `from` to `to` (degrees) the short way round, keeping a running total. */
+function turnTowards(from: number, to: number) {
+  const delta = ((((to - from) % 360) + 540) % 360) - 180;
+  return from + delta;
+}
 
 /**
  * Radial navigation. A button opens a native modal <dialog> (focus trap, Escape,
- * inert page for free) with one item per entry in `sections`, laid out on a ring.
- * Arrow keys move around the ring; the center shows the highlighted item's name.
+ * inert page for free) with one icon per entry in `sections`, laid out on a ring.
+ * An arrow on the hub's edge aims at the highlighted item; the hub shows its name
+ * and tagline. Aim with the mouse (anywhere around the ring), arrow keys, or Tab.
  */
 export function WheelMenu() {
   const [open, setOpen] = useState(false);
-  const [highlighted, setHighlighted] = useState<string | null>(null);
+  const [highlighted, setHighlighted] = useState<number | null>(null);
+  const [arrowAngle, setArrowAngle] = useState(0);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const dialogId = useId();
   const pathname = usePathname();
+  const router = useRouter();
 
   const currentIndex = Math.max(
     0,
     sections.findIndex((s) => s.href === pathname),
   );
+  const active = highlighted ?? currentIndex;
+  const activeSection = sections[active];
 
-  // Keep React state in sync however the dialog closes (Escape, backdrop, link, button).
+  // Keep React state in sync however the dialog closes (Escape, outside click, link, button).
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
@@ -37,7 +64,13 @@ export function WheelMenu() {
     return () => dialog.removeEventListener("close", onClose);
   }, []);
 
+  const aim = (index: number) => {
+    setHighlighted(index);
+    setArrowAngle((angle) => turnTowards(angle, index * STEP));
+  };
+
   const openWheel = () => {
+    setArrowAngle((angle) => turnTowards(angle, currentIndex * STEP));
     dialogRef.current?.showModal();
     setOpen(true);
     // Start on the current page's item, like a game menu remembering your place.
@@ -45,6 +78,41 @@ export function WheelMenu() {
   };
 
   const closeWheel = () => dialogRef.current?.close();
+
+  /** Which item a screen point aims at, or null inside the dead zone / outside the ring. */
+  const indexAt = (x: number, y: number) => {
+    const ring = ringRef.current?.getBoundingClientRect();
+    if (!ring) return null;
+    const dx = x - (ring.left + ring.width / 2);
+    const dy = y - (ring.top + ring.height / 2);
+    const distance = Math.hypot(dx, dy);
+    if (distance < DEAD_ZONE_PX || distance > ring.width / 2) return null;
+    const degrees = ((Math.atan2(dx, -dy) * 180) / Math.PI + 360) % 360;
+    return Math.round(degrees / STEP) % sections.length;
+  };
+
+  const onPointerMove = (event: PointerEvent<HTMLDialogElement>) => {
+    if (event.pointerType !== "mouse") return;
+    const index = indexAt(event.clientX, event.clientY);
+    if (index !== null && index !== highlighted) aim(index);
+  };
+
+  const onDialogClick = (event: MouseEvent<HTMLDialogElement>) => {
+    // Links and buttons handle their own clicks.
+    if ((event.target as Element).closest("a, button")) return;
+    const ring = ringRef.current?.getBoundingClientRect();
+    if (!ring) return;
+    const distance = Math.hypot(
+      event.clientX - (ring.left + ring.width / 2),
+      event.clientY - (ring.top + ring.height / 2),
+    );
+    // Outside the ring: close. Inside it: open whatever the arrow aims at.
+    if (distance > ring.width / 2) return closeWheel();
+    const index = indexAt(event.clientX, event.clientY);
+    if (index === null) return;
+    closeWheel();
+    router.push(sections[index].href);
+  };
 
   const onRingKeyDown = (event: KeyboardEvent<HTMLUListElement>) => {
     const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key];
@@ -55,8 +123,6 @@ export function WheelMenu() {
     const next = (Math.max(from, 0) + step + links.length) % links.length;
     links[next]?.focus();
   };
-
-  const readout = highlighted ?? sections[currentIndex].label;
 
   return (
     <>
@@ -77,48 +143,17 @@ export function WheelMenu() {
         ref={dialogRef}
         id={dialogId}
         aria-label="Navigation"
-        // A click on the dialog itself (not its content) is a click on the backdrop area.
-        onClick={(event) => event.target === event.currentTarget && closeWheel()}
+        onClick={onDialogClick}
+        onPointerMove={onPointerMove}
         className="wheel-dialog fixed inset-0 m-0 size-full max-h-none max-w-none place-items-center overflow-hidden bg-canvas/90 p-0 text-ink backdrop:bg-transparent open:grid"
       >
-        <div className="wheel-ring relative rounded-full border border-line">
-          <nav aria-label="Primary">
-            <ul onKeyDown={onRingKeyDown}>
-              {sections.map((section, i) => {
-                const current = i === currentIndex;
-                return (
-                  <li key={section.id}>
-                    <Link
-                      ref={(el) => {
-                        linkRefs.current[i] = el;
-                      }}
-                      href={section.href}
-                      aria-current={current ? "page" : undefined}
-                      onClick={closeWheel}
-                      onFocus={() => setHighlighted(section.label)}
-                      onMouseEnter={() => setHighlighted(section.label)}
-                      onMouseLeave={() => setHighlighted(null)}
-                      style={{ "--i": i, "--count": sections.length } as CSSProperties}
-                      className={`wheel-item absolute top-1/2 left-1/2 grid aspect-square place-items-center rounded-full border bg-surface p-1 text-center text-xs font-medium transition-colors duration-(--duration-fast) hover:bg-accent hover:text-on-accent focus-visible:bg-accent focus-visible:text-on-accent sm:text-sm ${
-                        current ? "border-2 border-accent" : "border-line"
-                      }`}
-                    >
-                      {section.label}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-
-          <div className="absolute top-1/2 left-1/2 flex -translate-1/2 flex-col items-center gap-2">
-            <p aria-hidden className="font-mono text-xs tracking-widest text-ink-muted uppercase">
-              {readout}
-            </p>
+        {/* Close sits exactly where the open button was: press the same spot to close. */}
+        <div className="pointer-events-none absolute inset-x-0 top-0">
+          <div className="container-page flex h-header items-center justify-end">
             <button
               type="button"
               onClick={closeWheel}
-              className="grid size-12 place-items-center rounded-full border border-line bg-canvas transition-colors hover:bg-surface"
+              className="pointer-events-auto grid size-11 place-items-center rounded-full border border-line bg-canvas transition-colors hover:bg-surface"
             >
               <span className="sr-only">Close navigation</span>
               <svg
@@ -136,6 +171,76 @@ export function WheelMenu() {
               </svg>
             </button>
           </div>
+        </div>
+
+        <div ref={ringRef} className="wheel-ring relative">
+          <div className="wheel-track absolute top-1/2 left-1/2 -translate-1/2 rounded-full" />
+
+          {/* Hub: arrow sweeps its edge, text stays in the middle. */}
+          <div className="wheel-hub absolute top-1/2 left-1/2 -translate-1/2 rounded-full border border-line bg-canvas">
+            <div
+              data-testid="wheel-arrow-track"
+              className="wheel-arrow absolute inset-0"
+              style={{ rotate: `${arrowAngle}deg` }}
+            >
+              <svg
+                data-testid="wheel-arrow"
+                viewBox="0 0 16 10"
+                className="absolute top-1.5 left-1/2 h-2.5 w-4 -translate-x-1/2 text-accent sm:top-2 sm:h-3.5 sm:w-5"
+                aria-hidden
+                focusable={false}
+              >
+                <path d="M8 0 16 10H0z" fill="currentColor" />
+              </svg>
+            </div>
+            <div
+              data-testid="wheel-readout"
+              aria-hidden
+              className="wheel-readout absolute top-1/2 left-1/2 -translate-1/2 text-center"
+            >
+              <p className="text-xs font-semibold tracking-wider uppercase sm:text-sm">
+                {activeSection.label}
+              </p>
+              <p className="mt-1 hidden text-sm text-ink-muted sm:block">{activeSection.tagline}</p>
+            </div>
+          </div>
+
+          <nav aria-label="Primary">
+            <ul onKeyDown={onRingKeyDown}>
+              {sections.map((section, i) => {
+                const SectionIcon = sectionIcons[section.id];
+                const current = i === currentIndex;
+                return (
+                  <li key={section.id}>
+                    <Link
+                      ref={(el) => {
+                        linkRefs.current[i] = el;
+                      }}
+                      href={section.href}
+                      aria-current={current ? "page" : undefined}
+                      data-highlighted={i === active ? "" : undefined}
+                      onClick={closeWheel}
+                      onFocus={() => aim(i)}
+                      style={{ "--i": i, "--count": sections.length } as CSSProperties}
+                      className="wheel-item group absolute top-1/2 left-1/2 aspect-square rounded-full"
+                    >
+                      <span
+                        className={`wheel-face grid size-full place-content-center justify-items-center gap-1 rounded-full border-2 bg-surface text-ink-muted group-data-highlighted:bg-canvas group-data-highlighted:text-ink group-data-highlighted:ring-4 group-data-highlighted:ring-accent/40 ${
+                          current ? "border-accent" : "border-line"
+                        }`}
+                      >
+                        <SectionIcon className="size-7 sm:size-9" />
+                        <span aria-hidden className="wheel-caption text-xs font-medium">
+                          {section.label}
+                        </span>
+                      </span>
+                      <span className="sr-only">{section.label}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
         </div>
       </dialog>
     </>

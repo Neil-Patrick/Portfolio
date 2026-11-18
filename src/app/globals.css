@@ -44,8 +44,10 @@
   --spacing-header: 4rem;
 
   /* Wheel menu: ring radius and item size, fluid from 320px phones up. */
-  --spacing-wheel-radius: clamp(7rem, 4rem + 14vw, 11rem);
-  --spacing-wheel-item: clamp(5.5rem, 4.5rem + 4vw, 7rem);
+  --spacing-wheel-radius: clamp(7rem, 4rem + 14vw, 12rem);
+  --spacing-wheel-item: clamp(5rem, 4rem + 4vw, 6.5rem);
+  --spacing-wheel-track: calc(var(--spacing-wheel-item) * 0.5); /* band the items sit on */
+  --spacing-wheel-hub: calc(2 * var(--spacing-wheel-radius) - var(--spacing-wheel-item) - 1rem);
 
   /* Motion tokens. Every animation uses these and respects reduced motion. */
   --duration-fast: 120ms;
@@ -117,6 +119,36 @@
     aspect-ratio: 1;
   }
 
+  /* The band the items sit on, centered on the item radius. */
+  .wheel-track {
+    width: calc(2 * var(--spacing-wheel-radius) + var(--spacing-wheel-track));
+    aspect-ratio: 1;
+    border: var(--spacing-wheel-track) solid var(--color-surface);
+    box-shadow:
+      0 0 0 1px var(--color-line),
+      inset 0 0 0 1px var(--color-line);
+  }
+
+  .wheel-hub {
+    width: var(--spacing-wheel-hub);
+    aspect-ratio: 1;
+  }
+
+  /* Center text stays inside the circle the arrow sweeps around. */
+  .wheel-readout {
+    width: calc(var(--spacing-wheel-hub) * 0.66);
+  }
+
+  /* Item captions only where there is no hover to reveal names (touch screens). */
+  .wheel-caption {
+    display: none;
+  }
+  @media (hover: none) {
+    .wheel-caption {
+      display: block;
+    }
+  }
+
   .wheel-item {
     --angle: calc(var(--i) * 360deg / var(--count));
     width: var(--spacing-wheel-item);
@@ -129,6 +161,19 @@
 @media (prefers-reduced-motion: no-preference) {
   .wheel-ring {
     transition: scale var(--duration-base) var(--ease-out-quick);
+  }
+  .wheel-arrow {
+    transition: rotate var(--duration-base) var(--ease-out-quick);
+  }
+  /* Scale the inner face, not the link: the link's transform positions it on the ring. */
+  .wheel-face {
+    transition:
+      scale var(--duration-fast) var(--ease-out-quick),
+      background-color var(--duration-fast),
+      color var(--duration-fast);
+  }
+  .wheel-item[data-highlighted] .wheel-face {
+    scale: 1.08;
   }
   .wheel-dialog:not([open]) .wheel-ring {
     scale: 0.85;

@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { devices, expect, test, type Page } from "@playwright/test";
 import { sections } from "../../src/content/site";
 
 const WIDTHS = [320, 768, 1024, 1440];
@@ -97,6 +97,19 @@ for (const width of [320, 1440]) {
         expect(box.x + box.width, "item off the right edge").toBeLessThanOrEqual(width);
         expect(box.width, "touch target").toBeGreaterThanOrEqual(44);
       }
+
+      // The arrow must never cover the center text, whichever item it points at.
+      const arrow = page.getByTestId("wheel-arrow");
+      const readout = page.getByTestId("wheel-readout");
+      for (let i = 0; i < sections.length; i++) {
+        await page.waitForTimeout(300); // let the arrow finish turning
+        const a = (await arrow.boundingBox())!;
+        const r = (await readout.boundingBox())!;
+        const overlaps =
+          a.x < r.x + r.width && r.x < a.x + a.width && a.y < r.y + r.height && r.y < a.y + a.height;
+        expect(overlaps, `arrow covers text when aiming at ${sections[i].label}`).toBe(false);
+        await page.keyboard.press("ArrowRight");
+      }
       await checkPage(page, errors);
     });
   }
@@ -144,7 +157,7 @@ test("theme switcher sets, persists, and clears the theme", async ({ page }) => 
 });
 
 test("wheel opens, moves with arrow keys, closes with Escape, and navigates", async ({ page }) => {
-  await page.setViewportSize({ width: 320, height: 700 });
+  await page.setViewportSize({ width: 1024, height: 800 });
   await page.goto("/");
   const trigger = wheelTrigger(page);
   const item = (name: string) => wheel(page).getByRole("link", { name, exact: true });
@@ -169,6 +182,9 @@ test("wheel opens, moves with arrow keys, closes with Escape, and navigates", as
   await expect(trigger).toBeFocused();
 
   await trigger.click();
+  await expect(page.getByTestId("wheel-readout")).toContainText("Home");
+  await item("Projects").hover();
+  await expect(page.getByTestId("wheel-readout")).toContainText("Things I've built.");
   await item("Projects").click();
   await expect(page).toHaveURL(/\/projects$/);
   await expect(wheel(page)).toBeHidden();
@@ -177,6 +193,43 @@ test("wheel opens, moves with arrow keys, closes with Escape, and navigates", as
   await trigger.click();
   await expect(item("Projects")).toHaveAttribute("aria-current", "page");
   await expect(item("Projects")).toBeFocused();
+});
+
+test("mouse aims the arrow by direction and click opens the aimed section", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await wheelTrigger(page).click();
+  await page.waitForTimeout(300);
+  const ring = (await page.locator(".wheel-ring").boundingBox())!;
+  const cx = ring.x + ring.width / 2;
+  const cy = ring.y + ring.height / 2;
+  const readout = page.getByTestId("wheel-readout");
+
+  // Point down-right at 120° (Credentials), inside the hub, not on any icon.
+  const angle = (sections.findIndex((s) => s.id === "credentials") * 360) / sections.length;
+  const rad = (angle * Math.PI) / 180;
+  const x = cx + 60 * Math.sin(rad);
+  const y = cy - 60 * Math.cos(rad);
+  await page.mouse.move(x, y);
+  await expect(readout).toContainText("Credentials");
+  await expect(readout).toContainText("Degrees and certifications.");
+
+  await page.mouse.click(x, y);
+  await expect(page).toHaveURL(/\/credentials$/);
+  await expect(wheel(page)).toBeHidden();
+});
+
+test.describe("on a touch phone", () => {
+  // Phone viewport with touch (no hover), so the hover: none captions apply.
+  const { viewport, userAgent, deviceScaleFactor } = devices["Pixel 7"];
+  test.use({ viewport, userAgent, deviceScaleFactor, isMobile: true, hasTouch: true });
+
+  test("wheel items show captions", async ({ page }) => {
+    await page.goto("/");
+    await wheelTrigger(page).tap();
+    const caption = wheel(page).locator(".wheel-caption", { hasText: "Projects" });
+    await expect(caption).toBeVisible();
+  });
 });
 
 test("clicking outside the ring closes the wheel", async ({ page }) => {
