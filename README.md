@@ -97,7 +97,7 @@ src/
   content/
     site.ts       Site info and section list: label, route, summary, detail, link text
                   (drives the header, home order, and section pages)
-    credentials.ts  Education, featured certification, Credly badges, TESDA modules
+    credentials.ts  Education, featured certification, Credly badges
     skills.ts      Technology groups for the Technologies page (from the CV)
     projects.ts    Projects: description, start month, stack, links
     tech.ts        Logo for each technology name (devicon imports)

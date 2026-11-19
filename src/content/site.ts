@@ -26,7 +26,7 @@ export const site = {
     "I'm a Computer Science student at Laguna State Polytechnic University in San Pablo City, specializing in Intelligent Systems. I expect to graduate in 2027.",
     "Most of what I've built so far is for the web: a flood-risk forecast app, an anonymous message board, and GADvance, a learning platform for our university's Gender and Development office. I build these with my thesis teammates, and we share the work across the whole stack, from the database to the interface.",
     "Now I'm moving toward data and AI: analysis, automation, and building with AI models. In 2026 I earned the IT Specialist – Artificial Intelligence certification, and my next projects are in that direction.",
-    "Before university, I took the STEM track at Laguna Science National High School and graduated with honors. I've also completed TESDA's online Visual Graphic Design (NC III) courses, so design is part of how I build.",
+    "Before university, I took the STEM track at Laguna Science National High School and graduated with honors.",
   ],
 };
 
@@ -68,7 +68,7 @@ export const sections: SiteSection[] = [
     label: "Credentials",
     cta: "See all credentials",
     href: "/credentials",
-    summary: "Plus 14 badges from IBM SkillsBuild and Cisco, and TESDA's Visual Graphic Design (NC III) program.",
+    summary: "Plus 14 badges from IBM SkillsBuild and Cisco.",
     detail: "My education and certifications, newest first. Each badge links to its verification page on Credly.",
   },
   {

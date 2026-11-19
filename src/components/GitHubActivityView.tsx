@@ -1,21 +1,15 @@
 "use client";
 
 import {
-  Activity,
-  BookMarked,
   BookPlus,
   CalendarRange,
-  CircleDot,
   Code2,
   Flame,
   FolderGit2,
   GitCommitHorizontal,
   GitFork,
-  GitPullRequest,
-  Star,
   Trophy,
   Users,
-  type LucideIcon,
 } from "lucide-react";
 import { motion, useInView } from "motion/react";
 import { useRef } from "react";
@@ -38,46 +32,37 @@ const plural = (count: number, word: string, many = `${word}s`) =>
 
 export function GitHubActivityView({ stats }: { stats: GitHubStats }) {
   const { activity } = stats;
-  const counters: { label: string; value: number; icon: LucideIcon }[] = activity
-    ? [
-        { label: "Contributions in the last year", value: activity.total, icon: Activity },
-        { label: "Commits in the last year", value: activity.commits, icon: GitCommitHorizontal },
-        { label: "Pull requests", value: activity.pullRequests, icon: GitPullRequest },
-        { label: "Issues", value: activity.issues, icon: CircleDot },
-        { label: "Stars earned", value: activity.stars, icon: Star },
-        { label: "Repositories contributed to", value: activity.reposContributedTo, icon: BookMarked },
-      ]
-    : [
-        { label: "Public repositories", value: stats.publicRepos, icon: FolderGit2 },
-        { label: "Followers", value: stats.followers, icon: Users },
-      ];
-
   return (
     // minmax(0, 1fr) + min-w-0: the heatmap scrolls inside its own box instead of widening the page.
     <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-16">
-      <dl className="grid grid-cols-2 gap-x-8 gap-y-8 sm:grid-cols-3 2xl:grid-cols-6">
-        {counters.map((counter) => (
-          <div key={counter.label}>
-            <dd className="text-4xl font-semibold sm:text-5xl">
-              <CountUp value={counter.value} />
-            </dd>
-            <dt className="mt-1 flex items-start gap-2 text-ink-muted">
-              <Icon icon={counter.icon} className="mt-0.5" />
-              {counter.label}
-            </dt>
-          </div>
-        ))}
-      </dl>
-
       {activity ? (
         <>
           <Streaks activity={activity} />
           <GitHubCalendar calendars={activity.calendars} />
         </>
       ) : (
-        <p className="max-w-prose text-ink-muted">
-          The contribution calendar appears once a GitHub token is configured.
-        </p>
+        <>
+          {/* No token: the public numbers are all there is, so show them. */}
+          <dl className="grid grid-cols-2 gap-8">
+            {[
+              { label: "Public repositories", value: stats.publicRepos, icon: FolderGit2 },
+              { label: "Followers", value: stats.followers, icon: Users },
+            ].map((counter) => (
+              <div key={counter.label}>
+                <dd className="text-4xl font-semibold sm:text-5xl">
+                  <CountUp value={counter.value} />
+                </dd>
+                <dt className="mt-1 flex items-start gap-2 text-ink-muted">
+                  <Icon icon={counter.icon} className="mt-0.5" />
+                  {counter.label}
+                </dt>
+              </div>
+            ))}
+          </dl>
+          <p className="max-w-prose text-ink-muted">
+            The contribution calendar appears once a GitHub token is configured.
+          </p>
+        </>
       )}
 
       <div className="grid gap-16 lg:grid-cols-2 lg:gap-x-16 xl:gap-x-24">

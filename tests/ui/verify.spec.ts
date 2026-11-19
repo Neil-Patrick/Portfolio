@@ -348,9 +348,8 @@ test("GitHub section shows live stats or the documented fallback", async ({ page
   await expect(section.getByRole("heading", { name: "GitHub activity" })).toBeVisible();
   const heatmap = section.getByTestId("heatmap");
   if ((await heatmap.count()) > 0) {
-    // Token configured: full calendar (52-53 weeks) and activity counters.
+    // Token configured: full calendar (52-53 weeks) and streaks.
     expect(await heatmap.locator("[data-day]").count()).toBeGreaterThanOrEqual(364);
-    await expect(section.getByText("Contributions in the last year", { exact: true })).toBeVisible();
     await expect(section.getByText("Current streak", { exact: true })).toBeVisible();
     await expect(section.getByText("Longest streak", { exact: true })).toBeVisible();
 

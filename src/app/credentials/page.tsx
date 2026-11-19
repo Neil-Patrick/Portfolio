@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { Icon } from "@/components/icons";
 import { SectionPage } from "@/components/SectionPage";
 import {
-  certificationGroups,
   certifications,
   education,
   featuredCertification as featured,
@@ -79,23 +78,6 @@ export default function CredentialsPage() {
           ))}
         </ul>
 
-        {certificationGroups.map((group, i) => (
-          <section key={group.name} aria-labelledby={`cert-group-${i}`} className="mt-10">
-            <h3 id={`cert-group-${i}`} className="text-xl">
-              {group.name}
-            </h3>
-            <p className="mb-3 text-ink-muted tabular-nums">
-              {group.issuer}, {group.modules.length} modules,{" "}
-              {formatMonth(group.modules[0].date)} to{" "}
-              {formatMonth(group.modules[group.modules.length - 1].date)}
-            </p>
-            <ul className="grid gap-x-8 gap-y-1 sm:grid-cols-2 xl:grid-cols-3">
-              {group.modules.map((module) => (
-                <li key={module.name}>{module.name}</li>
-              ))}
-            </ul>
-          </section>
-        ))}
       </section>
     </SectionPage>
   );

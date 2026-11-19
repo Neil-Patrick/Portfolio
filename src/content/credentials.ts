@@ -1,6 +1,6 @@
 /**
  * Education and certifications. Sources: CV, Credly (verified badge data),
- * and the previous portfolio (TESDA module dates). Dates are ISO (YYYY-MM-DD).
+ *. Dates are ISO (YYYY-MM-DD).
  */
 
 export type Education = {
@@ -63,29 +63,6 @@ export const certifications: Certification[] = [
   { name: "JavaScript Essentials 1", issuer: "Cisco", date: "2024-09-22", url: credly("bebba4a1-d44f-4476-8288-159ee955872d") },
   { name: "Cloud Computing Fundamentals", issuer: "IBM SkillsBuild", date: "2024-09-21", url: credly("faa51e9f-a807-42ed-8446-102904972fa0") },
   { name: "Fundamentals of Sustainability and Technology", issuer: "IBM", date: "2024-09-18", url: credly("a8edd2e1-d311-4cd2-91b7-bacf5a1b493c") },
-];
-
-/** Multi-module programs, shown as one entry with their modules. */
-export type CertificationGroup = {
-  name: string;
-  issuer: string;
-  modules: { name: string; date: string }[];
-};
-
-export const certificationGroups: CertificationGroup[] = [
-  {
-    name: "Visual Graphic Design (NC III)",
-    issuer: "TESDA Online",
-    modules: [
-      { name: "Introduction to Visual Graphic Design", date: "2024-10-25" },
-      { name: "Developing Designs for User Experience", date: "2025-04-20" },
-      { name: "Developing Designs for User Interface", date: "2025-04-22" },
-      { name: "Developing Designs for Logo", date: "2025-04-27" },
-      { name: "Developing Designs for Print Media", date: "2025-05-07" },
-      { name: "Developing Designs for Product Packaging", date: "2025-05-08" },
-      { name: "Designing Booth and Product/Window Display", date: "2025-05-13" },
-    ],
-  },
 ];
 
 /** "2026-11-12" -> "Nov 2026". UTC so the result never shifts with the reader's timezone. */

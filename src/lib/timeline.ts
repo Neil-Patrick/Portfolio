@@ -1,12 +1,8 @@
-import {
-  certificationGroups,
-  certifications,
-  featuredCertification,
-} from "@/content/credentials";
+import { certifications, featuredCertification } from "@/content/credentials";
 import { projects } from "@/content/projects";
 
 /**
- * Everything earned or built, as dated points for the home page chart.
+ * Certifications and projects, as dated points for the home page chart.
  * Derived from the content files, so adding a credential or project there
  * updates the chart automatically.
  */
@@ -36,15 +32,6 @@ export function buildTimeline(): TimelinePoint[] {
       kind: "certification" as const,
       href: cert.url,
     })),
-    ...certificationGroups.flatMap((group) =>
-      group.modules.map((module) => ({
-        id: `module-${module.name}`,
-        date: module.date,
-        label: module.name,
-        detail: `${group.issuer}, ${group.name}`,
-        kind: "certification" as const,
-      })),
-    ),
     ...projects.map((project) => ({
       id: `project-${project.id}`,
       date: `${project.started}-01`,
