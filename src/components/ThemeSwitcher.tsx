@@ -58,7 +58,11 @@ const OPTIONS: { value: ThemePreference; label: string; icon: React.ReactNode }[
   { value: "system", label: "System", icon: <Icon icon={Monitor} /> },
 ];
 
-/** Three-way theme toggle as a bordered segmented control. */
+/**
+ * Theme control. From `sm` up: a three-way segmented control. On phones, where
+ * the top bar is tight: one button that cycles Light → Dark → System. Both
+ * share the same store.
+ */
 export function ThemeSwitcher() {
   const name = useId();
   // null on the server: no option is checked until the client knows the saved choice.
@@ -67,8 +71,32 @@ export function ThemeSwitcher() {
   // React Strict Mode (dev only) resets <html> attributes on remount; re-apply.
   useLayoutEffect(() => applyTheme(readPreference()), []);
 
+  const currentIndex = Math.max(
+    OPTIONS.findIndex((option) => option.value === (preference ?? "system")),
+    0,
+  );
+  const current = OPTIONS[currentIndex];
+  const next = OPTIONS[(currentIndex + 1) % OPTIONS.length];
+
   return (
-    <fieldset className="flex w-fit gap-0.5 rounded-sm border border-line-strong p-0.5">
+    <>
+      <button
+        type="button"
+        onClick={() => setPreference(next.value)}
+        aria-label={`Color Theme: ${current.label}. Switch to ${next.label}`}
+        title={`Color Theme: ${current.label}`}
+        className="grid size-11 place-items-center rounded-sm border border-line-strong text-ink-muted hover:text-ink sm:hidden"
+      >
+        {current.icon}
+      </button>
+      <ThemeOptions name={name} preference={preference} />
+    </>
+  );
+}
+
+function ThemeOptions({ name, preference }: { name: string; preference: ThemePreference | null }) {
+  return (
+    <fieldset className="hidden w-fit gap-0.5 rounded-sm border border-line-strong p-0.5 sm:flex">
       <legend className="sr-only">Color Theme</legend>
       {OPTIONS.map((option) => (
         <label

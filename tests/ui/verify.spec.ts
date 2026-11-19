@@ -83,12 +83,13 @@ for (const section of pages) {
   }
 }
 
-// Mobile menu open, both schemes.
+// Compass menu open on the smallest phone, both schemes.
 for (const scheme of SCHEMES) {
-  test(`layout mobile menu open 320px ${scheme}`, async ({ page }) => {
+  test(`layout compass menu open 320px ${scheme}`, async ({ page }) => {
     const errors = collectErrors(page);
     await openPage(page, "/", 320, scheme);
-    await page.getByRole("button", { name: "Menu" }).click();
+    await page.getByRole("button", { name: "Open navigation" }).click();
+    await expect(page.getByRole("dialog", { name: "Site navigation" })).toBeVisible();
     await page.screenshot({ path: `${SCREENSHOT_DIR}/menu-320-${scheme}.png` });
     await checkPage(page, errors);
   });
@@ -113,41 +114,60 @@ test("each home preview links to its page", async ({ page }) => {
   }
 });
 
-test("desktop header links every page and marks the current one", async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/");
-  const nav = page.getByRole("navigation", { name: "Primary" });
-  await expect(page.getByRole("button", { name: "Menu" })).toBeHidden();
-  for (const section of pages) {
-    await expect(nav.getByRole("link", { name: section.label, exact: true })).toBeVisible();
+const compassNav = (page: Page) =>
+  page.getByRole("dialog", { name: "Site navigation" }).getByRole("navigation", { name: "Primary" });
+
+test("compass menu links every page and marks the current one", async ({ page }) => {
+  for (const width of [320, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    const trigger = page.getByRole("button", { name: "Open navigation" });
+    await expect(trigger).toBeVisible();
+    await trigger.click();
+    for (const section of sections) {
+      await expect(compassNav(page).getByRole("link", { name: section.label, exact: true })).toBeVisible();
+    }
+    await expect(compassNav(page).getByRole("link", { name: "Home", exact: true })).toHaveAttribute("aria-current", "page");
   }
-  await nav.getByRole("link", { name: "Projects", exact: true }).click();
+  await compassNav(page).getByRole("link", { name: "Projects", exact: true }).click();
   await expect(page).toHaveURL(/\/projects$/);
-  await expect(nav.getByRole("link", { name: "Projects", exact: true })).toHaveAttribute(
+  await expect(page.getByRole("dialog", { name: "Site navigation" })).toBeHidden();
+  await page.getByRole("button", { name: "Open navigation" }).click();
+  await expect(compassNav(page).getByRole("link", { name: "Projects", exact: true })).toHaveAttribute(
     "aria-current",
     "page",
   );
 });
 
-test("mobile menu opens, closes with Escape, and closes on link click", async ({ page }) => {
-  await page.setViewportSize({ width: 320, height: 700 });
+test("compass menu: Escape and the close button close it; arrow keys move the needle", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  const toggle = page.getByRole("button", { name: "Menu" });
-  const link = page.getByRole("navigation", { name: "Primary" }).getByRole("link", { name: "Contact" });
+  const trigger = page.getByRole("button", { name: "Open navigation" });
+  const dialog = page.getByRole("dialog", { name: "Site navigation" });
+  const aim = page.getByTestId("compass-aim");
 
-  await expect(toggle).toHaveAttribute("aria-expanded", "false");
-  await toggle.click();
-  await expect(toggle).toHaveAttribute("aria-expanded", "true");
-  await expect(link).toBeVisible();
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  await trigger.click();
+  await expect(trigger).toHaveAttribute("aria-expanded", "true");
+  // Opens aimed at (and focused on) the current page.
+  await expect(aim).toHaveText("Home");
+  await expect(compassNav(page).getByRole("link", { name: "Home", exact: true })).toBeFocused();
+
+  await page.keyboard.press("ArrowRight");
+  await expect(aim).toHaveText(sections[1].label);
+  await expect(compassNav(page).getByRole("link", { name: sections[1].label, exact: true })).toBeFocused();
+  await page.keyboard.press("ArrowLeft");
+  await page.keyboard.press("ArrowLeft");
+  await expect(aim).toHaveText(sections[sections.length - 1].label);
 
   await page.keyboard.press("Escape");
-  await expect(toggle).toHaveAttribute("aria-expanded", "false");
-  await expect(toggle).toBeFocused();
+  await expect(dialog).toBeHidden();
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  await expect(trigger).toBeFocused();
 
-  await toggle.click();
-  await link.click();
-  await expect(toggle).toHaveAttribute("aria-expanded", "false");
-  await expect(page).toHaveURL(/\/contact$/);
+  await trigger.click();
+  await page.getByRole("button", { name: "Close navigation" }).click();
+  await expect(dialog).toBeHidden();
 });
 
 test("footer links reach every page", async ({ page }) => {
@@ -182,6 +202,21 @@ test("theme switcher sets, persists, and clears the theme", async ({ page }) => 
   await option("System").click();
   await expect(html).not.toHaveAttribute("data-theme", /.*/);
   await expect(radio("System")).toBeChecked();
+});
+
+test("on phones one button cycles the theme: Light, Dark, System", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  await page.goto("/");
+  const html = page.locator("html");
+  const cycle = page.getByRole("button", { name: /^Color theme:/i });
+  await expect(page.getByRole("group", { name: /^Color theme$/i })).toBeHidden();
+  await expect(cycle).toHaveAccessibleName(/System. Switch to Light/i);
+  await cycle.click();
+  await expect(html).toHaveAttribute("data-theme", "light");
+  await cycle.click();
+  await expect(html).toHaveAttribute("data-theme", "dark");
+  await cycle.click();
+  await expect(html).not.toHaveAttribute("data-theme", /.*/);
 });
 
 test("a first-time visitor gets the System theme, following their OS", async ({ page }) => {
@@ -418,6 +453,13 @@ test("with full motion: home animates, scrolls, and hovers without errors", asyn
     .first()
     .evaluate((el) => getComputedStyle(el).clipPath);
   expect(chartClip, "career timeline revealed").not.toContain("100%");
+  // The compass menu plays its open and close animations without errors.
+  await page.getByRole("button", { name: "Open navigation" }).click();
+  await page.waitForTimeout(900);
+  await page.mouse.move(900, 300);
+  await page.waitForTimeout(400);
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog", { name: "Site navigation" })).toBeHidden();
   expect(errors, "console errors").toEqual([]);
 });
 

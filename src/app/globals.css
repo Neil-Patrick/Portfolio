@@ -62,6 +62,10 @@
   --radius-sm: 4px;
   --radius-md: 8px;
 
+  /* Glow around the item the compass menu points at. */
+  --shadow-glow: 0 0 0 3px color-mix(in oklab, var(--color-accent) 22%, transparent),
+    0 0 28px color-mix(in oklab, var(--color-accent) 40%, transparent);
+
   /* Sticky header height; also offsets anchor scrolling. */
   --spacing-header: 4rem;
 
@@ -158,4 +162,22 @@
   :not([data-shown]) > .streak-ring {
     stroke-dashoffset: 100;
   }
+}
+
+/* Compass menu (src/components/nav/CompassMenu.tsx): a full-screen native <dialog>.
+   Its dimmed, blurred backdrop is an animated element inside, so ::backdrop stays clear. */
+.compass-dialog {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-ink);
+  overflow: hidden;
+}
+.compass-dialog::backdrop {
+  background: transparent;
 }
