@@ -189,3 +189,13 @@
   animation: none;
   mix-blend-mode: normal;
 }
+
+/* No visible page scrollbar (the user's choice): the page still scrolls with
+   wheel, trackpad, touch, and keyboard. On the home page the depth gauge shows
+   where you are. Inner scroll areas (heatmap, tables) keep their scrollbars. */
+html {
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar {
+  display: none;
+}
