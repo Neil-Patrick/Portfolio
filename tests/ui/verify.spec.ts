@@ -486,6 +486,36 @@ test("with full motion: anchor links land below the sticky header", async ({ pag
   expect(top).toBeLessThanOrEqual(120);
 });
 
+test("depth gauge lists every home section and jumps to the one clicked", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await page.waitForLoadState("networkidle");
+  const gauge = page.getByRole("navigation", { name: "On This Page" });
+  await expect(gauge).toBeVisible();
+  await expect(gauge.getByRole("link")).toHaveCount(sections.length + 2);
+  await expect(gauge.getByRole("link", { name: "Home" })).toHaveAttribute("aria-current", "location");
+
+  await gauge.getByRole("link", { name: "Projects" }).click();
+  await expect(gauge.getByRole("link", { name: "Projects" })).toHaveAttribute("aria-current", "location");
+  const top = await page.locator("#projects").evaluate((el) => el.getBoundingClientRect().top);
+  expect(top, "section top sits just below the header").toBeGreaterThanOrEqual(40);
+  expect(top).toBeLessThanOrEqual(120);
+
+  // Every tick points at a section that exists.
+  for (const href of await gauge.getByRole("link").evaluateAll((links) => links.map((a) => a.getAttribute("href")))) {
+    await expect(page.locator(href!)).toHaveCount(1);
+  }
+});
+
+test("depth gauge is hidden on phones and absent on other pages", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  await page.goto("/");
+  await expect(page.getByRole("navigation", { name: "On This Page" })).toBeHidden();
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/projects");
+  await expect(page.getByRole("navigation", { name: "On This Page" })).toHaveCount(0);
+});
+
 test("links to other sites open in a new tab, safely; email links don't", async ({ page }) => {
   for (const path of ["/", "/about", "/credentials", "/technologies", "/projects", "/contact"]) {
     await page.goto(path);

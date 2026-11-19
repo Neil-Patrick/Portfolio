@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { GitHubActivity } from "@/components/GitHubActivity";
 import { ContactIcon } from "@/components/icons";
 import { PageBackground } from "@/components/background/PageBackground";
+import { DepthGauge } from "@/components/nav/DepthGauge";
 import { HeroIntro } from "@/components/hero/HeroIntro";
 import { CareerTimeline } from "@/components/CareerTimeline";
 import { Reveal, RevealItem } from "@/components/motion/Reveal";
@@ -11,7 +12,7 @@ import { Section } from "@/components/Section";
 import { TechIcon } from "@/components/TechIcon";
 import { featuredCertification, formatMonth } from "@/content/credentials";
 import { projects } from "@/content/projects";
-import { getSection, site, type SectionId } from "@/content/site";
+import { getSection, sections, site, type SectionId } from "@/content/site";
 import { isSkill, skillAnchor } from "@/lib/skill-usage";
 import { buildTimeline } from "@/lib/timeline";
 
@@ -96,11 +97,19 @@ const previews: Record<Exclude<SectionId, "home">, ReactNode> = {
   ),
 };
 
+/** On-page index (right edge, lg and up), in page order. */
+const gaugeItems = [
+  ...sections.map((section) => ({ id: section.id, label: section.label })),
+  { id: "career-timeline", label: "Career Timeline" },
+  { id: "github", label: "GitHub Activity" },
+];
+
 export default function HomePage() {
   return (
     <>
       {/* Subtle wave lines, fixed behind every home section. */}
       <PageBackground />
+      <DepthGauge items={gaugeItems} />
 
       {/* Full-bleed hero, running up behind the transparent header. */}
       <section
@@ -134,7 +143,7 @@ export default function HomePage() {
       })}
 
       {/* Data sections close the page, just before the footer. */}
-      <section aria-label="Career Timeline" className="py-12 sm:py-16">
+      <section id="career-timeline" aria-label="Career Timeline" className="py-12 sm:py-16">
         <div className="container-page">
           <CareerTimeline points={timeline} />
         </div>
