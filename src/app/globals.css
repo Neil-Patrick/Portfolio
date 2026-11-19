@@ -181,3 +181,11 @@
 .compass-dialog::backdrop {
   background: transparent;
 }
+
+/* Theme reveal (src/lib/theme-transition.ts): the new theme spreads out as a
+   circle from the theme dial. Replace the default crossfade with that clip. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}

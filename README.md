@@ -56,7 +56,8 @@ Create a `.env.local` file (git-ignored; env files are never committed) with the
   - Home page at 320, 768, 1024 and 1440px, in light and dark.
   - Each section page at 320 and 1440px, and the open mobile menu at 320px, in light and dark.
 - Behaviour:
-  - Navigation: every section exists on the home page; each home preview link opens its page with the right title; the compass menu links every page at phone and desktop widths and marks the current one; it opens aimed at the current page, arrow keys move the needle and focus, Escape and the close button close it (returning focus); on phones one button cycles the theme; the footer reaches every page.
+  - Navigation: every section exists on the home page; each home preview link opens its page with the right title; the compass menu links every page at phone and desktop widths and marks the current one; it opens aimed at the current page, arrow keys move the needle and focus, Escape and the close button close it (returning focus); the footer reaches every page.
+  - Theme: the dial turns Light → Dark → System at desktop and phone widths, the choice survives a reload, a first-time visitor follows the OS, and with full motion the circular reveal runs without errors.
   - Theme: the switcher sets, persists and clears the theme; a first-time visitor gets System.
   - Technologies and projects: every project tool is a listed technology or a known service; every technology shows an icon and every logo loads; selecting a technology lists its projects, updates the URL hash, and links to the project; a project's tool chip opens the Technologies page with it selected; on phones the panel opens under the selected group.
   - Background and motion: the home page shows the fixed wave background (static lines under reduced motion) behind readable text, and other pages have none; with full motion the page animates, scrolls, and hovers without errors, every revealed element ends fully visible, and the career timeline finishes drawing; with Lenis on, anchor links still land below the sticky header.
@@ -92,7 +93,7 @@ src/
     hero/              Name entrance and hero links (HeroIntro)
     motion/            MotionRoot (reduced-motion config + Lenis), Reveal, CountUp,
                        Tilt/Magnetic, PageTransition
-    ThemeSwitcher.tsx  Light / dark / system: 3 buttons from 640px, one cycling button on phones
+    ThemeSwitcher.tsx  Sun-and-moon dial: one button that turns Light → Dark → System
     Section.tsx        Home preview section with heading and a link to its page
     SkillExplorer.tsx  Technologies page: chips, "Used in" panel, hash-based selection
     TechIcon.tsx       Logo for a technology or tool (color, single-color, or fallback glyph)
@@ -107,6 +108,7 @@ src/
     tech.ts        Logo for each technology name (devicon imports)
   lib/
     theme.ts      Theme constants, applyTheme(), inline init script
+    theme-transition.ts  Circular theme reveal (View Transitions API, instant fallback)
     timeline.ts   Builds the chart's dated points from the content files
     github.ts     Cached GitHub stats (GraphQL with token, REST fallback)
     skill-usage.ts  Links technologies and projects by name (which projects use each one)
@@ -131,6 +133,7 @@ Text in `[square brackets]` in `src/content/` is placeholder content.
 - **Tailwind over Sass:** design tokens are defined once in `@theme`, so every utility class uses them, and only the classes actually used get shipped.
 - **Content as data:** projects, technologies, and links live in `src/content/`, separate from UI components.
 - **Visual direction: work shown as data, brought to life.** Subtle wave lines drifting behind the whole home page, a career timeline built from the real credentials and projects, and live GitHub activity. Pure black (dark) or off-white (light) canvas with neutral grays, one teal accent, IBM Plex Sans, one background color for the whole page, no divider lines: sections separate through space.
+- **Theme as a sky dial:** one round button with a horizon; the sun and moon ride a disc behind it, and each click turns it forward one stop (Light: sun up, Dark: moon up, System: both on the horizon with an "A"), with the compass needle's spring. The new theme spreads out from the dial as a circle (View Transitions API with `clip-path: circle()`); browsers without it and visitors with reduced motion switch instantly. It stays a plain button whose name states the current theme and the next one.
 - **Navigation as a compass:** one compass-rose button opens a full-screen radial menu, the same at every width. Page icons with their names sit on a ring; the compass needle swings (spring with a slight wobble) toward whatever you aim at: mouse direction from the center, hover, focus, or arrow keys. On open the ring draws itself, the rose spins in, and the icons fly out clockwise; with reduced motion it simply fades. It's a native modal `<dialog>` (focus trap, Escape, focus returns to the trigger), page scrolling pauses while it's open, and the footer still lists every page as a plain fallback.
 - **Background kept subtle:** six hairline waves in the accent color at 10-25% opacity, drifting so slowly that one cycle takes about half a minute; scrolling only nudges their phase. No pointer effects, particles, or pulses: it's texture, not a feature. Earlier experiments (a 3D neural network, a particle field) were dropped as too busy behind text.
 - **Motion with guardrails:** Motion handles reveals, count-ups, tilt, the name entrance, and page transitions; Lenis smooths scrolling. Under `prefers-reduced-motion: reduce`, Lenis is off, the 3D scene is a still frame, and a CSS rule shows every `[data-reveal]` element as-is (CSS rather than JS branching, so server and client HTML match and nothing hydrates differently). Without JavaScript, a `<noscript>` style does the same.

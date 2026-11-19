@@ -182,41 +182,32 @@ test("footer links reach every page", async ({ page }) => {
 
 /* ---------- Behaviour: theme ---------- */
 
-test("theme switcher sets, persists, and clears the theme", async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/");
-  const html = page.locator("html");
-  const switcher = page.getByRole("group", { name: /^Color theme$/i });
-  // Click the visible option (label with icon) like a user; the radio itself is visually hidden.
-  const option = (name: string) => switcher.getByTitle(name);
-  const radio = (name: string) => switcher.getByRole("radio", { name });
+const themeDial = (page: Page) => page.getByRole("button", { name: /^Color theme:/i });
 
-  await option("Dark").click();
-  await expect(html).toHaveAttribute("data-theme", "dark");
-  await expect(radio("Dark")).toBeChecked();
+test("theme dial turns Light, Dark, System, and the choice persists", async ({ page }) => {
+  for (const width of [1440, 375]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    await page.evaluate(() => localStorage.clear());
+    await page.reload();
+    const html = page.locator("html");
+    const dial = themeDial(page);
+    await expect(dial).toHaveAccessibleName(/System\. Switch to Light/i);
 
-  await page.reload();
-  await expect(html).toHaveAttribute("data-theme", "dark");
-  await expect(radio("Dark")).toBeChecked();
+    await dial.click();
+    await expect(html).toHaveAttribute("data-theme", "light");
+    await expect(dial).toHaveAccessibleName(/Light\. Switch to Dark/i);
+    await dial.click();
+    await expect(html).toHaveAttribute("data-theme", "dark");
 
-  await option("System").click();
-  await expect(html).not.toHaveAttribute("data-theme", /.*/);
-  await expect(radio("System")).toBeChecked();
-});
+    await page.reload();
+    await expect(html).toHaveAttribute("data-theme", "dark");
+    await expect(themeDial(page)).toHaveAccessibleName(/Dark\. Switch to System/i);
 
-test("on phones one button cycles the theme: Light, Dark, System", async ({ page }) => {
-  await page.setViewportSize({ width: 375, height: 800 });
-  await page.goto("/");
-  const html = page.locator("html");
-  const cycle = page.getByRole("button", { name: /^Color theme:/i });
-  await expect(page.getByRole("group", { name: /^Color theme$/i })).toBeHidden();
-  await expect(cycle).toHaveAccessibleName(/System. Switch to Light/i);
-  await cycle.click();
-  await expect(html).toHaveAttribute("data-theme", "light");
-  await cycle.click();
-  await expect(html).toHaveAttribute("data-theme", "dark");
-  await cycle.click();
-  await expect(html).not.toHaveAttribute("data-theme", /.*/);
+    await themeDial(page).click();
+    await expect(html).not.toHaveAttribute("data-theme", /.*/);
+    await expect(themeDial(page)).toHaveAccessibleName(/System\. Switch to Light/i);
+  }
 });
 
 test("a first-time visitor gets the System theme, following their OS", async ({ page }) => {
@@ -226,10 +217,23 @@ test("a first-time visitor gets the System theme, following their OS", async ({ 
   await page.goto("/");
   await page.waitForLoadState("networkidle");
   await expect(page.locator("html")).not.toHaveAttribute("data-theme", /.*/);
-  await expect(
-    page.getByRole("group", { name: /^Color theme$/i }).getByRole("radio", { name: "System" }),
-  ).toBeChecked();
+  await expect(themeDial(page)).toHaveAccessibleName(/^Color theme: System/i);
   expect(await page.evaluate(() => localStorage.getItem("theme"))).toBeNull();
+});
+
+test("with full motion: the theme reveal runs without errors and lands on the right theme", async ({ page }) => {
+  const errors = collectErrors(page);
+  await page.emulateMedia({ reducedMotion: "no-preference", colorScheme: "dark" });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await page.waitForLoadState("networkidle");
+  await themeDial(page).click();
+  await page.waitForTimeout(800); // circle reveal + dial spring
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await themeDial(page).click();
+  await page.waitForTimeout(800);
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  expect(errors, "console errors").toEqual([]);
 });
 
 /* ---------- Behaviour: career timeline ---------- */
