@@ -3,7 +3,13 @@
 import { BadgeCheck, FolderGit2, Table2 } from "lucide-react";
 import { motion, useInView } from "motion/react";
 import Link from "next/link";
-import { useId, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import {
+  useId,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type PointerEvent,
+} from "react";
 import { formatMonth } from "@/content/credentials";
 import { NEW_TAB_NOTE, newTab } from "@/lib/links";
 import type { TimelinePoint } from "@/lib/timeline";
@@ -27,7 +33,7 @@ const MARKER = 10; // px; dataviz minimum is 8
 
 type Props = { points: TimelinePoint[] };
 
-export function LearningChart({ points }: Props) {
+export function CareerTimeline({ points }: Props) {
   const [selected, setSelected] = useState(points.length - 1);
   const plotRef = useRef<HTMLDivElement>(null);
   const plotInView = useInView(plotRef, { once: true, amount: 0.4 });
@@ -46,9 +52,15 @@ export function LearningChart({ points }: Props) {
 
   const firstYear = new Date(t0).getUTCFullYear() + 1;
   const lastYear = new Date(t1).getUTCFullYear();
-  const yearTicks = Array.from({ length: lastYear - firstYear + 1 }, (_, i) => firstYear + i);
+  const yearTicks = Array.from(
+    { length: lastYear - firstYear + 1 },
+    (_, i) => firstYear + i,
+  );
 
-  const positions = points.map((p, i) => ({ left: x(times[i]), top: y(p.count) }));
+  const positions = points.map((p, i) => ({
+    left: x(times[i]),
+    top: y(p.count),
+  }));
 
   // Step line: flat until each new item, then up by one.
   let path = `M 0 100 H ${positions[0].left}`;
@@ -74,7 +86,8 @@ export function LearningChart({ points }: Props) {
   };
 
   const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
-    if (event.pointerType === "mouse") setSelected(nearestTo(event.clientX, event.clientY));
+    if (event.pointerType === "mouse")
+      setSelected(nearestTo(event.clientX, event.clientY));
   };
   const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     setSelected(nearestTo(event.clientX, event.clientY));
@@ -103,22 +116,26 @@ export function LearningChart({ points }: Props) {
   const currentPos = positions[selected];
 
   return (
-    <figure aria-labelledby={captionId} className="rounded-md border border-line-strong bg-surface p-4 sm:p-6">
+    <figure
+      aria-labelledby={captionId}
+      className="rounded-md border border-line-strong bg-surface p-4 sm:p-6"
+    >
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <figcaption id={captionId}>
-          <span className="block font-semibold">Career timeline</span>
+          <span className="block font-semibold">Career Timeline</span>
           <span className="block text-ink-muted tabular-nums">
-            {certCount} certifications and {projectCount} projects since {formatMonth(points[0].date)}
+            {certCount} certifications and {projectCount} projects since{" "}
+            {formatMonth(points[0].date)}
           </span>
         </figcaption>
         <ul className="flex gap-4 text-sm text-ink-muted" aria-label="Legend">
           <li className="flex items-center gap-2">
             <Marker kind="certification" />
-            Certification
+            Certifications
           </li>
           <li className="flex items-center gap-2">
             <Marker kind="project" />
-            Project
+            Projects
           </li>
         </ul>
       </div>
@@ -149,7 +166,12 @@ export function LearningChart({ points }: Props) {
           onKeyDown={onKeyDown}
           className="relative h-full touch-pan-y outline-offset-4"
         >
-          <svg aria-hidden className="absolute inset-0 size-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <svg
+            aria-hidden
+            className="absolute inset-0 size-full overflow-visible"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+          >
             {yTicks.map((tick) => (
               <line
                 key={tick}
@@ -180,10 +202,18 @@ export function LearningChart({ points }: Props) {
             initial={{ clipPath: "inset(-12px 100% -12px -12px)" }}
             // Triggered by the plot entering view, not this element: a fully clipped
             // element never counts as "in view" to IntersectionObserver.
-            animate={plotInView ? { clipPath: "inset(-12px -12px -12px -12px)" } : undefined}
+            animate={
+              plotInView
+                ? { clipPath: "inset(-12px -12px -12px -12px)" }
+                : undefined
+            }
             transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
           >
-            <svg className="absolute inset-0 size-full overflow-visible" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <svg
+              className="absolute inset-0 size-full overflow-visible"
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+            >
               <path
                 d={path}
                 fill="none"
@@ -198,7 +228,10 @@ export function LearningChart({ points }: Props) {
                 key={point.id}
                 kind={point.kind}
                 selected={i === selected}
-                style={{ left: `${positions[i].left}%`, top: `${positions[i].top}%` }}
+                style={{
+                  left: `${positions[i].left}%`,
+                  top: `${positions[i].top}%`,
+                }}
                 className="absolute -translate-x-1/2 -translate-y-1/2"
               />
             ))}
@@ -238,9 +271,12 @@ export function LearningChart({ points }: Props) {
         <span className="text-ink-muted">{current.detail}</span>
         {current.href &&
           (current.kind === "project" ? (
-            <Link href={current.href} className="inline-flex items-center gap-1.5 self-center text-accent underline underline-offset-2">
+            <Link
+              href={current.href}
+              className="inline-flex items-center gap-1.5 self-center text-accent underline underline-offset-2"
+            >
               <Icon icon={FolderGit2} />
-              See project
+              See Project
             </Link>
           ) : (
             <a
@@ -258,25 +294,39 @@ export function LearningChart({ points }: Props) {
       <details className="mt-3">
         <summary className="inline-flex min-h-11 cursor-pointer items-center gap-2 text-accent">
           <Icon icon={Table2} />
-          Show as table
+          Show as Table
         </summary>
         <div className="mt-2 overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <caption className="sr-only">Every certification and project, oldest first</caption>
+            <caption className="sr-only">
+              Every certification and project, oldest first
+            </caption>
             <thead className="text-ink-muted">
               <tr className="border-b border-line-strong">
-                <th scope="col" className="py-2 pr-4 font-semibold">Date</th>
-                <th scope="col" className="py-2 pr-4 font-semibold">Item</th>
-                <th scope="col" className="py-2 pr-4 font-semibold">Type</th>
-                <th scope="col" className="py-2 font-semibold">Details</th>
+                <th scope="col" className="py-2 pr-4 font-semibold">
+                  Date
+                </th>
+                <th scope="col" className="py-2 pr-4 font-semibold">
+                  Item
+                </th>
+                <th scope="col" className="py-2 pr-4 font-semibold">
+                  Type
+                </th>
+                <th scope="col" className="py-2 font-semibold">
+                  Details
+                </th>
               </tr>
             </thead>
             <tbody>
               {points.map((point) => (
                 <tr key={point.id} className="border-b border-line">
-                  <td className="py-2 pr-4 whitespace-nowrap tabular-nums">{formatMonth(point.date)}</td>
+                  <td className="py-2 pr-4 whitespace-nowrap tabular-nums">
+                    {formatMonth(point.date)}
+                  </td>
                   <td className="py-2 pr-4">{point.label}</td>
-                  <td className="py-2 pr-4">{point.kind === "project" ? "Project" : "Certification"}</td>
+                  <td className="py-2 pr-4">
+                    {point.kind === "project" ? "Project" : "Certification"}
+                  </td>
                   <td className="py-2 text-ink-muted">{point.detail}</td>
                 </tr>
               ))}
@@ -300,7 +350,10 @@ function Marker({
   className?: string;
   style?: React.CSSProperties;
 }) {
-  const shape = kind === "project" ? "rounded-xs bg-series-project" : "rounded-full bg-series-cert";
+  const shape =
+    kind === "project"
+      ? "rounded-xs bg-series-project"
+      : "rounded-full bg-series-cert";
   // A 2px canvas ring separates overlapping markers; the selected one gets an ink ring too.
   const ring = selected
     ? "outline-2 outline-ink outline-offset-1 ring-2 ring-surface z-10"

@@ -47,7 +47,7 @@ async function openPage(page: Page, path: string, width: number, scheme: (typeof
 
 const chartPlot = (page: Page) => page.getByRole("group", { name: /Timeline plot/ });
 const chartReadout = (page: Page) => page.getByTestId("chart-readout");
-const chartFigure = (page: Page) => page.getByRole("figure", { name: /^Career timeline/ });
+const chartFigure = (page: Page) => page.getByRole("figure", { name: /^Career timeline/i });
 
 /* ---------- Layout, console, and accessibility ---------- */
 
@@ -197,7 +197,7 @@ test("a first-time visitor gets the System theme, following their OS", async ({ 
   expect(await page.evaluate(() => localStorage.getItem("theme"))).toBeNull();
 });
 
-/* ---------- Behaviour: learning chart ---------- */
+/* ---------- Behaviour: career timeline ---------- */
 
 test("chart plots every timeline item and lists them all in the table", async ({ page }) => {
   await page.goto("/");
@@ -207,7 +207,7 @@ test("chart plots every timeline item and lists them all in the table", async ({
     timeline.filter((p) => p.kind === "project").length,
   );
 
-  await page.getByText("Show as table").click();
+  await page.getByText(/^Show as table$/i).click();
   await expect(chartFigure(page).locator("table tbody tr")).toHaveCount(timeline.length);
 });
 
@@ -345,7 +345,7 @@ test("hero shows the network (3D canvas or static fallback) behind readable text
 test("GitHub section shows live stats or the documented fallback", async ({ page }) => {
   await page.goto("/");
   const section = page.locator("#github");
-  await expect(section.getByRole("heading", { name: "GitHub activity" })).toBeVisible();
+  await expect(section.getByRole("heading", { name: /^GitHub activity$/i })).toBeVisible();
   const heatmap = section.getByTestId("heatmap");
   if ((await heatmap.count()) > 0) {
     // Token configured: full calendar (52-53 weeks) and streaks.

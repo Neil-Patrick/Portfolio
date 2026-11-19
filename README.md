@@ -80,7 +80,7 @@ src/
   components/
     SiteHeader.tsx     Sticky top bar: name, page links, theme switcher; "Menu" disclosure on small screens
     SiteFooter.tsx     Plain page links + contact links
-    LearningChart.tsx  Career timeline: cumulative chart, readout, table view
+    CareerTimeline.tsx Career timeline: cumulative chart, readout, table view
     GitHubActivity.tsx      GitHub section (server: fetches cached stats)
     GitHubActivityView.tsx  Counters, streaks (ring), this month's activity, language bars
     GitHubCalendar.tsx      Contribution heatmap with year buttons, readout, monthly table

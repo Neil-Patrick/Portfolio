@@ -4,7 +4,7 @@ import { GitHubActivity } from "@/components/GitHubActivity";
 import { ContactIcon } from "@/components/icons";
 import { HeroBackground } from "@/components/hero/HeroBackground";
 import { HeroIntro } from "@/components/hero/HeroIntro";
-import { LearningChart } from "@/components/LearningChart";
+import { CareerTimeline } from "@/components/CareerTimeline";
 import { Reveal, RevealItem } from "@/components/motion/Reveal";
 import { Tilt } from "@/components/motion/Tilt";
 import { Section } from "@/components/Section";
@@ -30,9 +30,12 @@ const previews: Record<Exclude<SectionId, "home">, ReactNode> = {
     <div>
       <p className="text-xl font-semibold">{featuredCertification.name}</p>
       <p className="text-ink-muted tabular-nums">
-        {featuredCertification.issuer}, {formatMonth(featuredCertification.date)}
+        {featuredCertification.issuer},{" "}
+        {formatMonth(featuredCertification.date)}
       </p>
-      <p className="mt-3 max-w-prose text-ink-muted">{getSection("credentials").summary}</p>
+      <p className="mt-3 max-w-prose text-ink-muted">
+        {getSection("credentials").summary}
+      </p>
     </div>
   ),
   technologies: (
@@ -60,12 +63,17 @@ const previews: Record<Exclude<SectionId, "home">, ReactNode> = {
               className="flex h-full flex-col rounded-md border border-line-strong bg-canvas p-6 transition-colors hover:border-accent"
             >
               <span className="text-xl font-semibold">{project.name}</span>
-              <span className="mt-2 flex-1 text-ink-muted">{project.summary}</span>
+              <span className="mt-2 flex-1 text-ink-muted">
+                {project.summary}
+              </span>
               {/* Logos of the technologies it uses (names are in the project page). */}
               <span aria-hidden className="mt-5 flex flex-wrap gap-2">
-                {project.stack.filter(isSkill).slice(0, 6).map((tool) => (
-                  <TechIcon key={tool} name={tool} />
-                ))}
+                {project.stack
+                  .filter(isSkill)
+                  .slice(0, 6)
+                  .map((tool) => (
+                    <TechIcon key={tool} name={tool} />
+                  ))}
               </span>
             </Link>
           </Tilt>
@@ -75,9 +83,14 @@ const previews: Record<Exclude<SectionId, "home">, ReactNode> = {
   ),
   contact: (
     <p className="text-2xl">
-      <a href={email.href} className="group inline-flex items-center gap-3 text-accent">
+      <a
+        href={email.href}
+        className="group inline-flex items-center gap-3 text-accent"
+      >
         <ContactIcon label={email.label} />
-        <span className="break-all underline underline-offset-4 group-hover:no-underline">{email.text}</span>
+        <span className="break-all underline underline-offset-4 group-hover:no-underline">
+          {email.text}
+        </span>
       </a>
     </p>
   ),
@@ -99,7 +112,12 @@ export default function HomePage() {
           className="pointer-events-none absolute inset-0 bg-linear-to-r from-canvas via-canvas/75 to-canvas/10"
         />
         <div className="container-page relative py-16">
-          <HeroIntro name={site.name} role={site.role} intro={site.intro} links={heroLinks} />
+          <HeroIntro
+            name={site.name}
+            role={site.role}
+            intro={site.intro}
+            links={heroLinks}
+          />
         </div>
       </section>
 
@@ -119,13 +137,13 @@ export default function HomePage() {
       })}
 
       {/* Data sections close the page, just before the footer. */}
-      <section aria-label="Career timeline" className="py-12 sm:py-16">
+      <section aria-label="Career Timeline" className="py-12 sm:py-16">
         <div className="container-page">
-          <LearningChart points={timeline} />
+          <CareerTimeline points={timeline} />
         </div>
       </section>
 
-      <Section id="github" title="GitHub activity">
+      <Section id="github" title="GitHub Activity">
         <GitHubActivity />
       </Section>
     </>
