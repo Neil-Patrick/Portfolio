@@ -45,7 +45,7 @@ export function GitHubActivityView({ stats }: { stats: GitHubStats }) {
           {/* No token: the public numbers are all there is, so show them. */}
           <dl className="grid grid-cols-2 gap-8">
             {[
-              { label: "Public repositories", value: stats.publicRepos, icon: FolderGit2 },
+              { label: "Public Repositories", value: stats.publicRepos, icon: FolderGit2 },
               { label: "Followers", value: stats.followers, icon: Users },
             ].map((counter) => (
               <div key={counter.label}>
@@ -72,7 +72,7 @@ export function GitHubActivityView({ stats }: { stats: GitHubStats }) {
 
       <a href={stats.url} {...newTab} className="group inline-flex min-h-11 w-fit items-center gap-2 font-semibold text-accent">
         <GitHubLogo />
-        <span className="underline underline-offset-4 group-hover:no-underline">View my GitHub profile</span>
+        <span className="underline underline-offset-4 group-hover:no-underline">View My GitHub Profile</span>
         <span className="sr-only">{NEW_TAB_NOTE}</span>
       </a>
     </div>
@@ -98,7 +98,7 @@ function Streaks({ activity }: { activity: GitHubActivity }) {
         </p>
         <p className="mt-1 flex items-center justify-center gap-2 font-semibold">
           <Icon icon={CalendarRange} className="text-accent" />
-          Total contributions
+          Total Contributions
         </p>
         <p className="text-sm text-ink-muted">{shortDate(activity.allTime.since, true)} – present</p>
       </div>
@@ -109,7 +109,7 @@ function Streaks({ activity }: { activity: GitHubActivity }) {
         </p>
         <p className="mt-1 flex items-center justify-center gap-2 font-semibold">
           <Icon icon={Trophy} className="text-accent" />
-          Longest streak
+          Longest Streak
         </p>
         <p className="text-sm text-ink-muted">{range(longest)}</p>
       </div>
@@ -145,7 +145,7 @@ function StreakRing({ current, longest }: { current: Streak; longest: Streak }) 
           <CountUp value={current.length} />
         </span>
       </div>
-      <p className="mt-3 font-semibold">Current streak</p>
+      <p className="mt-3 font-semibold">Current Streak</p>
       <p className="text-sm text-ink-muted">{range(current)}</p>
       {longest.length > 0 && (
         <p className="mt-1 text-sm text-ink-muted">
@@ -175,7 +175,7 @@ function ThisMonth({ month }: { month: GitHubActivity["month"] }) {
             <div>
               <p className="mb-3 flex items-center gap-2 text-ink-muted">
                 <Icon icon={GitCommitHorizontal} />
-                Created {plural(month.commits, "commit")} in {plural(month.commitsByRepo.length, "repository", "repositories")}
+                Created {plural(month.commits, "Commit")} in {plural(month.commitsByRepo.length, "Repository", "Repositories")}
               </p>
               <ul className="grid gap-3">
                 {month.commitsByRepo.map((repo) => (
@@ -197,7 +197,7 @@ function ThisMonth({ month }: { month: GitHubActivity["month"] }) {
             <div>
               <p className="mb-2 flex items-center gap-2 text-ink-muted">
                 <Icon icon={BookPlus} />
-                Created {plural(month.reposCreated.length, "repository", "repositories")}
+                Created {plural(month.reposCreated.length, "Repository", "Repositories")}
               </p>
               <ul>
                 {month.reposCreated.map((repo) => (
@@ -210,7 +210,7 @@ function ThisMonth({ month }: { month: GitHubActivity["month"] }) {
                       {repo.isFork && (
                         <span className="ml-2 inline-flex items-center gap-1 align-middle text-ink-muted">
                           <Icon icon={GitFork} />
-                          fork
+                          Fork
                         </span>
                       )}
                     </span>
@@ -242,7 +242,7 @@ function Languages({ stats }: { stats: GitHubStats }) {
     <div>
       <h3 className="mb-1 flex items-center gap-2 text-lg">
         <Icon icon={Code2} className="text-accent" />
-        Most used languages
+        Most Used Languages
       </h3>
       <p className="mb-4 text-sm text-ink-muted">
         {stats.languagesBasis === "bytes"

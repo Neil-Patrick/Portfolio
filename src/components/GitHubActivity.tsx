@@ -13,7 +13,7 @@ export async function GitHubActivity() {
       <p className="text-ink-muted">
         GitHub stats are unavailable right now.{" "}
         <a href={profileUrl} {...newTab} className="text-accent underline underline-offset-4">
-          See my GitHub profile
+          See My GitHub Profile
           <span className="sr-only">{NEW_TAB_NOTE}</span>
         </a>
         .

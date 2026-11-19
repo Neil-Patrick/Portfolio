@@ -237,7 +237,7 @@ async function viaGraphQL(login: string, token: string): Promise<GitHubStats> {
     ? await graphql<Record<string, RawCalendar>>(token, yearsQuery(years), { login })
     : {};
 
-  const past = toCalendar("past", "Past year", collection);
+  const past = toCalendar("past", "Past Year", collection);
   const yearCalendars = years.map((year) => toCalendar(String(year), String(year), yearData[`y${year}`]));
 
   // "Today" is the last day of the rolling calendar (GitHub's view of the user's day).

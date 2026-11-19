@@ -27,7 +27,7 @@ export const projects: Project[] = [
     started: "2025-11",
     stack: ["Python", "Node.js", "Express", "MySQL", "React Router", "TypeScript", "Tailwind CSS"],
     links: [
-      { label: "Live site", href: "https://flood-forecast-frontend-heyi.vercel.app" },
+      { label: "Live Site", href: "https://flood-forecast-frontend-heyi.vercel.app" },
       { label: "Source", href: "https://github.com/nathsuki73/flood-forecast-frontend" },
     ],
   },
@@ -40,7 +40,7 @@ export const projects: Project[] = [
     started: "2026-02",
     stack: ["Next.js", "TypeScript", "Node.js", "Express", "Laravel", "MySQL"],
     links: [
-      { label: "Live site", href: "https://gadvance.vercel.app" },
+      { label: "Live Site", href: "https://gadvance.vercel.app" },
       { label: "Source", href: "https://github.com/nathsuki73/gadvance" },
     ],
   },
@@ -61,7 +61,7 @@ export const projects: Project[] = [
       "Cloudflare Turnstile",
     ],
     links: [
-      { label: "Live site", href: "https://untold-diaries.vercel.app" },
+      { label: "Live Site", href: "https://untold-diaries.vercel.app" },
       { label: "Source", href: "https://github.com/nathsuki73/untold-diaries" },
     ],
   },

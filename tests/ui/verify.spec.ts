@@ -166,7 +166,7 @@ test("theme switcher sets, persists, and clears the theme", async ({ page }) => 
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   const html = page.locator("html");
-  const switcher = page.getByRole("group", { name: "Color theme" });
+  const switcher = page.getByRole("group", { name: /^Color theme$/i });
   // Click the visible option (label with icon) like a user; the radio itself is visually hidden.
   const option = (name: string) => switcher.getByTitle(name);
   const radio = (name: string) => switcher.getByRole("radio", { name });
@@ -192,7 +192,7 @@ test("a first-time visitor gets the System theme, following their OS", async ({ 
   await page.waitForLoadState("networkidle");
   await expect(page.locator("html")).not.toHaveAttribute("data-theme", /.*/);
   await expect(
-    page.getByRole("group", { name: "Color theme" }).getByRole("radio", { name: "System" }),
+    page.getByRole("group", { name: /^Color theme$/i }).getByRole("radio", { name: "System" }),
   ).toBeChecked();
   expect(await page.evaluate(() => localStorage.getItem("theme"))).toBeNull();
 });
@@ -294,7 +294,7 @@ test("selecting a technology lists the projects that use it", async ({ page }) =
   await typescript.click();
   await expect(typescript).toHaveAttribute("aria-pressed", "true");
   await expect(page).toHaveURL(/#tech-typescript$/);
-  await expect(panel).toContainText("Used in 3 projects");
+  await expect(panel).toContainText(/Used in 3 projects/i);
   for (const name of ["Flood Forecast", "GADvance", "Untold Diaries"]) {
     await expect(panel.getByRole("link", { name })).toBeVisible();
   }
@@ -326,7 +326,7 @@ test("on a phone, the usage panel opens under the selected technology's group", 
   await page.getByRole("button", { name: /^MySQL/ }).click();
   const group = page.locator("section", { has: page.getByRole("heading", { name: "Backend and databases" }) });
   await expect(group.getByTestId("skill-usage")).toBeVisible();
-  await expect(group.getByTestId("skill-usage")).toContainText("Used in 2 projects");
+  await expect(group.getByTestId("skill-usage")).toContainText(/Used in 2 projects/i);
 });
 
 /* ---------- Behaviour: motion, hero, GitHub ---------- */
@@ -350,8 +350,8 @@ test("GitHub section shows live stats or the documented fallback", async ({ page
   if ((await heatmap.count()) > 0) {
     // Token configured: full calendar (52-53 weeks) and streaks.
     expect(await heatmap.locator("[data-day]").count()).toBeGreaterThanOrEqual(364);
-    await expect(section.getByText("Current streak", { exact: true })).toBeVisible();
-    await expect(section.getByText("Longest streak", { exact: true })).toBeVisible();
+    await expect(section.getByText(/^Current streak$/i)).toBeVisible();
+    await expect(section.getByText(/^Longest streak$/i)).toBeVisible();
 
     // Year buttons swap the calendar; exactly one is pressed.
     const years = section.getByRole("group", { name: "Calendar year" }).getByRole("button");

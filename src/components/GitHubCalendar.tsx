@@ -27,7 +27,7 @@ export function GitHubCalendar({ calendars }: { calendars: ContributionCalendar[
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <figcaption id="heatmap-caption" className="font-semibold">
           <span className="tabular-nums">{calendar.total.toLocaleString("en-US")}</span>{" "}
-          {calendar.key === "past" ? "contributions in the last year" : `contributions in ${calendar.label}`}
+          {calendar.key === "past" ? "Contributions in the Last Year" : `Contributions in ${calendar.label}`}
         </figcaption>
         {calendars.length > 1 && (
           <div role="group" aria-label="Calendar year" className="flex flex-wrap gap-1">
@@ -151,7 +151,7 @@ function Grid({ weeks }: { weeks: ContributionDay[][] }) {
       <details className="mt-2">
         <summary className="inline-flex min-h-11 cursor-pointer items-center gap-2 text-accent">
           <Icon icon={Table2} />
-          Show monthly totals
+          Show Monthly Totals
         </summary>
         <table className="mt-2 text-sm">
           <caption className="sr-only">Contributions per month</caption>

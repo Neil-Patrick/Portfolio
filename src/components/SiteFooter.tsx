@@ -28,7 +28,7 @@ export function SiteFooter() {
 
         <div>
           <h2 id="footer-contact" className="mb-2 text-base">
-            Get in touch
+            Get in Touch
           </h2>
           <ul aria-labelledby="footer-contact" className="flex flex-wrap gap-x-6">
             {site.contactLinks.map((link) => (

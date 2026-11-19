@@ -11,12 +11,12 @@ const degree = education[0];
 
 /** Quick facts, all taken from the content files. */
 const facts = [
-  { label: "Based in", value: degree.location },
+  { label: "Based In", value: degree.location },
   { label: "Studying", value: `${degree.program}, ${degree.school}` },
   { label: "Graduating", value: "2027 (expected)" },
-  { label: "Heading toward", value: "Data and AI" },
+  { label: "Heading Toward", value: "Data and AI" },
   {
-    label: "Latest certification",
+    label: "Latest Certification",
     value: `${featuredCertification.name} (${formatMonth(featuredCertification.date)})`,
   },
 ];
@@ -33,7 +33,7 @@ export default function AboutPage() {
 
         <aside aria-labelledby="at-a-glance" className="self-start rounded-md border border-line-strong bg-surface p-6">
           <h2 id="at-a-glance" className="mb-4 text-lg">
-            At a glance
+            At a Glance
           </h2>
           <dl className="grid gap-4">
             {facts.map((fact) => (

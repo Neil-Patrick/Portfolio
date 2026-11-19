@@ -58,7 +58,7 @@ export const sections: SiteSection[] = [
   {
     id: "about",
     label: "About",
-    cta: "Read more about me",
+    cta: "Read More About Me",
     href: "/about",
     summary: "Computer Science student in Laguna, Philippines, moving from web development toward data and AI.",
     detail: "Who I am, what I've built, and where I'm heading.",
@@ -66,7 +66,7 @@ export const sections: SiteSection[] = [
   {
     id: "credentials",
     label: "Credentials",
-    cta: "See all credentials",
+    cta: "See All Credentials",
     href: "/credentials",
     summary: "Plus 14 badges from IBM SkillsBuild and Cisco.",
     detail: "My education and certifications, newest first. Each badge links to its verification page on Credly.",
@@ -74,7 +74,7 @@ export const sections: SiteSection[] = [
   {
     id: "technologies",
     label: "Technologies",
-    cta: "See all technologies",
+    cta: "See All Technologies",
     href: "/technologies",
     summary: "Python, SQL, TypeScript, and Next.js, with MySQL, PostgreSQL, and Supabase for data.",
     detail: "The languages, frameworks, and tools I work with, grouped by area.",
@@ -82,7 +82,7 @@ export const sections: SiteSection[] = [
   {
     id: "projects",
     label: "Projects",
-    cta: "See all projects",
+    cta: "See All Projects",
     href: "/projects",
     summary: "Flood Forecast, GADvance, and Untold Diaries, built with my thesis team.",
     detail: "Team projects with my thesis teammates. We split the work evenly across the whole stack.",
@@ -90,7 +90,7 @@ export const sections: SiteSection[] = [
   {
     id: "contact",
     label: "Contact",
-    cta: "See contact details",
+    cta: "See Contact Details",
     href: "/contact",
     summary: "Reach me by email or on LinkedIn.",
     detail: "The best ways to reach me.",

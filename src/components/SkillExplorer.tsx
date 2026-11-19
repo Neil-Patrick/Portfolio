@@ -96,7 +96,7 @@ export function SkillExplorer({ groups }: Props) {
                         </span>
                         <span className="sr-only">
                           , used in {skill.projects.length}{" "}
-                          {skill.projects.length === 1 ? "project" : "projects"}
+                          {skill.projects.length === 1 ? "Project" : "Projects"}
                         </span>
                       </button>
                     ) : (
@@ -154,7 +154,7 @@ function UsagePanel({ skill }: { skill: ExplorerSkill | null }) {
               </p>
               <p className="mt-1 text-ink-muted">
                 Used in {skill.projects.length}{" "}
-                {skill.projects.length === 1 ? "project" : "projects"}
+                {skill.projects.length === 1 ? "Project" : "Projects"}
               </p>
               <ul className="mt-4 grid gap-3">
                 {skill.projects.map((project) => (
