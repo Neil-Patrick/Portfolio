@@ -13,7 +13,7 @@ Personal portfolio website.
 - [Lucide](https://lucide.dev) (`lucide-react`, ISC) for UI icons: navigation, contact links, theme switcher, GitHub stats; only the imported icons ship
 - [Motion](https://motion.dev) (MIT) for scroll reveals, count-ups, hover/tilt effects, and page transitions
 - [Lenis](https://lenis.darkroom.engineering) (MIT) for smooth scrolling
-- [three.js](https://threejs.org) + [React Three Fiber](https://r3f.docs.pmnd.rs) (MIT) for the 3D neural network in the home hero (lazy-loaded)
+- [three.js](https://threejs.org) + [React Three Fiber](https://r3f.docs.pmnd.rs) (MIT) for the subtle wave-line background behind the home page (lazy-loaded)
 - No UI or chart libraries: the career timeline and heatmap are hand-built
 - Hosted on [Vercel](https://vercel.com)
 
@@ -59,7 +59,7 @@ Create a `.env.local` file (git-ignored; env files are never committed) with the
   - Navigation: every section exists on the home page; each home preview link opens its page with the right title; the desktop header links every page and marks the current one; the mobile menu opens, closes with Escape (returning focus) and on link click; the footer reaches every page.
   - Theme: the switcher sets, persists and clears the theme; a first-time visitor gets System.
   - Technologies and projects: every project tool is a listed technology or a known service; every technology shows an icon and every logo loads; selecting a technology lists its projects, updates the URL hash, and links to the project; a project's tool chip opens the Technologies page with it selected; on phones the panel opens under the selected group.
-  - Hero and motion: the hero shows the 3D canvas or its static fallback behind readable text; with full motion the page animates, scrolls, and hovers without errors, every revealed element ends fully visible, and the career timeline finishes drawing; with Lenis on, anchor links still land below the sticky header.
+  - Background and motion: the home page shows the fixed wave background (static lines under reduced motion) behind readable text, and other pages have none; with full motion the page animates, scrolls, and hovers without errors, every revealed element ends fully visible, and the career timeline finishes drawing; with Lenis on, anchor links still land below the sticky header.
   - GitHub: the section shows counters, streaks, and the contribution calendar, and the year buttons swap the calendar (with a token); or the public fallback (without).
   - Chart: one marker per timeline item and a table row for each; Home, End and arrow keys move the selection; clicking selects the nearest item; the chart fits a 320px screen.
 
@@ -84,8 +84,10 @@ src/
     GitHubActivity.tsx      GitHub section (server: fetches cached stats)
     GitHubActivityView.tsx  Counters, streaks (ring), this month's activity, language bars
     GitHubCalendar.tsx      Contribution heatmap with year buttons, readout, monthly table
-    hero/              3D neural network (NeuralNetwork), lazy loader + pause logic
-                       (HeroBackground), static fallback, name entrance (HeroIntro)
+    background/        Fixed home-page background: PageBackground (loader, pause logic),
+                       WaveLines (animated), WaveFallback (static), waves.ts (shared
+                       wave math), scene-utils.ts (theme colors for the scene)
+    hero/              Name entrance and hero links (HeroIntro)
     motion/            MotionRoot (reduced-motion config + Lenis), Reveal, CountUp,
                        Tilt/Magnetic, PageTransition
     ThemeSwitcher.tsx  Light / dark / system control
@@ -126,9 +128,10 @@ Text in `[square brackets]` in `src/content/` is placeholder content.
 
 - **Tailwind over Sass:** design tokens are defined once in `@theme`, so every utility class uses them, and only the classes actually used get shipped.
 - **Content as data:** projects, technologies, and links live in `src/content/`, separate from UI components.
-- **Visual direction: work shown as data, brought to life.** A full-bleed home hero with a 3D neural network (nodes, links, and pulses of "data" moving along them, leaning toward the cursor), a career timeline built from the real credentials and projects, and live GitHub activity. Deep navy or off-white canvas, one teal accent, IBM Plex Sans, no divider lines: sections separate through space and alternating full-width bands.
+- **Visual direction: work shown as data, brought to life.** Subtle wave lines drifting behind the whole home page, a career timeline built from the real credentials and projects, and live GitHub activity. Pure black (dark) or off-white (light) canvas with neutral grays, one teal accent, IBM Plex Sans, one background color for the whole page, no divider lines: sections separate through space.
+- **Background kept subtle:** six hairline waves in the accent color at 10-25% opacity, drifting so slowly that one cycle takes about half a minute; scrolling only nudges their phase. No pointer effects, particles, or pulses: it's texture, not a feature. Earlier experiments (a 3D neural network, a particle field) were dropped as too busy behind text.
 - **Motion with guardrails:** Motion handles reveals, count-ups, tilt, the name entrance, and page transitions; Lenis smooths scrolling. Under `prefers-reduced-motion: reduce`, Lenis is off, the 3D scene is a still frame, and a CSS rule shows every `[data-reveal]` element as-is (CSS rather than JS branching, so server and client HTML match and nothing hydrates differently). Without JavaScript, a `<noscript>` style does the same.
-- **3D kept off the critical path:** three.js and React Three Fiber load only on the client after the page is interactive (`next/dynamic`, about 240 KB gzipped, separate chunk), never on other pages. The scene pauses when the hero is off-screen or the tab is hidden, caps the pixel ratio at 1.5, and uses half the nodes on phones. A static SVG version of the same network shows first and whenever WebGL is unavailable.
+- **3D kept off the critical path:** three.js and React Three Fiber load only on the client after the page is interactive (`next/dynamic`, about 240 KB gzipped, separate chunk), never on other pages. The wave scene pauses when the tab is hidden. A static SVG of the same lines shows first, whenever WebGL is unavailable, and on its own with reduced motion (the 3D code is then never downloaded).
 - **GitHub data, cached and honest:** fetched on the server with `'use cache'` + `cacheLife('hours')`, so the home page is prerendered and refreshes in the background. Every number comes from the API; without a token the section says what it can't show. The heatmap uses one hue (the accent) from light to dark instead of GitHub's greens, with a legend and a monthly-totals table. Streaks are computed from the yearly calendars; a day with no contributions yet doesn't break the current streak, and on a tie the most recent longest streak is shown. The current-streak ring fills toward the longest streak, which is said in text beside it. There is deliberately no letter grade (as some GitHub stats cards show): it's a third-party score, not data.
 - **Hand-built chart, no library:** one chart doesn't justify a charting dependency. Gridlines and the step line are SVG with non-scaling strokes; markers and axis labels are HTML positioned in percentages, so nothing distorts at any width. Certifications are circles and projects squares (identity never relies on color alone), the two series colors passed a colorblind-safety and contrast validator in both themes, and a table view lists every point. Mouse, tap, and arrow keys all drive one readout line instead of a floating tooltip.
 - **Semantic color tokens only:** Tailwind's default palette is removed (`--color-*: initial`). Components use role names (`bg-canvas`, `bg-surface`, `text-ink`, `border-line-strong`, `text-accent`) and never `dark:` classes. Each token is `light-dark(LIGHT, DARK)`, so restyling means editing `globals.css` only. Every text and background pair passes WCAG AA, and control borders (`line-strong`) pass 3:1.

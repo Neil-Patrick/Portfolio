@@ -331,15 +331,27 @@ test("on a phone, the usage panel opens under the selected technology's group", 
 
 /* ---------- Behaviour: motion, hero, GitHub ---------- */
 
-test("hero shows the network (3D canvas or static fallback) behind readable text", async ({ page }) => {
+test("home shows the wave background (animated or static) behind readable text", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   await page.waitForLoadState("networkidle");
-  const hero = page.locator("#home");
-  await expect(hero.locator("[data-hero-canvas], [data-hero-fallback]").first()).toBeAttached();
-  await expect(hero.getByRole("heading", { level: 1 })).toHaveText("Neil Patrick Pajadan");
+  const layer = page.locator('[data-bg="waves"]');
+  await expect(layer).toHaveCSS("position", "fixed");
+  await expect(layer).toHaveCSS("pointer-events", "none");
+  // Tests run with reduced motion, so only the static lines show (no 3D download).
+  await expect(layer.locator('[data-bg-fallback="waves"] path')).toHaveCount(6);
+  await expect(layer.locator("canvas")).toHaveCount(0);
+  await expect(page.locator("#home").getByRole("heading", { level: 1 })).toHaveText("Neil Patrick Pajadan");
   const axe = await new AxeBuilder({ page }).include("#home").withTags(["wcag2aa"]).analyze();
   expect(axe.violations.map((v) => v.id)).toEqual([]);
+});
+
+test("other pages have no 3D background", async ({ page }) => {
+  for (const path of ["/about", "/projects"]) {
+    await page.goto(path);
+    await page.waitForLoadState("networkidle");
+    await expect(page.locator("[data-bg]")).toHaveCount(0);
+  }
 });
 
 test("GitHub section shows live stats or the documented fallback", async ({ page }) => {
@@ -378,7 +390,8 @@ test("with full motion: home animates, scrolls, and hovers without errors", asyn
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   await page.waitForLoadState("networkidle");
-  await page.waitForTimeout(1500); // hero entrance + 3D scene start
+  await page.waitForTimeout(1500); // hero entrance + wave scene start
+  await expect(page.locator('[data-bg-canvas="waves"], [data-bg-fallback="waves"]').first()).toBeAttached();
 
   // Scroll the whole page so every reveal, counter, and heatmap runs.
   for (let i = 0; i < 12; i++) {

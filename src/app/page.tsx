@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { GitHubActivity } from "@/components/GitHubActivity";
 import { ContactIcon } from "@/components/icons";
-import { HeroBackground } from "@/components/hero/HeroBackground";
+import { PageBackground } from "@/components/background/PageBackground";
 import { HeroIntro } from "@/components/hero/HeroIntro";
 import { CareerTimeline } from "@/components/CareerTimeline";
 import { Reveal, RevealItem } from "@/components/motion/Reveal";
@@ -99,18 +99,15 @@ const previews: Record<Exclude<SectionId, "home">, ReactNode> = {
 export default function HomePage() {
   return (
     <>
+      {/* Subtle wave lines, fixed behind every home section. */}
+      <PageBackground />
+
       {/* Full-bleed hero, running up behind the transparent header. */}
       <section
         id="home"
         aria-labelledby="home-heading"
         className="relative -mt-header flex min-h-svh items-center overflow-hidden pt-header"
       >
-        <HeroBackground />
-        {/* Keeps the text readable (AA) over the moving network. */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-linear-to-r from-canvas via-canvas/75 to-canvas/10"
-        />
         <div className="container-page relative py-16">
           <HeroIntro
             name={site.name}

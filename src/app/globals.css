@@ -30,18 +30,18 @@
   /* Remove Tailwind's default palette so only these tokens can be used. */
   --color-*: initial;
 
-  --color-canvas: light-dark(#f7f8fa, #0d1724); /* page background */
-  --color-surface: light-dark(#eceff3, #152234); /* panels, header, footer */
-  --color-ink: light-dark(#13233a, #e6edf5); /* primary text */
-  --color-ink-muted: light-dark(#4a5a70, #9dadc2); /* secondary text */
-  --color-line: light-dark(#d5dbe3, #22324a); /* decorative dividers only */
-  --color-line-strong: light-dark(#74839a, #5f7390); /* control & panel boundaries (≥3:1) */
+  --color-canvas: light-dark(#f7f8fa, #000000); /* page background (dark: pure black) */
+  --color-surface: light-dark(#eceff3, #0f0f0f); /* panels, cards, header */
+  --color-ink: light-dark(#13233a, #ededed); /* primary text */
+  --color-ink-muted: light-dark(#4a5a70, #a1a1a1); /* secondary text */
+  --color-line: light-dark(#d5dbe3, #262626); /* decorative dividers only */
+  --color-line-strong: light-dark(#74839a, #6b6b6b); /* control & panel boundaries (≥3:1) */
   --color-accent: light-dark(#0b7268, #4fd1c1); /* links, active nav, focus */
-  --color-on-accent: light-dark(#ffffff, #0d1724); /* text on accent */
+  --color-on-accent: light-dark(#ffffff, #000000); /* text on accent */
   --color-focus: var(--color-accent); /* focus rings */
 
   /* Light tile behind dark brand logos, only in dark mode (src/content/tech.ts). */
-  --color-logo-backing: light-dark(transparent, #e6edf5);
+  --color-logo-backing: light-dark(transparent, #ededed);
 
   /* Contribution heatmap: one hue (accent), light to dark, over the band surface. */
   --color-heat-0: var(--color-line);
