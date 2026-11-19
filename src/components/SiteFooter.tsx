@@ -8,7 +8,7 @@ const linkClass = "inline-flex min-h-11 items-center gap-2 text-ink-muted hover:
 /** Plain page links and contact links on every page. */
 export function SiteFooter() {
   return (
-    <footer className="mt-12 border-t border-line bg-surface">
+    <footer className="mt-12 border-t border-line">
       <div className="container-page grid gap-8 py-10 sm:grid-cols-2">
         <nav aria-labelledby="footer-pages">
           <h2 id="footer-pages" className="mb-2 text-base">

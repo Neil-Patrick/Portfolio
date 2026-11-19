@@ -83,9 +83,6 @@ const previews: Record<Exclude<SectionId, "home">, ReactNode> = {
   ),
 };
 
-/** Alternate full-bleed surface bands so sections separate without divider lines. */
-const banded = new Set<keyof typeof previews>(["credentials", "projects"]);
-
 export default function HomePage() {
   return (
     <>
@@ -115,16 +112,14 @@ export default function HomePage() {
             title={section.label}
             href={section.href}
             cta={section.cta}
-            band={banded.has(id)}
           >
             {previews[id]}
           </Section>
         );
       })}
 
-      {/* Data sections close the page, just before the footer. Bands keep alternating:
-          contact (canvas) → timeline (surface) → GitHub (canvas). */}
-      <section aria-label="Career timeline" className="bg-surface py-16 sm:py-24">
+      {/* Data sections close the page, just before the footer. */}
+      <section aria-label="Career timeline" className="py-12 sm:py-16">
         <div className="container-page">
           <LearningChart points={timeline} />
         </div>
