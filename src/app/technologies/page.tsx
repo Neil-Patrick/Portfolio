@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SectionPage } from "@/components/SectionPage";
 import { SkillExplorer } from "@/components/SkillExplorer";
 import { getSection } from "@/content/site";
-import { skillGroups } from "@/content/skills";
+import { skillGroups, techDescriptions } from "@/content/skills";
 import { projectsUsing, skillAnchor } from "@/lib/skill-usage";
 
 const section = getSection("technologies");
@@ -15,6 +15,7 @@ const groups = skillGroups.map((group) => ({
   skills: group.skills.map((name) => ({
     name,
     anchor: skillAnchor(name),
+    description: techDescriptions[name] ?? "",
     projects: projectsUsing(name).map(({ id, name, summary }) => ({ id, name, summary })),
   })),
 }));

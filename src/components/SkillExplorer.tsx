@@ -9,6 +9,8 @@ export type ExplorerSkill = {
   name: string;
   /** Chip id; the URL hash `#<anchor>` selects this skill. */
   anchor: string;
+  /** One sentence: what the technology is. */
+  description: string;
   projects: { id: string; name: string; summary: string }[];
 };
 
@@ -18,8 +20,8 @@ const chipBase =
   "inline-flex min-h-11 items-center gap-2 rounded-sm border px-3 py-1.5";
 
 /**
- * Skill groups with logos. Skills used in a listed project are toggle buttons;
- * selecting one shows which projects use it. On large screens the panel is a
+ * Skill groups with logos. Every skill is a toggle button; selecting one shows
+ * what it is and which projects use it (the badge counts those projects). On large screens the panel is a
  * sticky side column; below that it opens under the selected skill's group.
  * The selection lives in the URL hash so the Projects page can link straight to it.
  */
@@ -31,9 +33,7 @@ export function SkillExplorer({ groups }: Props) {
   useEffect(() => {
     const fromHash = () => {
       const anchor = decodeURIComponent(window.location.hash.slice(1));
-      const match = allSkills.find(
-        (skill) => skill.anchor === anchor && skill.projects.length > 0,
-      );
+      const match = allSkills.find((skill) => skill.anchor === anchor);
       if (match) setSelected(match.name);
     };
     fromHash();
@@ -71,40 +71,39 @@ export function SkillExplorer({ groups }: Props) {
                     id={skill.anchor}
                     className="scroll-mt-28"
                   >
-                    {skill.projects.length > 0 ? (
-                      <button
-                        type="button"
-                        aria-pressed={selected === skill.name}
-                        onClick={() => select(skill)}
-                        className={`${chipBase} ${
-                          selected === skill.name
-                            ? "border-accent bg-accent text-on-accent"
-                            : "border-line-strong bg-surface hover:border-accent"
-                        }`}
-                      >
-                        <TechIcon name={skill.name} />
-                        {skill.name}
-                        <span
-                          aria-hidden
-                          className={`rounded-xs px-1.5 text-xs font-semibold tabular-nums ${
-                            selected === skill.name
-                              ? "bg-on-accent text-accent"
-                              : "bg-canvas text-ink-muted"
-                          }`}
-                        >
-                          {skill.projects.length}
-                        </span>
-                        <span className="sr-only">
-                          , used in {skill.projects.length}{" "}
-                          {skill.projects.length === 1 ? "Project" : "Projects"}
-                        </span>
-                      </button>
-                    ) : (
-                      <span className={`${chipBase} border-line text-ink`}>
-                        <TechIcon name={skill.name} />
-                        {skill.name}
-                      </span>
-                    )}
+                    <button
+                      type="button"
+                      aria-pressed={selected === skill.name}
+                      onClick={() => select(skill)}
+                      className={`${chipBase} ${
+                        selected === skill.name
+                          ? "border-accent bg-accent text-on-accent"
+                          : skill.projects.length > 0
+                            ? "border-line-strong bg-surface hover:border-accent"
+                            : "border-line text-ink hover:border-accent"
+                      }`}
+                    >
+                      <TechIcon name={skill.name} />
+                      {skill.name}
+                      {skill.projects.length > 0 && (
+                        <>
+                          <span
+                            aria-hidden
+                            className={`rounded-xs px-1.5 text-xs font-semibold tabular-nums ${
+                              selected === skill.name
+                                ? "bg-on-accent text-accent"
+                                : "bg-canvas text-ink-muted"
+                            }`}
+                          >
+                            {skill.projects.length}
+                          </span>
+                          <span className="sr-only">
+                            , used in {skill.projects.length}{" "}
+                            {skill.projects.length === 1 ? "Project" : "Projects"}
+                          </span>
+                        </>
+                      )}
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -152,11 +151,13 @@ function UsagePanel({ skill }: { skill: ExplorerSkill | null }) {
                 <TechIcon name={skill.name} />
                 {skill.name}
               </p>
-              <p className="mt-1 text-ink-muted">
-                Used in {skill.projects.length}{" "}
-                {skill.projects.length === 1 ? "Project" : "Projects"}
+              <p className="mt-2">{skill.description}</p>
+              <p className="mt-4 text-sm text-ink-muted">
+                {skill.projects.length > 0
+                  ? `Used in ${skill.projects.length} ${skill.projects.length === 1 ? "Project" : "Projects"}`
+                  : "Not in a listed project yet."}
               </p>
-              <ul className="mt-4 grid gap-3">
+              <ul className="mt-2 grid gap-3">
                 {skill.projects.map((project) => (
                   <li key={project.id}>
                     <Link
@@ -172,8 +173,8 @@ function UsagePanel({ skill }: { skill: ExplorerSkill | null }) {
             </>
           ) : (
             <p className="text-ink-muted">
-              Pick a highlighted technology to see the projects that use it. The
-              number on each one is how many projects it appears in.
+              Pick a technology to see what it is and which projects use it. The
+              number on a technology is how many projects it appears in.
             </p>
           )}
         </motion.div>

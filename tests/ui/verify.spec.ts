@@ -329,7 +329,7 @@ test("selecting a technology lists the projects that use it", async ({ page }) =
   const typescript = page.getByRole("button", { name: /^TypeScript/ });
   const panel = page.getByRole("complementary", { name: "Projects using the selected technology" }).getByTestId("skill-usage");
 
-  await expect(panel).toContainText("Pick a highlighted technology");
+  await expect(panel).toContainText("Pick a technology");
   await typescript.click();
   await expect(typescript).toHaveAttribute("aria-pressed", "true");
   await expect(page).toHaveURL(/#tech-typescript$/);
@@ -347,7 +347,27 @@ test("selecting a technology lists the projects that use it", async ({ page }) =
   await expect(typescript).toHaveAttribute("aria-pressed", "true");
   await typescript.click();
   await expect(typescript).toHaveAttribute("aria-pressed", "false");
-  await expect(panel).toContainText("Pick a highlighted technology");
+  await expect(panel).toContainText("Pick a technology");
+});
+
+test("every technology has a one-sentence description", async () => {
+  const { skillGroups, techDescriptions } = await import("../../src/content/skills");
+  const missing = skillGroups.flatMap((group) => group.skills).filter((name) => !techDescriptions[name]?.trim());
+  expect(missing, "technologies without a description").toEqual([]);
+});
+
+test("selecting a technology shows what it is, even when no project uses it", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/technologies");
+  await page.waitForLoadState("networkidle");
+  const { techDescriptions } = await import("../../src/content/skills");
+  const panel = page.getByRole("complementary", { name: "Projects using the selected technology" }).getByTestId("skill-usage");
+  await page.getByRole("button", { name: "Java", exact: true }).click();
+  await expect(panel).toContainText(techDescriptions.Java);
+  await expect(panel).toContainText("Not in a listed project yet.");
+  await page.getByRole("button", { name: /^Python/ }).click();
+  await expect(panel).toContainText(techDescriptions.Python);
+  await expect(panel.getByRole("link", { name: "Flood Forecast" })).toBeVisible();
 });
 
 test("a project's tool chip opens the Technologies page with it selected", async ({ page }) => {
