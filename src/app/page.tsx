@@ -13,10 +13,31 @@ import { TechIcon } from "@/components/TechIcon";
 import { featuredCertification, formatMonth } from "@/content/credentials";
 import { projects } from "@/content/projects";
 import { getSection, sections, site, type SectionId } from "@/content/site";
+import { techIcons } from "@/content/tech";
 import { isSkill, skillAnchor } from "@/lib/skill-usage";
 import { buildTimeline } from "@/lib/timeline";
 
 const timeline = buildTimeline();
+
+/**
+ * Up to six logos for a project preview card: technologies that have a real logo,
+ * each logo shown once (React and React Native share one). Glyph-only names are
+ * skipped; they say nothing at this size and the full stack is on the Projects page.
+ */
+function previewLogos(stack: string[]) {
+  const seen = new Set<string>();
+  return stack
+    .filter((tool) => {
+      const icon = techIcons[tool];
+      if (!isSkill(tool) || !icon) return false;
+      // React Native ships as its own file but draws the same atom as React.
+      const key = tool === "React" || tool === "React Native" ? "react" : typeof icon.src === "string" ? icon.src : icon.src.src;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, 6);
+}
 
 /** Hero links: the three a recruiter needs first. */
 const heroLinks = site.contactLinks.filter((link) =>
@@ -55,7 +76,7 @@ const previews: Record<Exclude<SectionId, "home">, ReactNode> = {
     </Reveal>
   ),
   projects: (
-    <ul className="grid gap-6 md:grid-cols-3">
+    <ul className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
       {projects.map((project) => (
         <li key={project.id}>
           <Tilt className="h-full">
@@ -69,12 +90,9 @@ const previews: Record<Exclude<SectionId, "home">, ReactNode> = {
               </span>
               {/* Logos of the technologies it uses (names are in the project page). */}
               <span aria-hidden className="mt-5 flex flex-wrap gap-2">
-                {project.stack
-                  .filter(isSkill)
-                  .slice(0, 6)
-                  .map((tool) => (
-                    <TechIcon key={tool} name={tool} />
-                  ))}
+                {previewLogos(project.stack).map((tool) => (
+                  <TechIcon key={tool} name={tool} />
+                ))}
               </span>
             </Link>
           </Tilt>

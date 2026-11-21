@@ -1,6 +1,7 @@
-import { Database, Waypoints } from "lucide-react";
+import { Database, Package, Waypoints } from "lucide-react";
 import Image from "next/image";
 import { databaseGlyph, techIcons } from "@/content/tech";
+import { isSkill } from "@/lib/skill-usage";
 
 const SIZE = 18;
 
@@ -14,8 +15,10 @@ export function TechIcon({ name }: { name: string }) {
   const icon = techIcons[name];
 
   if (!icon) {
-    // Database glyph for SQL-like tools, a "connected service" glyph for services.
-    const Glyph = databaseGlyph.has(name) ? Database : Waypoints;
+    // No logo: a database glyph for SQL-like tools, a library glyph for other skills,
+    // and the "connected service" glyph for project-only libraries and services
+    // (explained by the Projects page legend).
+    const Glyph = databaseGlyph.has(name) ? Database : isSkill(name) ? Package : Waypoints;
     return (
       <Glyph
         size={SIZE}

@@ -84,8 +84,8 @@ export const sections: SiteSection[] = [
     label: "Projects",
     cta: "See All Projects",
     href: "/projects",
-    summary: "Flood Forecast, GADvance, and Untold Diaries, built with my thesis team.",
-    detail: "Team projects with my thesis teammates. We split the work evenly across the whole stack.",
+    summary: "Flood Forecast, GADvance, Untold Diaries, and Statera, built with my thesis and class teams.",
+    detail: "Team projects: three with my thesis team, one with a class team. We split the work across the whole stack.",
   },
   {
     id: "contact",

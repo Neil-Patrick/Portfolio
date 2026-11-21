@@ -104,8 +104,11 @@ src/
     site.ts       Site info and section list: label, route, summary, detail, link text
                   (drives the header, home order, and section pages)
     credentials.ts  Education, featured certification, Credly badges
-    skills.ts      Technology groups for the Technologies page (from the CV)
-    projects.ts    Projects: description, start month, stack, links
+    skills.ts      Technology groups for the Technologies page (CV plus main tools from
+                   the project repos), and projectOnly: libraries/services shown on
+                   projects but not listed as technologies
+    projects.ts    Projects: description, start month, stack (notable tools, checked
+                   against each repo), links
     tech.ts        Logo for each technology name (devicon imports)
   lib/
     theme.ts      Theme constants, applyTheme(), inline init script
@@ -119,7 +122,7 @@ tests/ui/         Playwright UI checks
 
 Text in `[square brackets]` in `src/content/` is placeholder content.
 
-**Adding a technology:** add its name to a group in `src/content/skills.ts` (the file keeps its original name; it feeds the Technologies page). For a logo, find it on [devicon.dev](https://devicon.dev), import its `-original.svg` in `src/content/tech.ts`, and add one line to `techIcons` (use `mono: true` for black-by-brand logos, `darkBacking: true` for dark ones). If a project uses it, write the same name in that project's `stack` in `projects.ts` and the two connect automatically.
+**Adding a technology:** add its name to a group in `src/content/skills.ts` (the file keeps its original name; it feeds the Technologies page). For a logo, find it on [devicon.dev](https://devicon.dev), import its `-original.svg` in `src/content/tech.ts`, and add one line to `techIcons` (use `mono: true` for black-by-brand logos, `darkBacking: true` for dark ones). If a project uses it, write the same name in that project's `stack` in `projects.ts` and the two connect automatically. A tool a project uses that you don't want on the Technologies page goes in `projectOnly` in `skills.ts` instead (it shows a neutral glyph, explained by the Projects page legend). Skills without a devicon logo get a neutral library glyph.
 
 **Dev server note:** on this Windows setup, Turbopack sometimes keeps serving an old build of `globals.css` after an edit. If a style change doesn't show up, stop and restart `npm run dev`.
 

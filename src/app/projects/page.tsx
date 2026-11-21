@@ -26,7 +26,7 @@ export default function ProjectsPage() {
       >
         <li className="flex items-center gap-2">
           <TechIcon name="Service" />
-          Service only, not listed under Technologies
+          Library or service, not listed under Technologies
         </li>
       </ul>
 

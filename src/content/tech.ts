@@ -14,6 +14,8 @@ import bootstrap from "devicon/icons/bootstrap/bootstrap-original.svg";
 import canva from "devicon/icons/canva/canva-original.svg";
 import csharp from "devicon/icons/csharp/csharp-original.svg";
 import css from "devicon/icons/css3/css3-original.svg";
+import docker from "devicon/icons/docker/docker-original.svg";
+import expo from "devicon/icons/expo/expo-original.svg";
 import express from "devicon/icons/express/express-original.svg";
 import figma from "devicon/icons/figma/figma-original.svg";
 import git from "devicon/icons/git/git-original.svg";
@@ -21,6 +23,7 @@ import github from "devicon/icons/github/github-original.svg";
 import html from "devicon/icons/html5/html5-original.svg";
 import java from "devicon/icons/java/java-original.svg";
 import javascript from "devicon/icons/javascript/javascript-original.svg";
+import jest from "devicon/icons/jest/jest-plain.svg";
 import laravel from "devicon/icons/laravel/laravel-original.svg";
 import linkedin from "devicon/icons/linkedin/linkedin-original.svg";
 import mysql from "devicon/icons/mysql/mysql-original.svg";
@@ -29,11 +32,13 @@ import nodejs from "devicon/icons/nodejs/nodejs-original.svg";
 import postgresql from "devicon/icons/postgresql/postgresql-original.svg";
 import python from "devicon/icons/python/python-original.svg";
 import react from "devicon/icons/react/react-original.svg";
+import reactnative from "devicon/icons/reactnative/reactnative-original.svg";
 import reactrouter from "devicon/icons/reactrouter/reactrouter-original.svg";
 import sass from "devicon/icons/sass/sass-original.svg";
 import supabase from "devicon/icons/supabase/supabase-original.svg";
 import tailwindcss from "devicon/icons/tailwindcss/tailwindcss-original.svg";
 import typescript from "devicon/icons/typescript/typescript-original.svg";
+import vite from "devicon/icons/vitejs/vitejs-original.svg";
 import vercel from "devicon/icons/vercel/vercel-original.svg";
 import visualstudio from "devicon/icons/visualstudio/visualstudio-original.svg";
 import vscode from "devicon/icons/vscode/vscode-original.svg";
@@ -57,6 +62,9 @@ export const techIcons: Record<string, TechIconData> = {
   // Frameworks and libraries
   "Next.js": { src: nextjs, mono: true },
   React: { src: react },
+  "React Native": { src: reactnative },
+  Expo: { src: expo, mono: true },
+  Vite: { src: vite },
   "React Router": { src: reactrouter },
   "Tailwind CSS": { src: tailwindcss },
   Bootstrap: { src: bootstrap },
@@ -71,6 +79,8 @@ export const techIcons: Record<string, TechIconData> = {
   // Hosting, tools, design
   Vercel: { src: vercel, mono: true },
   Git: { src: git },
+  Docker: { src: docker },
+  Jest: { src: jest },
   GitHub: { src: github, mono: true },
   // Contact links (not technologies; listed so the same logo component draws them)
   LinkedIn: { src: linkedin },
@@ -78,8 +88,10 @@ export const techIcons: Record<string, TechIconData> = {
   "VS Code": { src: vscode },
   Figma: { src: figma },
   Canva: { src: canva },
-  // Project services (OpenRouter, Spotify Web API, Cloudflare Turnstile) deliberately have
-  // no logo: they all use the neutral service glyph explained by the Projects page legend.
+  // No devicon logo: skills (Framer Motion, TanStack Query, NextAuth.js) get a neutral
+  // library glyph; project-only libraries and services (OpenRouter, Spotify Web API,
+  // Cloudflare Turnstile, MapLibre GL, Upstash Redis, Recharts, Zod, Render) get the
+  // service glyph explained by the Projects page legend. See TechIcon.tsx.
 };
 
 /** Names without a devicon logo that are databases get a database glyph; others a neutral one. */
