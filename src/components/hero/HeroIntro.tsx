@@ -15,9 +15,9 @@ type Props = {
 };
 
 /**
- * The page's one orchestrated load moment: the name rises word by word from
- * behind a mask, then the role, intro, and links follow. With reduced motion,
- * CSS keeps the text in place (globals.css, [data-reveal]).
+ * The home intro, just below the landing: the name rises word by word from
+ * behind a mask when it scrolls into view, then the role, intro, and links
+ * follow. With reduced motion, CSS keeps the text in place (globals.css, [data-reveal]).
  */
 export function HeroIntro({ name, role, intro, links }: Props) {
   const words = name.split(" ");
@@ -25,7 +25,15 @@ export function HeroIntro({ name, role, intro, links }: Props) {
 
   return (
     <div className="max-w-3xl">
-      <h1 id="home-heading" className="text-display">
+      {/* The h1 watches the viewport (each word starts hidden inside its mask, so it
+          can't be "in view" itself) and hands the reveal down to the words. */}
+      <motion.h1
+        id="intro-heading"
+        className="text-display"
+        initial="hidden"
+        whileInView="shown"
+        viewport={{ once: true, amount: 0.5 }}
+      >
         {words.map((word, i) => (
           // The space sits outside the masked word: inside an inline-block it would collapse.
           <span key={`${word}-${i}`}>
@@ -33,8 +41,7 @@ export function HeroIntro({ name, role, intro, links }: Props) {
               <motion.span
                 data-reveal
                 className="inline-block"
-                initial={{ y: "110%" }}
-                animate={{ y: 0 }}
+                variants={{ hidden: { y: "110%" }, shown: { y: 0 } }}
                 transition={{ duration: 0.8, delay: 0.1 + i * 0.12, ease: EASE }}
               >
                 {word}
@@ -43,12 +50,13 @@ export function HeroIntro({ name, role, intro, links }: Props) {
             {i < words.length - 1 && " "}
           </span>
         ))}
-      </h1>
+      </motion.h1>
 
       <motion.div
         data-reveal
         initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.7, delay: after, ease: EASE }}
       >
         <p className="mt-4 text-xl text-ink-muted sm:text-2xl">{role}</p>

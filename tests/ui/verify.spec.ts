@@ -1,12 +1,14 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { sections } from "../../src/content/site";
+import { homeIndex, sections, site } from "../../src/content/site";
 import { buildTimeline } from "../../src/lib/timeline";
 
 const WIDTHS = [320, 768, 1024, 1440];
 const SCHEMES = ["light", "dark"] as const;
 const SCREENSHOT_DIR = "test-results/screenshots";
 const pages = sections.filter((s) => s.href !== "/");
+/** Section pages the home page links to with an arrow (Credentials has no home section). */
+const homePages = pages.filter((s) => homeIndex.some((item) => item.id === s.id));
 const timeline = buildTimeline();
 
 /** Collects console errors and uncaught exceptions from the moment it is called. */
@@ -97,15 +99,22 @@ for (const scheme of SCHEMES) {
 
 /* ---------- Behaviour: navigation ---------- */
 
-test("every section in site.ts exists on the home page", async ({ page }) => {
+test("home shows exactly the sections in homeIndex, in that order", async ({ page }) => {
   await page.goto("/");
-  for (const section of sections) {
-    await expect(page.locator(`#${section.id}`), `#${section.id}`).toHaveCount(1);
+  for (const item of homeIndex) {
+    await expect(page.locator(`#${item.id}`), `#${item.id}`).toHaveCount(1);
   }
+  const order = await page.evaluate(
+    (ids) => ids.map((id) => document.getElementById(id)!.getBoundingClientRect().top + window.scrollY),
+    homeIndex.map((item) => item.id),
+  );
+  expect(order, "sections appear top to bottom in homeIndex order").toEqual([...order].sort((a, b) => a - b));
+  // Credentials has no home section (the career timeline plots every certification).
+  await expect(page.locator("#credentials")).toHaveCount(0);
 });
 
 test("each home preview links to its page", async ({ page }) => {
-  for (const section of pages) {
+  for (const section of homePages) {
     await page.goto("/");
     await page.getByRole("link", { name: section.cta, exact: true }).click();
     await expect(page).toHaveURL(new RegExp(`${section.href}$`));
@@ -401,7 +410,7 @@ test("home shows the wave background (animated or static) behind readable text",
   // Tests run with reduced motion, so only the static lines show (no 3D download).
   await expect(layer.locator('[data-bg-fallback="waves"] path')).toHaveCount(6);
   await expect(layer.locator("canvas")).toHaveCount(0);
-  await expect(page.locator("#home").getByRole("heading", { level: 1 })).toHaveText("Neil Patrick Pajadan");
+  await expect(page.locator("#about").getByRole("heading", { level: 1 })).toHaveText("Neil Patrick Pajadan");
   const axe = await new AxeBuilder({ page }).include("#home").withTags(["wcag2aa"]).analyze();
   expect(axe.violations.map((v) => v.id)).toEqual([]);
 });
@@ -514,7 +523,7 @@ test("depth gauge lists every home section and jumps to the one clicked", async 
   await page.waitForLoadState("networkidle");
   const gauge = page.getByRole("navigation", { name: "On This Page" });
   await expect(gauge).toBeVisible();
-  await expect(gauge.getByRole("link")).toHaveCount(sections.length + 2);
+  await expect(gauge.getByRole("link")).toHaveCount(homeIndex.length);
   await expect(gauge.getByRole("link", { name: "Home" })).toHaveAttribute("aria-current", "location");
 
   await gauge.getByRole("link", { name: "Projects" }).click();
@@ -565,4 +574,83 @@ test("credential log entries keep their Credly links, opening safely in a new ta
     await expect(link).toHaveAttribute("target", "_blank");
     await expect(link).toHaveAttribute("rel", /noopener/);
   }
+});
+
+/* ---------- Behaviour: home landing and "Let's Build" ---------- */
+
+test("landing system check reports the real counts and status, fully shown under reduced motion", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const { projects } = await import("../../src/content/projects");
+  const { certifications, featuredCertification } = await import("../../src/content/credentials");
+  const { skillGroups } = await import("../../src/content/skills");
+  const landing = page.locator("#home");
+  const check = landing.locator("dl");
+  await expect(check).toContainText(`Projects${projects.length} Found`);
+  await expect(check).toContainText(
+    `Certifications${[featuredCertification, ...certifications].filter((c) => c.url).length} Verified`,
+  );
+  await expect(check).toContainText(`Technologies${skillGroups.flatMap((g) => g.skills).length} Loaded`);
+  await expect(check).toContainText(`Status${site.availability}`);
+  // Tests run with reduced motion: no row is mid-print (clipped) or faded.
+  const hidden = await landing.locator(".boot-row, .boot-fade").evaluateAll((els) =>
+    els.filter((el) => {
+      const style = getComputedStyle(el);
+      return style.clipPath !== "none" || Number(style.opacity) < 1;
+    }).length,
+  );
+  expect(hidden, "boot rows not fully shown").toBe(0);
+  await expect(landing.getByRole("link", { name: site.landing.primaryCta })).toHaveAttribute("href", "#contact");
+  await expect(landing.getByRole("link", { name: site.landing.secondaryCta })).toHaveAttribute("href", "#projects");
+});
+
+test("landing headline lines fit their column at every width", async ({ page }) => {
+  for (const width of [320, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    const clipped = await page.locator("[data-landing-line]").evaluateAll((lines) =>
+      lines.filter((line) => {
+        const column = line.closest("[data-landing-column]")!.getBoundingClientRect();
+        const box = line.firstElementChild!.getBoundingClientRect();
+        return box.right > column.right + 1;
+      }).length,
+    );
+    expect(clipped, `headline lines wider than their column at ${width}px`).toBe(0);
+  }
+});
+
+test("brief builder composes an email from the picks", async ({ page }) => {
+  await page.goto("/");
+  const section = page.locator("#contact");
+  await section.getByText("A Freelance Project", { exact: true }).click();
+  await section.getByText("Web App", { exact: true }).click();
+  await section.getByText("Data or AI", { exact: true }).click();
+  await expect(section.getByTestId("brief-subject")).toHaveText("Freelance Project: Web App, Data or AI");
+
+  const href = (await section.getByRole("link", { name: "Email the Brief" }).getAttribute("href"))!;
+  const url = new URL(href);
+  expect(url.protocol).toBe("mailto:");
+  expect(url.pathname).toBe("neilpatrick.dev@gmail.com");
+  expect(url.searchParams.get("subject")).toBe("Freelance Project: Web App, Data or AI");
+  const body = url.searchParams.get("body")!;
+  expect(body).toContain("I'm reaching out about: A Freelance Project");
+  expect(body).toContain("Focus: Web App, Data or AI");
+  expect(body).toContain("Timeline:");
+
+  // Clicking a picked chip again unticks it. The chips are real, labelled form controls.
+  await section.getByText("Web App", { exact: true }).click();
+  await expect(section.getByTestId("brief-subject")).toHaveText("Freelance Project: Data or AI");
+  await expect(section.getByRole("checkbox", { name: "Web App" })).not.toBeChecked();
+  await expect(section.getByRole("radio", { name: "A Freelance Project" })).toBeChecked();
+});
+
+test("Copy Email copies the address and says so", async ({ page, context }) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.goto("/");
+  const section = page.locator("#contact");
+  await section.getByRole("button", { name: "Copy Email" }).click();
+  await expect(section.getByRole("button", { name: "Copied" })).toBeVisible();
+  await expect(section.getByTestId("copy-status")).toHaveText("Email address copied.");
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe("neilpatrick.dev@gmail.com");
 });

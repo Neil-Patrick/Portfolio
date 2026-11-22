@@ -33,19 +33,29 @@ export function Section({ id, title, href, cta, children }: SectionProps) {
         <RevealItem>{children}</RevealItem>
         {href && cta && (
           <RevealItem>
-            <Magnetic className="inline-block">
-              <Link
-                href={href}
-                aria-label={cta}
-                title={cta}
-                className="group grid size-11 place-items-center rounded-full border border-line-strong text-accent transition-colors hover:border-accent hover:bg-accent hover:text-on-accent"
-              >
-                <Icon icon={ArrowRight} className="transition-transform motion-safe:group-hover:translate-x-0.5" />
-              </Link>
-            </Magnetic>
+            <ArrowLink href={href} label={cta} />
           </RevealItem>
         )}
       </Reveal>
     </section>
+  );
+}
+
+/**
+ * Round arrow button to a section's own page (home page). Icon only, so the
+ * label is its accessible name and tooltip, e.g. "See All Projects".
+ */
+export function ArrowLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Magnetic className="inline-block">
+      <Link
+        href={href}
+        aria-label={label}
+        title={label}
+        className="group grid size-11 place-items-center rounded-full border border-line-strong text-accent transition-colors hover:border-accent hover:bg-accent hover:text-on-accent"
+      >
+        <Icon icon={ArrowRight} className="transition-transform motion-safe:group-hover:translate-x-0.5" />
+      </Link>
+    </Magnetic>
   );
 }

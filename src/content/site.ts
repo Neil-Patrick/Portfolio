@@ -28,7 +28,54 @@ export const site = {
     "Now I'm moving toward data and AI: analysis, automation, and building with AI models. In 2026 I earned the IT Specialist – Artificial Intelligence certification, and my next projects are in that direction.",
     "Before university, I took the STEM track at Laguna Science National High School and graduated with honors.",
   ],
+  /** Shown as "Status" in the landing's system check. Neil: open to internships, jobs, and freelance work. */
+  availability: "Open to Work",
+  /** Home landing (the boot sequence). Draft copy, true to the intro: edit freely. */
+  landing: {
+    /** One line each; they decode in. Keep each line short enough to fit a phone. */
+    headline: ["Web Apps Today.", "Data and AI Next."],
+    primaryCta: "Work With Me",
+    secondaryCta: "See the Work",
+  },
+  /** Home "Let's Build" section: the project brief builder composes an email from these. */
+  collaborate: {
+    heading: "Let's Build Something",
+    lead: "I'm open to internships, jobs, and freelance projects. Pick what fits, and your email app opens with a ready outline.",
+    /** Subject and outline when no reason is picked. */
+    defaultSubject: "Hello From Your Portfolio",
+    defaultOutline: ["What you have in mind:", "Links:"],
+    reasons: [
+      {
+        id: "role",
+        label: "An Internship or Job",
+        subject: "Internship or Job",
+        outline: ["About the role:", "Company and location:", "Start date:", "Links:"],
+      },
+      {
+        id: "freelance",
+        label: "A Freelance Project",
+        subject: "Freelance Project",
+        outline: ["About the project:", "Timeline:", "Budget:", "Links:"],
+      },
+    ],
+    /** Each backed by real work: web projects, Statera (mobile), AI certification and Python, Figma and UX. */
+    focuses: ["Web App", "Mobile App", "Data or AI", "UI Design"],
+  },
 };
+
+/**
+ * Home page sections, top to bottom. Drives the depth gauge; a test checks
+ * the page renders exactly these, in this order.
+ */
+export const homeIndex = [
+  { id: "home", label: "Home" },
+  { id: "about", label: "About" },
+  { id: "projects", label: "Projects" },
+  { id: "technologies", label: "Technologies" },
+  { id: "career-timeline", label: "Career Timeline" },
+  { id: "github", label: "GitHub Activity" },
+  { id: "contact", label: "Contact" },
+];
 
 export type SectionId =
   | "home"
@@ -46,24 +93,21 @@ export type SiteSection = {
   cta: string;
   /** Route of the section's own page. Home is "/". */
   href: string;
-  /** Short preview shown on the home page. */
-  summary: string;
   /** Lead sentence under the section page's h1. */
   detail: string;
   /** Short subtitle shown with the section in the compass menu. */
   tab: string;
 };
 
-/** Order here is the order on the home page and in the wheel. */
+/** Order here is the order in the compass menu and the footer. The home page order is `homeIndex`. */
 export const sections: SiteSection[] = [
-  { id: "home", label: "Home", cta: "", href: "/", summary: "", detail: "", tab: "Introduction" },
+  { id: "home", label: "Home", cta: "", href: "/", detail: "", tab: "Introduction" },
   {
     id: "about",
     label: "About",
     cta: "Read More About Me",
     href: "/about",
     tab: "Overview",
-    summary: "Computer Science student in Laguna, Philippines, moving from web development toward data and AI.",
     detail: "Who I am, what I've built, and where I'm heading.",
   },
   {
@@ -72,7 +116,6 @@ export const sections: SiteSection[] = [
     cta: "See All Credentials",
     href: "/credentials",
     tab: "Education and Badges",
-    summary: "Plus 14 badges from IBM SkillsBuild and Cisco.",
     detail: "My education and certifications, newest first. Each badge links to its verification page on Credly.",
   },
   {
@@ -81,7 +124,6 @@ export const sections: SiteSection[] = [
     cta: "See All Technologies",
     href: "/technologies",
     tab: "Tools and Skills",
-    summary: "Python, SQL, TypeScript, and Next.js, with MySQL, PostgreSQL, and Supabase for data.",
     detail: "The languages, frameworks, and tools I work with, grouped by area.",
   },
   {
@@ -90,7 +132,6 @@ export const sections: SiteSection[] = [
     cta: "See All Projects",
     href: "/projects",
     tab: "Team Builds",
-    summary: "Flood Forecast, GADvance, Untold Diaries, and Statera, built with my thesis and class teams.",
     detail: "Team projects: three with my thesis team, one with a class team. We split the work across the whole stack.",
   },
   {
@@ -99,7 +140,6 @@ export const sections: SiteSection[] = [
     cta: "See Contact Details",
     href: "/contact",
     tab: "Get in Touch",
-    summary: "Reach me by email or on LinkedIn.",
     detail: "The best ways to reach me.",
   },
 ];
