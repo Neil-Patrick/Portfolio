@@ -155,6 +155,8 @@ test("compass menu: Escape and the close button close it; arrow keys move the ne
 
   await page.keyboard.press("ArrowRight");
   await expect(aim).toHaveText(sections[1].label);
+  // The HUD readout also shows the aimed page's subtitle.
+  await expect(page.getByTestId("compass-aim-detail")).toHaveText(sections[1].tab);
   await expect(compassNav(page).getByRole("link", { name: sections[1].label, exact: true })).toBeFocused();
   await page.keyboard.press("ArrowLeft");
   await page.keyboard.press("ArrowLeft");
@@ -548,5 +550,19 @@ test("links to other sites open in a new tab, safely; email links don't", async 
     for (const link of await page.locator('a[href^="mailto:"]').all()) {
       await expect(link).not.toHaveAttribute("target", "_blank");
     }
+  }
+});
+
+/* ---------- Behaviour: HUD section pages ---------- */
+
+test("credential log entries keep their Credly links, opening safely in a new tab", async ({ page }) => {
+  await page.goto("/credentials");
+  const { certifications, featuredCertification } = await import("../../src/content/credentials");
+  const links = page.locator('main a[href^="https://www.credly.com/badges/"]');
+  await expect(links).toHaveCount(certifications.length + 1);
+  await expect(links.first()).toHaveAttribute("href", featuredCertification.url!);
+  for (const link of await links.all()) {
+    await expect(link).toHaveAttribute("target", "_blank");
+    await expect(link).toHaveAttribute("rel", /noopener/);
   }
 });

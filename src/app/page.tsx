@@ -49,7 +49,7 @@ const email = site.contactLinks.find((link) => link.label === "Email")!;
 const previews: Record<Exclude<SectionId, "home">, ReactNode> = {
   about: <p className="max-w-prose text-xl">{getSection("about").summary}</p>,
   credentials: (
-    <div>
+    <div className="hud-corners w-fit max-w-full p-5 sm:p-6">
       <p className="text-xl font-semibold">{featuredCertification.name}</p>
       <p className="text-ink-muted tabular-nums">
         {featuredCertification.issuer},{" "}
@@ -82,7 +82,7 @@ const previews: Record<Exclude<SectionId, "home">, ReactNode> = {
           <Tilt className="h-full">
             <Link
               href={`/projects#${project.id}`}
-              className="flex h-full flex-col rounded-md border border-line-strong bg-canvas p-6 transition-colors hover:border-accent"
+              className="hud-corners flex h-full flex-col border border-line-strong bg-canvas p-6 transition-colors hover:border-accent"
             >
               <span className="text-xl font-semibold">{project.name}</span>
               <span className="mt-2 flex-1 text-ink-muted">

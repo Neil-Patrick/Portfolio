@@ -66,6 +66,9 @@
   --shadow-glow: 0 0 0 3px color-mix(in oklab, var(--color-accent) 22%, transparent),
     0 0 28px color-mix(in oklab, var(--color-accent) 40%, transparent);
 
+  /* The same glow for clipped or SVG shapes (compass hexagons), as a filter. */
+  --drop-shadow-glow: 0 0 10px color-mix(in oklab, var(--color-accent) 55%, transparent);
+
   /* Sticky header height; also offsets anchor scrolling. */
   --spacing-header: 4rem;
 
@@ -79,6 +82,105 @@
 
 @theme inline {
   --font-sans: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-saira), var(--font-plex), ui-sans-serif, sans-serif;
+}
+
+/* ==========================================================================
+   HUD language (section pages, plus corner brackets on home cards).
+   Inspired by a game-HUD layout: corner brackets, notched tabs, caps labels.
+   All colors come from the tokens above, so both themes work.
+   ========================================================================== */
+
+:root {
+  --hud-corner: 0.875rem; /* bracket arm length */
+  --hud-stroke: 2px; /* bracket thickness */
+  --hud-notch: 0.75rem; /* cut corner on tags and highlighted rows */
+  --hud-corner-lg: 2rem; /* brackets around the compass dial */
+}
+
+/* Four accent corner brackets, drawn as backgrounds (no extra markup).
+   Only background-image/size/position are set, so bg-* colors still apply. */
+@utility hud-corners {
+  background-image:
+    linear-gradient(var(--color-accent) 0 0), linear-gradient(var(--color-accent) 0 0),
+    linear-gradient(var(--color-accent) 0 0), linear-gradient(var(--color-accent) 0 0),
+    linear-gradient(var(--color-accent) 0 0), linear-gradient(var(--color-accent) 0 0),
+    linear-gradient(var(--color-accent) 0 0), linear-gradient(var(--color-accent) 0 0);
+  background-size:
+    var(--hud-corner) var(--hud-stroke), var(--hud-stroke) var(--hud-corner),
+    var(--hud-corner) var(--hud-stroke), var(--hud-stroke) var(--hud-corner),
+    var(--hud-corner) var(--hud-stroke), var(--hud-stroke) var(--hud-corner),
+    var(--hud-corner) var(--hud-stroke), var(--hud-stroke) var(--hud-corner);
+  background-position:
+    0 0, 0 0,
+    100% 0, 100% 0,
+    0 100%, 0 100%,
+    100% 100%, 100% 100%;
+  background-repeat: no-repeat;
+  background-origin: border-box;
+}
+
+/* Short caps label: tabs, field labels, dates. Callers set size and color. */
+@utility hud-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+/* Top-right corner cut. Clips outlines too, so pair with an inset focus ring. */
+@utility hud-notch {
+  clip-path: polygon(0 0, calc(100% - var(--hud-notch)) 0, 100% var(--hud-notch), 100% 100%, 0 100%);
+}
+
+/* The one load moment on section pages: the panel's brackets "lock on",
+   sliding out from the center to the corners. */
+@keyframes hud-lock {
+  from {
+    background-position:
+      50% 50%, 50% 50%, 50% 50%, 50% 50%,
+      50% 50%, 50% 50%, 50% 50%, 50% 50%;
+  }
+}
+/* The aimed compass label fills in from the left. */
+@keyframes hud-wipe {
+  from {
+    transform: scaleX(0);
+  }
+}
+/* One light sweep across a highlighted row (needs position: relative). */
+@keyframes hud-scan {
+  from {
+    translate: -100% 0;
+  }
+  to {
+    translate: 100% 0;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hud-scan {
+    overflow: hidden;
+  }
+  .hud-scan::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      100deg,
+      transparent 30%,
+      color-mix(in oklab, var(--color-on-accent) 28%, transparent) 50%,
+      transparent 70%
+    );
+    animation: hud-scan 1100ms var(--ease-out-soft) 500ms both;
+  }
+  .hud-lock {
+    animation: hud-lock 700ms var(--ease-out-soft) both;
+  }
+  .hud-wipe {
+    transform-origin: left;
+    animation: hud-wipe 450ms var(--ease-out-soft) 150ms both;
+  }
 }
 
 /* Page-width wrapper with fluid side gutters. */

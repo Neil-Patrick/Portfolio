@@ -15,13 +15,28 @@ const item: Variants = {
   shown: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
 };
 
+/** Slides in from the left instead, like lines printing on a HUD log. */
+const itemLeft: Variants = {
+  hidden: { opacity: 0, x: -32 },
+  shown: { opacity: 1, x: 0, transition: { duration: 0.5, ease: EASE } },
+};
+
 /**
  * Reveals its <RevealItem> children in sequence the first time it scrolls into
  * view. With reduced motion, CSS keeps every [data-reveal] element visible (globals.css).
  */
-export function Reveal({ children, className }: { children: ReactNode; className?: string }) {
+export function Reveal({
+  children,
+  className,
+  as = "div",
+}: {
+  children: ReactNode;
+  className?: string;
+  as?: "div" | "ul";
+}) {
+  const Component = as === "ul" ? motion.ul : motion.div;
   return (
-    <motion.div
+    <Component
       className={className}
       variants={container}
       initial="hidden"
@@ -29,7 +44,7 @@ export function Reveal({ children, className }: { children: ReactNode; className
       viewport={{ once: true, amount: 0.15 }}
     >
       {children}
-    </motion.div>
+    </Component>
   );
 }
 
@@ -37,14 +52,16 @@ export function RevealItem({
   children,
   className,
   as = "div",
+  from = "below",
 }: {
   children: ReactNode;
   className?: string;
   as?: "div" | "li";
+  from?: "below" | "left";
 }) {
   const Component = as === "li" ? motion.li : motion.div;
   return (
-    <Component data-reveal className={className} variants={item}>
+    <Component data-reveal className={className} variants={from === "left" ? itemLeft : item}>
       {children}
     </Component>
   );

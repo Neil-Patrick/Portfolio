@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Sans } from "next/font/google";
+import { IBM_Plex_Sans, Saira_Condensed } from "next/font/google";
 import { InlineScript } from "@/components/InlineScript";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -11,6 +11,13 @@ import "./globals.css";
 // One family for everything: engineering character, tabular figures for dates and counts.
 const plex = IBM_Plex_Sans({
   variable: "--font-plex",
+  subsets: ["latin"],
+});
+
+// HUD display face (section pages): condensed, for titles, tabs, and short caps labels.
+const saira = Saira_Condensed({
+  variable: "--font-saira",
+  weight: ["600", "700"],
   subsets: ["latin"],
 });
 
@@ -28,7 +35,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       // Smooth anchor scrolling, but instant jumps on route changes (Next.js reads this).
       data-scroll-behavior="smooth"
-      className={`${plex.variable} h-full antialiased`}
+      className={`${plex.variable} ${saira.variable} h-full antialiased`}
     >
       <head>
         <InlineScript html={themeInitScript} />

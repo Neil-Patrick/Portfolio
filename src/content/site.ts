@@ -50,16 +50,19 @@ export type SiteSection = {
   summary: string;
   /** Lead sentence under the section page's h1. */
   detail: string;
+  /** Short subtitle shown with the section in the compass menu. */
+  tab: string;
 };
 
 /** Order here is the order on the home page and in the wheel. */
 export const sections: SiteSection[] = [
-  { id: "home", label: "Home", cta: "", href: "/", summary: "", detail: "" },
+  { id: "home", label: "Home", cta: "", href: "/", summary: "", detail: "", tab: "Introduction" },
   {
     id: "about",
     label: "About",
     cta: "Read More About Me",
     href: "/about",
+    tab: "Overview",
     summary: "Computer Science student in Laguna, Philippines, moving from web development toward data and AI.",
     detail: "Who I am, what I've built, and where I'm heading.",
   },
@@ -68,6 +71,7 @@ export const sections: SiteSection[] = [
     label: "Credentials",
     cta: "See All Credentials",
     href: "/credentials",
+    tab: "Education and Badges",
     summary: "Plus 14 badges from IBM SkillsBuild and Cisco.",
     detail: "My education and certifications, newest first. Each badge links to its verification page on Credly.",
   },
@@ -76,6 +80,7 @@ export const sections: SiteSection[] = [
     label: "Technologies",
     cta: "See All Technologies",
     href: "/technologies",
+    tab: "Tools and Skills",
     summary: "Python, SQL, TypeScript, and Next.js, with MySQL, PostgreSQL, and Supabase for data.",
     detail: "The languages, frameworks, and tools I work with, grouped by area.",
   },
@@ -84,6 +89,7 @@ export const sections: SiteSection[] = [
     label: "Projects",
     cta: "See All Projects",
     href: "/projects",
+    tab: "Team Builds",
     summary: "Flood Forecast, GADvance, Untold Diaries, and Statera, built with my thesis and class teams.",
     detail: "Team projects: three with my thesis team, one with a class team. We split the work across the whole stack.",
   },
@@ -92,6 +98,7 @@ export const sections: SiteSection[] = [
     label: "Contact",
     cta: "See Contact Details",
     href: "/contact",
+    tab: "Get in Touch",
     summary: "Reach me by email or on LinkedIn.",
     detail: "The best ways to reach me.",
   },

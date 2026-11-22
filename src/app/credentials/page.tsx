@@ -1,6 +1,8 @@
 import { Award } from "lucide-react";
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { Icon } from "@/components/icons";
+import { Reveal, RevealItem } from "@/components/motion/Reveal";
 import { SectionPage } from "@/components/SectionPage";
 import {
   certifications,
@@ -15,69 +17,80 @@ const section = getSection("credentials");
 
 export const metadata: Metadata = { title: section.label };
 
+/** One HUD log entry: caps title with its date on the right, details underneath. */
+function LogEntry({ title, date, children }: { title: string; date: string; children: ReactNode }) {
+  return (
+    <>
+      <span className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+        <span className="font-display text-xl font-semibold tracking-wide uppercase">{title}</span>
+        <span className="hud-label shrink-0 text-sm text-ink-muted tabular-nums sm:max-w-xs sm:text-right">{date}</span>
+      </span>
+      <span className="mt-1 block text-ink-muted">{children}</span>
+    </>
+  );
+}
+
+const row = "block border border-l-4 border-line-strong bg-canvas px-4 py-3";
+/** Linked rows: the edge turns teal and the row nudges right on hover or keyboard focus. */
+const linkRow = `${row} min-h-11 transition-[color,border-color,translate] duration-200 hover:border-accent hover:text-accent focus-visible:border-accent motion-safe:hover:translate-x-1 motion-safe:focus-visible:translate-x-1`;
+
 export default function CredentialsPage() {
   return (
     <SectionPage section={section}>
       <section aria-labelledby="education" className="mb-14">
-        <h2 id="education" className="mb-5 text-2xl sm:text-3xl">
+        <h2 id="education" className="mb-5 hud-label text-xl text-ink">
           Education
         </h2>
-        <ul className="grid gap-6 sm:grid-cols-2">
+        <Reveal as="ul" className="grid gap-3">
           {education.map((entry) => (
-            <li key={entry.school} className="rounded-md border border-line-strong bg-surface p-5">
-              <p className="text-lg font-semibold">{entry.program}</p>
-              <p className="mt-1">{entry.school}</p>
-              {entry.note && <p className="mt-1 text-accent">{entry.note}</p>}
-              <p className="mt-2 text-sm text-ink-muted tabular-nums">
-                {entry.location}, {entry.period}
-              </p>
-            </li>
+            <RevealItem as="li" from="left" key={entry.school} className={row}>
+              <LogEntry title={entry.program} date={entry.period}>
+                {entry.school}, {entry.location}
+                {entry.note && <span className="block text-accent">{entry.note}</span>}
+              </LogEntry>
+            </RevealItem>
           ))}
-        </ul>
+        </Reveal>
       </section>
 
       <section aria-labelledby="certifications">
-        <h2 id="certifications" className="mb-5 text-2xl sm:text-3xl">
+        <h2 id="certifications" className="mb-5 hud-label text-xl text-ink">
           Certifications
         </h2>
 
-        {/* The credential that matters most for data and AI roles, shown first and larger. */}
+        {/* The credential that matters most for data and AI roles: the highlighted entry,
+            with one light sweep across it on load. */}
         <a
           href={featured.url}
           {...newTab}
-          className="rounded-md border border-line-strong bg-surface mb-8 flex items-center gap-5 p-5 hover:border-accent sm:p-6"
+          className="hud-notch hud-scan relative mb-6 flex items-center gap-4 bg-accent px-4 py-4 text-on-accent focus-visible:-outline-offset-4 focus-visible:outline-on-accent sm:gap-5 sm:px-6"
         >
-          <span className="grid size-14 shrink-0 place-items-center rounded-md bg-canvas text-accent">
-            <Icon icon={Award} size={28} />
-          </span>
-          <span>
-            <span className="block text-xl font-semibold">{featured.name}</span>
-            <span className="mt-1 block text-ink-muted tabular-nums">
-              {featured.issuer}, {formatMonth(featured.date)}
+          <Icon icon={Award} size={28} className="shrink-0" />
+          <span className="flex-1">
+            <span className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+              <span className="font-display text-2xl font-bold tracking-wide uppercase">{featured.name}</span>
+              <span className="hud-label shrink-0 text-sm tabular-nums">{formatMonth(featured.date)}</span>
+            </span>
+            <span className="mt-1 block tabular-nums">
+              {featured.issuer}
               {featured.expires && `, valid until ${formatMonth(featured.expires)}`}
             </span>
           </span>
           <span className="sr-only">{NEW_TAB_NOTE}</span>
         </a>
 
-        <ul className="grid gap-x-8 sm:grid-cols-2 xl:grid-cols-3">
+        <Reveal as="ul" className="grid gap-3">
           {certifications.map((cert) => (
-            <li key={cert.name} className="py-2">
-              <a
-                href={cert.url}
-                {...newTab}
-                className="inline-flex min-h-11 flex-col justify-center hover:text-accent"
-              >
-                <span className="font-medium">{cert.name}</span>
-                <span className="text-sm text-ink-muted tabular-nums">
-                  {cert.issuer}, {formatMonth(cert.date)}
-                </span>
+            <RevealItem as="li" from="left" key={cert.name}>
+              <a href={cert.url} {...newTab} className={linkRow}>
+                <LogEntry title={cert.name} date={formatMonth(cert.date)}>
+                  {cert.issuer}
+                </LogEntry>
                 <span className="sr-only">{NEW_TAB_NOTE}</span>
               </a>
-            </li>
+            </RevealItem>
           ))}
-        </ul>
-
+        </Reveal>
       </section>
     </SectionPage>
   );

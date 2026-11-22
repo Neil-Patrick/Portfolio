@@ -174,6 +174,17 @@ function Dial({ current, onClose }: { current: number; onClose: () => void }) {
           onPointerMove={onPointerMove}
           className="relative aspect-square w-[min(92vw,78vh,38rem)]"
         >
+          {/* HUD corner brackets lock on around the dial as it opens. */}
+          <motion.div
+            aria-hidden
+            className="hud-corners pointer-events-none absolute -inset-3"
+            style={{ ["--hud-corner" as string]: "var(--hud-corner-lg)" }}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.55 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: reduceMotion ? 1 : 0.85, transition: { duration: 0.15 } }}
+            transition={{ type: "spring", stiffness: 140, damping: 16, delay: reduceMotion ? 0 : 0.05 }}
+          />
+
           <Ring reduceMotion={Boolean(reduceMotion)} />
 
           {/* Compass: spins in, then its needle (north point) follows the aim. */}
@@ -190,19 +201,23 @@ function Dial({ current, onClose }: { current: number; onClose: () => void }) {
                   <CompassRose className="size-[min(24vw,11rem)]" />
                 </motion.div>
               </motion.div>
-              <div className="mt-2 h-7 sm:mt-3 sm:h-9">
+              {/* HUD readout: the aimed page's name and subtitle. */}
+              <div className="mt-2 h-14 text-center sm:mt-3 sm:h-16">
                 <AnimatePresence mode="wait" initial={false}>
-                  <motion.p
+                  <motion.div
                     key={aim}
-                    data-testid="compass-aim"
-                    className="text-lg font-semibold tracking-widest sm:text-2xl"
                     initial={{ opacity: 0, y: 6 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.15 }}
                   >
-                    {sections[aim].label}
-                  </motion.p>
+                    <p data-testid="compass-aim" className="hud-label text-xl leading-tight sm:text-3xl">
+                      {sections[aim].label}
+                    </p>
+                    <p data-testid="compass-aim-detail" className="text-xs text-ink-muted sm:text-sm">
+                      {sections[aim].tab}
+                    </p>
+                  </motion.div>
                 </AnimatePresence>
               </div>
             </div>
@@ -239,22 +254,33 @@ function Dial({ current, onClose }: { current: number; onClose: () => void }) {
                       onFocus={() => aimAt(i)}
                       className="group relative flex flex-col items-center outline-none"
                     >
+                      {/* Hexagon button (HUD), glowing when aimed. */}
                       <span
-                        className={`grid size-14 place-items-center rounded-full border bg-surface transition-[scale,border-color,box-shadow,color] duration-200 group-focus-visible:outline-2 group-focus-visible:outline-offset-4 group-focus-visible:outline-focus sm:size-16 ${
-                          active ? "scale-108 border-accent text-accent shadow-glow" : "border-line-strong text-ink"
+                        className={`relative grid size-14 place-items-center transition-[scale,color,filter] duration-200 group-focus-visible:outline-2 group-focus-visible:outline-offset-4 group-focus-visible:outline-focus sm:size-16 ${
+                          active ? "scale-108 text-accent drop-shadow-glow" : "text-ink"
                         }`}
                       >
-                        <SectionIcon id={section.id} className="size-6" />
+                        <svg aria-hidden viewBox="0 0 100 100" className="absolute inset-0 size-full overflow-visible">
+                          <polygon
+                            points="50,3 91,26.5 91,73.5 50,97 9,73.5 9,26.5"
+                            vectorEffect="non-scaling-stroke"
+                            strokeWidth={active ? 2 : 1}
+                            className={`fill-surface transition-[stroke] duration-200 ${active ? "stroke-accent" : "stroke-line-strong"}`}
+                          />
+                        </svg>
+                        <SectionIcon id={section.id} className="relative size-6" />
                       </span>
+                      {/* HUD tag: fills teal when aimed; a teal edge marks the current page. */}
                       <motion.span
-                        className={`absolute top-full mt-1.5 rounded-xs bg-canvas px-1.5 py-0.5 text-xs whitespace-nowrap tracking-widest sm:text-sm ${
-                          active ? "text-accent" : "text-ink-muted"
-                        }`}
+                        className={`hud-notch hud-label absolute top-full mt-1.5 overflow-hidden border-l-2 bg-surface px-2 py-0.5 text-xs whitespace-nowrap sm:text-sm ${
+                          i === current ? "border-accent" : "border-transparent"
+                        } ${active ? "text-on-accent" : "text-ink-muted"}`}
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: reduceMotion ? 0 : 0.35 + i * 0.04 }}
                       >
-                        {section.label}
+                        {active && <span aria-hidden className="hud-wipe absolute inset-0 bg-accent" />}
+                        <span className="relative">{section.label}</span>
                       </motion.span>
                     </Link>
                   </motion.li>
