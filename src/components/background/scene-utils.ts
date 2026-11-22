@@ -3,9 +3,18 @@
 import { useEffect, useState } from "react";
 import * as THREE from "three";
 
-/** Theme colors for the 3D background scene (client only). */
+/** Theme colors for the 3D scenes (background waves, landing welcome visuals). Client only. */
 
-export type Palette = { cert: THREE.Color; accent: THREE.Color; project: THREE.Color; line: THREE.Color };
+export type Palette = {
+  cert: THREE.Color;
+  accent: THREE.Color;
+  project: THREE.Color;
+  line: THREE.Color;
+  ink: THREE.Color;
+  canvas: THREE.Color;
+  /** Dark canvas: glows add light (additive blending); on light, they blend normally. */
+  dark: boolean;
+};
 
 /** Resolve a CSS color token to a THREE.Color by letting the browser compute it. */
 function readToken(name: string) {
@@ -19,11 +28,15 @@ function readToken(name: string) {
 }
 
 function readPalette(): Palette {
+  const canvas = readToken("--color-canvas");
   return {
     cert: readToken("--color-series-cert"),
     accent: readToken("--color-accent"),
     project: readToken("--color-series-project"),
     line: readToken("--color-line-strong"),
+    ink: readToken("--color-ink"),
+    canvas,
+    dark: canvas.getHSL({ h: 0, s: 0, l: 0 }).l < 0.5,
   };
 }
 

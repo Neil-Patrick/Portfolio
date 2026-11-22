@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 import { homeIndex, sections, site } from "../../src/content/site";
+import { INTRO_SEEN_KEY } from "../../src/lib/intro";
 import { buildTimeline } from "../../src/lib/timeline";
 
 const WIDTHS = [320, 768, 1024, 1440];
@@ -10,6 +11,16 @@ const pages = sections.filter((s) => s.href !== "/");
 /** Section pages the home page links to with an arrow (Credentials has no home section). */
 const homePages = pages.filter((s) => homeIndex.some((item) => item.id === s.id));
 const timeline = buildTimeline();
+
+// Ordinary tests skip the home loading screen, as on a repeat visit in the same
+// tab. Its own tests open fresh pages without this mark.
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript((key) => {
+    try {
+      window.sessionStorage.setItem(key, "1");
+    } catch {}
+  }, INTRO_SEEN_KEY);
+});
 
 /** Collects console errors and uncaught exceptions from the moment it is called. */
 function collectErrors(page: Page) {
@@ -578,33 +589,6 @@ test("credential log entries keep their Credly links, opening safely in a new ta
 
 /* ---------- Behaviour: home landing and "Let's Build" ---------- */
 
-test("boot landing: the system check reports the real counts and status, fully shown under reduced motion", async ({ page }) => {
-  test.skip(site.landing.visual !== "boot", "the landing currently shows the sonar");
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/");
-  const { projects } = await import("../../src/content/projects");
-  const { certifications, featuredCertification } = await import("../../src/content/credentials");
-  const { skillGroups } = await import("../../src/content/skills");
-  const landing = page.locator("#home");
-  const check = landing.locator("dl");
-  await expect(check).toContainText(`Projects${projects.length} Found`);
-  await expect(check).toContainText(
-    `Certifications${[featuredCertification, ...certifications].filter((c) => c.url).length} Verified`,
-  );
-  await expect(check).toContainText(`Technologies${skillGroups.flatMap((g) => g.skills).length} Loaded`);
-  await expect(check).toContainText(`Status${site.availability}`);
-  // Tests run with reduced motion: no row is mid-print (clipped) or faded.
-  const hidden = await landing.locator(".boot-row, .load-fade").evaluateAll((els) =>
-    els.filter((el) => {
-      const style = getComputedStyle(el);
-      return style.clipPath !== "none" || Number(style.opacity) < 1;
-    }).length,
-  );
-  expect(hidden, "boot rows not fully shown").toBe(0);
-  await expect(landing.getByRole("link", { name: site.landing.primaryCta })).toHaveAttribute("href", "#contact");
-  await expect(landing.getByRole("link", { name: site.landing.secondaryCta })).toHaveAttribute("href", "#projects");
-});
-
 test("landing headline lines fit their column at every width", async ({ page }) => {
   for (const width of [320, 768, 1024, 1440]) {
     await page.setViewportSize({ width, height: 900 });
@@ -618,79 +602,6 @@ test("landing headline lines fit their column at every width", async ({ page }) 
       }).length,
     );
     expect(clipped, `headline lines wider than their column at ${width}px`).toBe(0);
-  }
-});
-
-test("sonar landing: every project is a contact linking to it, closer to the center is newer, still under reduced motion", async ({ page }) => {
-  test.skip(site.landing.visual !== "sonar", "the landing currently shows the boot sequence");
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/");
-  const { projects } = await import("../../src/content/projects");
-  const landing = page.locator("#home");
-  const contacts = landing.getByRole("list", { name: "Projects on the scope" }).getByRole("link");
-  await expect(contacts).toHaveCount(projects.length);
-  for (const project of projects) {
-    await expect(landing.getByRole("link", { name: new RegExp(`^${project.name}`) })).toHaveAttribute(
-      "href",
-      `/projects#${project.id}`,
-    );
-  }
-
-  // Distance from the scope's center follows the start date: newest closest.
-  const scope = (await landing.locator("figure.sonar > div").boundingBox())!;
-  const center = { x: scope.x + scope.width / 2, y: scope.y + scope.height / 2 };
-  const distances: { started: string; distance: number }[] = [];
-  for (const project of projects) {
-    const blip = (await landing
-      .getByRole("link", { name: new RegExp(`^${project.name}`) })
-      .locator(".sonar-blip")
-      .boundingBox())!;
-    distances.push({
-      started: project.started,
-      distance: Math.hypot(blip.x + blip.width / 2 - center.x, blip.y + blip.height / 2 - center.y),
-    });
-  }
-  const byNewest = [...distances].sort((a, b) => b.started.localeCompare(a.started));
-  for (let i = 1; i < byNewest.length; i++) {
-    if (byNewest[i].started !== byNewest[i - 1].started) {
-      expect(byNewest[i].distance, "an older project sits farther out").toBeGreaterThan(byNewest[i - 1].distance);
-    }
-  }
-
-  // Tests run with reduced motion: the sweep stands still and every contact is fully lit.
-  await expect(landing.locator(".sonar-sweep")).toHaveCSS("animation-name", "none");
-  for (const blip of await landing.locator(".sonar-blip").all()) {
-    await expect(blip).toHaveCSS("opacity", "1");
-  }
-  await expect(landing).toContainText(site.availability);
-  await expect(landing.getByRole("link", { name: site.landing.primaryCta })).toHaveAttribute("href", "#contact");
-  await expect(landing.getByRole("link", { name: site.landing.secondaryCta })).toHaveAttribute("href", "#projects");
-});
-
-test("sonar landing: contact labels stay on screen and never overlap", async ({ page }) => {
-  test.skip(site.landing.visual !== "sonar", "the landing currently shows the boot sequence");
-  for (const width of [320, 375, 768, 1024, 1440]) {
-    await page.setViewportSize({ width, height: 900 });
-    await page.goto("/");
-    await page.waitForLoadState("networkidle");
-    const boxes = await page.locator("#home .sonar-tag").evaluateAll((tags) =>
-      tags.map((tag) => {
-        const r = tag.getBoundingClientRect();
-        return { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
-      }),
-    );
-    for (const box of boxes) {
-      expect(box.left, `label off the left edge at ${width}px`).toBeGreaterThanOrEqual(0);
-      expect(box.right, `label off the right edge at ${width}px`).toBeLessThanOrEqual(width);
-    }
-    for (let i = 0; i < boxes.length; i++) {
-      for (let j = i + 1; j < boxes.length; j++) {
-        const a = boxes[i];
-        const b = boxes[j];
-        const overlap = a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
-        expect(overlap, `labels ${i} and ${j} overlap at ${width}px`).toBe(false);
-      }
-    }
   }
 });
 
@@ -727,4 +638,124 @@ test("Copy Email copies the address and says so", async ({ page, context }) => {
   await expect(section.getByRole("button", { name: "Copied" })).toBeVisible();
   await expect(section.getByTestId("copy-status")).toHaveText("Email address copied.");
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe("neilpatrick.dev@gmail.com");
+});
+
+/* ---------- Behaviour: loading screen and 3D welcome ---------- */
+
+/** A page without the "intro seen" mark, so the loading screen may play. */
+async function freshPage(context: BrowserContext, reducedMotion: "reduce" | "no-preference") {
+  const page = await context.newPage();
+  await page.emulateMedia({ reducedMotion });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  return page;
+}
+
+const introState = (page: Page) => page.evaluate(() => document.documentElement.dataset.intro ?? null);
+
+test("loading screen: plays on the first home visit with the real counts, skips on a key, and stays away for the tab", async ({ context }) => {
+  const page = await freshPage(context, "no-preference");
+  const errors = collectErrors(page);
+  // Watch from the first byte: the loader is decided before first paint and lasts under 3s.
+  await page.goto("/", { waitUntil: "commit" });
+  const overlay = page.locator("[data-intro-overlay]");
+  await expect(page.locator("html")).toHaveAttribute("data-intro", "play");
+  await expect(overlay).toBeVisible();
+  await expect(overlay).toContainText(site.name);
+  await expect(overlay).toContainText(site.availability);
+
+  // The numbers count up in CSS (drawn by ::after), so check the values they count to.
+  const { projects } = await import("../../src/content/projects");
+  const { certifications, featuredCertification } = await import("../../src/content/credentials");
+  const { skillGroups } = await import("../../src/content/skills");
+  const targets = await overlay
+    .locator(".boot-count")
+    .evaluateAll((counts) => counts.map((count) => (count as HTMLElement).style.getPropertyValue("--to")));
+  expect(targets).toEqual([
+    "100",
+    String(projects.length),
+    String([featuredCertification, ...certifications].filter((c) => c.url).length),
+    String(skillGroups.flatMap((g) => g.skills).length),
+  ]);
+
+  // Once the page is interactive (the controller then holds the page still), any key skips it.
+  await page.waitForFunction(
+    () => document.documentElement.style.overflow === "hidden" || document.documentElement.dataset.intro === "done",
+  );
+  if ((await introState(page)) === "play") {
+    await page.keyboard.press("Shift");
+    await expect(page.locator("html")).toHaveAttribute("data-intro", "done", { timeout: 1500 });
+  } else {
+    test.info().annotations.push({
+      type: "note",
+      description: "The loader finished before the page was interactive, so skipping wasn't exercised.",
+    });
+  }
+  // Either way it ends, and the page scrolls again.
+  await expect(page.locator("html")).toHaveAttribute("data-intro", "done", { timeout: 5000 });
+  await expect(overlay).toBeHidden();
+  expect(await page.evaluate(() => document.documentElement.style.overflow)).toBe("");
+  await page.mouse.wheel(0, 900);
+  await page.waitForTimeout(900);
+  expect(await page.evaluate(() => window.scrollY), "page scrolls after the loader").toBeGreaterThan(100);
+
+  // Not again in this tab, unless asked for with ?intro.
+  await page.reload();
+  expect(await introState(page)).toBeNull();
+  await expect(overlay).toBeHidden();
+  await page.goto("/?intro", { waitUntil: "commit" });
+  await expect(page.locator("html")).toHaveAttribute("data-intro", "play");
+  expect(errors, "console errors").toEqual([]);
+});
+
+test("loading screen: clears on its own, then the landing headline decodes into place", async ({ context }) => {
+  const page = await freshPage(context, "no-preference");
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveAttribute("data-intro", "done", { timeout: 5000 });
+  await expect(page.locator("[data-intro-overlay]")).toBeHidden();
+  const firstLine = page.locator("[data-landing-line] span[aria-hidden]").first();
+  await expect(firstLine).toHaveText(site.landing.headline[0], { timeout: 3000 });
+});
+
+test("loading screen: never shows with reduced motion", async ({ context }) => {
+  const page = await freshPage(context, "reduce");
+  for (const path of ["/", "/?intro"]) {
+    await page.goto(path);
+    expect(await introState(page)).toBeNull();
+    await expect(page.locator("[data-intro-overlay]")).toBeHidden();
+  }
+});
+
+const welcomeKinds = ["compass", "gyroscope", "monolith"] as const;
+
+test("3D welcome: each visual shows its still version under reduced motion", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("[data-welcome]")).toHaveAttribute("data-welcome", site.landing.visual);
+  for (const kind of welcomeKinds) {
+    await page.goto(`/?visual=${kind}`);
+    const visual = page.locator("[data-welcome]");
+    await expect(visual).toHaveAttribute("data-welcome", kind);
+    await expect(visual.locator("[data-welcome-still]")).toBeVisible();
+    await expect(visual.locator("[data-welcome-canvas]")).toHaveCount(0);
+  }
+});
+
+test("3D welcome: with full motion each visual runs and follows the cursor without errors", async ({ page }) => {
+  const errors = collectErrors(page);
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  for (const kind of welcomeKinds) {
+    await page.goto(`/?visual=${kind}`);
+    await page.waitForLoadState("networkidle");
+    const visual = page.locator("[data-welcome]");
+    await expect(visual).toHaveAttribute("data-welcome", kind);
+    // The 3D canvas, or the still version where WebGL isn't available.
+    await expect(visual.locator("[data-welcome-canvas], [data-welcome-still]").first()).toBeAttached();
+    const box = (await visual.boundingBox())!;
+    for (const [fx, fy] of [[0.2, 0.2], [0.8, 0.3], [0.5, 0.5], [0.3, 0.85]]) {
+      await page.mouse.move(box.x + box.width * fx, box.y + box.height * fy, { steps: 4 });
+      await page.waitForTimeout(150);
+    }
+    await page.waitForTimeout(600);
+  }
+  expect(errors, "console errors").toEqual([]);
 });

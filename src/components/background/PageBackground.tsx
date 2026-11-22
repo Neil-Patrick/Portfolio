@@ -3,27 +3,12 @@
 import { useReducedMotion } from "motion/react";
 import dynamic from "next/dynamic";
 import { useEffect, useState, useSyncExternalStore } from "react";
+import { hasWebGL, noSubscribe } from "@/lib/webgl";
 import { WaveFallback } from "./WaveFallback";
 
 // three.js + react-three-fiber load only on the client, after the page is interactive.
 const WaveLines = dynamic(() => import("./WaveLines"), { ssr: false });
 
-let webglSupport: boolean | undefined;
-
-/** Checked once per page load (creating a context is not free), then cached. */
-function hasWebGL() {
-  if (webglSupport === undefined) {
-    try {
-      const canvas = document.createElement("canvas");
-      webglSupport = Boolean(canvas.getContext("webgl2") ?? canvas.getContext("webgl"));
-    } catch {
-      webglSupport = false;
-    }
-  }
-  return webglSupport;
-}
-
-const noSubscribe = () => () => {};
 
 /**
  * Fixed wave background behind every home section. The static lines show

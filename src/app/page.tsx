@@ -5,6 +5,7 @@ import { DepthGauge } from "@/components/nav/DepthGauge";
 import { HeroIntro } from "@/components/hero/HeroIntro";
 import { Landing } from "@/components/hero/Landing";
 import { Collaborate } from "@/components/home/Collaborate";
+import { IntroLoader } from "@/components/intro/IntroLoader";
 import { CareerTimeline } from "@/components/CareerTimeline";
 import { Reveal, RevealItem } from "@/components/motion/Reveal";
 import { Tilt } from "@/components/motion/Tilt";
@@ -49,13 +50,16 @@ const technologies = getSection("technologies");
 
 /**
  * Home, top to bottom (the same order as `homeIndex` in site.ts, which the
- * depth gauge reads): the boot-sequence landing, the intro, projects,
+ * depth gauge reads), after the loading screen: the landing, the intro, projects,
  * technologies, the career timeline (which also plots every certification),
  * GitHub activity, and the "Let's Build" invitation.
  */
 export default function HomePage() {
   return (
     <>
+      {/* Cyberpunk loading screen: first home visit in a tab only (decided before first paint). */}
+      <IntroLoader />
+
       {/* Subtle wave lines, fixed behind every home section. */}
       <PageBackground />
       <DepthGauge items={homeIndex} />

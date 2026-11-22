@@ -2,6 +2,7 @@
 
 import { useInView, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import { whenIntroDone } from "@/lib/intro";
 
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&/<>";
 const DURATION = 600;
@@ -23,8 +24,9 @@ export function DecodeText({ text, inView = false }: { text: string; inView?: bo
   useEffect(() => {
     if (reduceMotion || !start) return;
     let frame = 0;
-    const begin = performance.now();
+    let begin = 0;
     const tick = (now: number) => {
+      begin ||= now;
       const progress = Math.min((now - begin) / DURATION, 1);
       const settled = Math.floor(progress * text.length);
       setShown(
@@ -36,8 +38,12 @@ export function DecodeText({ text, inView = false }: { text: string; inView?: bo
       );
       if (progress < 1) frame = requestAnimationFrame(tick);
     };
-    frame = requestAnimationFrame(tick);
+    // On the home page's first visit, wait for the loading screen to clear, so the decode is seen.
+    const stopWaiting = whenIntroDone(() => {
+      frame = requestAnimationFrame(tick);
+    });
     return () => {
+      stopWaiting();
       cancelAnimationFrame(frame);
       setShown(text);
     };

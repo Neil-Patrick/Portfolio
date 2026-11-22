@@ -28,15 +28,15 @@ export const site = {
     "Now I'm moving toward data and AI: analysis, automation, and building with AI models. In 2026 I earned the IT Specialist – Artificial Intelligence certification, and my next projects are in that direction.",
     "Before university, I took the STEM track at Laguna Science National High School and graduated with honors.",
   ],
-  /** Shown as "Status" in the landing's system check. Neil: open to internships, jobs, and freelance work. */
+  /** Shown under the landing's buttons and in the loading screen's system check. Neil: open to internships, jobs, and freelance work. */
   availability: "Open to Work",
   /** Home landing. Draft copy, true to the intro: edit freely. */
   landing: {
     /**
-     * The animated piece beside the headline: "sonar" (projects ping on a sonar
-     * scope) or "boot" (a System Check panel that boots). Switch to compare.
+     * The 3D welcome animation beside the headline: "compass", "gyroscope", or
+     * "monolith". Being compared (also via /?visual=…); the others go once one is chosen.
      */
-    visual: "sonar" as "sonar" | "boot",
+    visual: "compass" as "compass" | "gyroscope" | "monolith",
     /** One line each; they decode in. Keep each line short enough to fit a phone. */
     headline: ["Web Apps Today.", "Data and AI Next."],
     primaryCta: "Work With Me",

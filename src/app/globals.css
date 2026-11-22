@@ -60,6 +60,9 @@
   /* Home landing headline: sized to its column (cqi), so each line always fits. */
   --text-landing: clamp(2.25rem, 12cqi, 7.5rem);
   --text-landing--line-height: 1;
+  /* The loading screen's glitching name. */
+  --text-intro: clamp(2.5rem, 1rem + 7vw, 6.5rem);
+  --text-intro--line-height: 1;
 
   /* Radii: small for chips and controls, medium for panels. */
   --radius-sm: 4px;
@@ -216,14 +219,13 @@
 }
 
 /* ==========================================================================
-   Home landing (src/components/hero/Landing.tsx). Two visuals, switched in
-   site.ts: the "boot sequence" (BootPanel.tsx) and the "sonar" (SonarScope.tsx).
-   load-fade, live-pulse, and cue-bob are shared.
-
-   Boot sequence, CSS only, from first paint: a progress bar fills, each
-   system-check row prints in (row --i every 220ms), its number counts up,
-   then "Ready" and a blinking cursor. The base state (reduced motion, old
-   browsers) is simply the final one.
+   Home landing and loading screen.
+   - load-fade, live-pulse, cue-bob: small load-time helpers (Landing.tsx).
+   - System check (used by the loading screen): rows print in, one every
+     --row-step after --row-start; numbers count up in CSS alone; a progress
+     bar fills; a cursor blinks.
+   - The loading screen itself (src/components/intro/), further down.
+   The base state (reduced motion, old browsers) is always the final one.
    ========================================================================== */
 
 /* An integer custom property, so numbers can count up in CSS alone. */
@@ -286,7 +288,7 @@
 
 @media (prefers-reduced-motion: no-preference) {
   .boot-row {
-    --row-delay: calc(250ms + var(--i, 0) * 220ms);
+    --row-delay: calc(var(--row-start, 250ms) + var(--i, 0) * var(--row-step, 220ms));
     animation: boot-print 300ms var(--ease-out-soft) var(--row-delay) both;
   }
   .boot-count {
@@ -295,7 +297,7 @@
   }
   .boot-fill {
     transform-origin: left;
-    animation: boot-fill 1200ms var(--ease-out-soft) 150ms both;
+    animation: boot-fill var(--fill-duration, 1200ms) var(--ease-out-soft) var(--fill-delay, 150ms) both;
   }
   .load-fade {
     animation: load-fade 500ms var(--ease-out-soft) var(--fade-delay, 600ms) both;
@@ -311,104 +313,287 @@
   }
 }
 
-/* Sonar (SonarScope.tsx): the sweep turns once per --sonar-period, and each
-   contact pings as the leading edge passes its --bearing. Both use the same
-   period and start together, and a contact's delay is its bearing's share of
-   the turn, so they stay in step without JavaScript. Base state (reduced
-   motion): a still scope with every contact lit. */
-.sonar {
-  --sonar-period: 6s;
+/* ---------- Loading screen (src/components/intro/, src/lib/intro.ts) ----------
+   Shown only while <html data-intro> is "play" or "skip": the first home visit
+   in a tab, with motion allowed (decided before first paint). Timeline, about
+   2.7s: CRT power-on, flicker, the name glitching in, the system check
+   printing, "Access Granted", CRT power-off, fade out. "skip" fades it at once. */
+.intro {
+  display: none;
 }
-/* A teal tail that fades in behind the leading edge (at north before turning). */
-.sonar-sweep {
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg 250deg,
-    color-mix(in oklab, var(--color-accent) 5%, transparent) 290deg,
-    color-mix(in oklab, var(--color-accent) 26%, transparent) 360deg
-  );
+:root[data-intro="play"] .intro,
+:root[data-intro="skip"] .intro {
+  display: block;
 }
-.sonar-sweep::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: calc(50% - 1px);
-  width: 2px;
-  height: 50%;
-  background: linear-gradient(to top, transparent, var(--color-accent));
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  overflow: hidden;
+  /* Always dark, whatever the theme: the color tokens resolve to their dark values in here. */
+  color-scheme: dark;
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  animation: intro-out 450ms ease-in 2250ms forwards;
 }
-/* Each blip's echo ring, shown only while it pings. */
-.sonar-blip::after {
+:root[data-intro="skip"] .intro {
+  animation: intro-skip 300ms ease-out forwards;
+}
+/* Scanlines and a vignette over everything. */
+.intro::before,
+.intro::after {
   content: "";
   position: absolute;
   inset: 0;
-  border: 1px solid var(--color-accent);
-  border-radius: 9999px;
+  z-index: 2;
+  pointer-events: none;
+}
+.intro::before {
+  background: repeating-linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--color-ink) 5%, transparent) 0 1px,
+    transparent 1px 3px
+  );
+}
+.intro::after {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 55%,
+    color-mix(in oklab, var(--color-canvas) 85%, transparent)
+  );
+}
+/* A brighter band rolling down the screen, like an old CRT. */
+.intro-roll {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  z-index: 2;
+  height: 20%;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    color-mix(in oklab, var(--color-ink) 6%, transparent),
+    transparent
+  );
+  animation: intro-roll 2.4s linear infinite;
+}
+/* The screen's content switches on and off like a CRT, flickering in between. */
+.intro-screen {
+  animation:
+    intro-crt-on 450ms var(--ease-out-soft) both,
+    intro-flicker 900ms steps(1, end) 420ms both,
+    intro-crt-off 400ms ease-in 1950ms forwards;
+}
+/* The name: two offset copies glitch over it in slices, then settle; one more glitch near the end. */
+.intro-name {
+  position: relative;
+  animation: intro-name-in 800ms steps(1, end) 380ms both;
+}
+.intro-name::before,
+.intro-name::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  clip-path: inset(50% 0 50% 0);
+}
+.intro-name::before {
+  color: var(--color-accent);
+  animation:
+    intro-glitch-a 1s steps(1, end) 380ms both,
+    intro-glitch-b 380ms steps(1, end) 1700ms forwards;
+}
+.intro-name::after {
+  color: color-mix(in oklab, var(--color-accent) 35%, var(--color-ink));
+  animation:
+    intro-glitch-b 1s steps(1, end) 430ms both,
+    intro-glitch-a 380ms steps(1, end) 1740ms forwards;
+}
+.intro-granted {
   opacity: 0;
+  animation: intro-granted 500ms steps(1, end) 1500ms forwards;
 }
 
-@keyframes sonar-sweep {
+@keyframes intro-out {
   to {
-    rotate: 1turn;
+    opacity: 0;
+    visibility: hidden;
   }
 }
-@keyframes sonar-ping {
+@keyframes intro-skip {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@keyframes intro-roll {
+  from {
+    translate: 0 -100%;
+  }
+  to {
+    translate: 0 500%;
+  }
+}
+@keyframes intro-crt-on {
+  0% {
+    transform: scale(1.15, 0.004);
+    filter: brightness(4);
+  }
+  40% {
+    transform: scale(1, 0.004);
+    filter: brightness(3);
+  }
+  100% {
+    transform: scale(1, 1);
+    filter: brightness(1);
+  }
+}
+@keyframes intro-flicker {
   0% {
     opacity: 1;
-    scale: 1.6;
   }
   8% {
-    scale: 1;
+    opacity: 0.55;
   }
-  65%,
-  100% {
-    opacity: 0.4;
-    scale: 1;
+  14% {
+    opacity: 1;
+  }
+  30% {
+    opacity: 0.85;
+  }
+  36% {
+    opacity: 0.3;
+  }
+  41% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.9;
+  }
+  74% {
+    opacity: 1;
   }
 }
-@keyframes sonar-echo {
+@keyframes intro-crt-off {
   0% {
-    opacity: 0.8;
-    scale: 1;
+    transform: scale(1, 1);
+    filter: brightness(1);
+    opacity: 1;
   }
-  30%,
+  55% {
+    transform: scale(1, 0.004);
+    filter: brightness(4);
+    opacity: 1;
+  }
   100% {
+    transform: scale(0, 0.004);
+    filter: brightness(6);
     opacity: 0;
-    scale: 4.5;
   }
 }
-@keyframes sonar-tag {
+@keyframes intro-name-in {
   0% {
-    border-color: var(--color-accent);
+    opacity: 0;
   }
-  65%,
+  12% {
+    opacity: 1;
+  }
+  20% {
+    opacity: 0.15;
+  }
+  30% {
+    opacity: 1;
+  }
+  55% {
+    opacity: 0.5;
+  }
+  62% {
+    opacity: 1;
+  }
+}
+@keyframes intro-glitch-a {
+  0% {
+    clip-path: inset(0 0 82% 0);
+    translate: -6px 0;
+  }
+  14% {
+    clip-path: inset(38% 0 40% 0);
+    translate: 5px 0;
+  }
+  28% {
+    clip-path: inset(70% 0 8% 0);
+    translate: -4px 0;
+  }
+  42% {
+    clip-path: inset(12% 0 62% 0);
+    translate: 3px 0;
+  }
+  56% {
+    clip-path: inset(55% 0 22% 0);
+    translate: -5px 0;
+  }
+  70%,
   100% {
-    border-color: var(--color-line-strong);
+    clip-path: inset(50% 0 50% 0);
+    translate: 0 0;
+  }
+}
+@keyframes intro-glitch-b {
+  0% {
+    clip-path: inset(60% 0 15% 0);
+    translate: 6px 0;
+  }
+  16% {
+    clip-path: inset(8% 0 70% 0);
+    translate: -5px 0;
+  }
+  32% {
+    clip-path: inset(44% 0 34% 0);
+    translate: 4px 0;
+  }
+  48% {
+    clip-path: inset(80% 0 4% 0);
+    translate: -3px 0;
+  }
+  64% {
+    clip-path: inset(25% 0 52% 0);
+    translate: 5px 0;
+  }
+  78%,
+  100% {
+    clip-path: inset(50% 0 50% 0);
+    translate: 0 0;
+  }
+}
+@keyframes intro-granted {
+  0% {
+    opacity: 1;
+  }
+  15% {
+    opacity: 0.2;
+  }
+  30% {
+    opacity: 1;
+  }
+  45% {
+    opacity: 0.4;
+  }
+  60%,
+  100% {
+    opacity: 1;
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .sonar-sweep {
-    animation: sonar-sweep var(--sonar-period) linear infinite;
-  }
-  .sonar-blip,
-  .sonar-blip::after,
-  .sonar-tag {
-    animation-duration: var(--sonar-period);
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-    /* Negative, so every contact is already mid-cycle at load, in step with the sweep. */
-    animation-delay: calc((var(--bearing) / 360 - 1) * var(--sonar-period));
-  }
-  .sonar-blip {
-    animation-name: sonar-ping;
-  }
-  .sonar-blip::after {
-    animation-name: sonar-echo;
-  }
-  .sonar-tag {
-    animation-name: sonar-tag;
-  }
+/* Hologram texture over the landing's 3D welcome visual (src/components/hero/welcome/). */
+.holo-scanlines {
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--color-accent) 7%, transparent) 0 1px,
+    transparent 1px 4px
+  );
+  mask-image: radial-gradient(circle at center, black 40%, transparent 72%);
 }
 
 /* Page-width wrapper with fluid side gutters. */
