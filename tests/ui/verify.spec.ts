@@ -578,7 +578,8 @@ test("credential log entries keep their Credly links, opening safely in a new ta
 
 /* ---------- Behaviour: home landing and "Let's Build" ---------- */
 
-test("landing system check reports the real counts and status, fully shown under reduced motion", async ({ page }) => {
+test("boot landing: the system check reports the real counts and status, fully shown under reduced motion", async ({ page }) => {
+  test.skip(site.landing.visual !== "boot", "the landing currently shows the sonar");
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   const { projects } = await import("../../src/content/projects");
@@ -593,7 +594,7 @@ test("landing system check reports the real counts and status, fully shown under
   await expect(check).toContainText(`Technologies${skillGroups.flatMap((g) => g.skills).length} Loaded`);
   await expect(check).toContainText(`Status${site.availability}`);
   // Tests run with reduced motion: no row is mid-print (clipped) or faded.
-  const hidden = await landing.locator(".boot-row, .boot-fade").evaluateAll((els) =>
+  const hidden = await landing.locator(".boot-row, .load-fade").evaluateAll((els) =>
     els.filter((el) => {
       const style = getComputedStyle(el);
       return style.clipPath !== "none" || Number(style.opacity) < 1;
@@ -617,6 +618,79 @@ test("landing headline lines fit their column at every width", async ({ page }) 
       }).length,
     );
     expect(clipped, `headline lines wider than their column at ${width}px`).toBe(0);
+  }
+});
+
+test("sonar landing: every project is a contact linking to it, closer to the center is newer, still under reduced motion", async ({ page }) => {
+  test.skip(site.landing.visual !== "sonar", "the landing currently shows the boot sequence");
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const { projects } = await import("../../src/content/projects");
+  const landing = page.locator("#home");
+  const contacts = landing.getByRole("list", { name: "Projects on the scope" }).getByRole("link");
+  await expect(contacts).toHaveCount(projects.length);
+  for (const project of projects) {
+    await expect(landing.getByRole("link", { name: new RegExp(`^${project.name}`) })).toHaveAttribute(
+      "href",
+      `/projects#${project.id}`,
+    );
+  }
+
+  // Distance from the scope's center follows the start date: newest closest.
+  const scope = (await landing.locator("figure.sonar > div").boundingBox())!;
+  const center = { x: scope.x + scope.width / 2, y: scope.y + scope.height / 2 };
+  const distances: { started: string; distance: number }[] = [];
+  for (const project of projects) {
+    const blip = (await landing
+      .getByRole("link", { name: new RegExp(`^${project.name}`) })
+      .locator(".sonar-blip")
+      .boundingBox())!;
+    distances.push({
+      started: project.started,
+      distance: Math.hypot(blip.x + blip.width / 2 - center.x, blip.y + blip.height / 2 - center.y),
+    });
+  }
+  const byNewest = [...distances].sort((a, b) => b.started.localeCompare(a.started));
+  for (let i = 1; i < byNewest.length; i++) {
+    if (byNewest[i].started !== byNewest[i - 1].started) {
+      expect(byNewest[i].distance, "an older project sits farther out").toBeGreaterThan(byNewest[i - 1].distance);
+    }
+  }
+
+  // Tests run with reduced motion: the sweep stands still and every contact is fully lit.
+  await expect(landing.locator(".sonar-sweep")).toHaveCSS("animation-name", "none");
+  for (const blip of await landing.locator(".sonar-blip").all()) {
+    await expect(blip).toHaveCSS("opacity", "1");
+  }
+  await expect(landing).toContainText(site.availability);
+  await expect(landing.getByRole("link", { name: site.landing.primaryCta })).toHaveAttribute("href", "#contact");
+  await expect(landing.getByRole("link", { name: site.landing.secondaryCta })).toHaveAttribute("href", "#projects");
+});
+
+test("sonar landing: contact labels stay on screen and never overlap", async ({ page }) => {
+  test.skip(site.landing.visual !== "sonar", "the landing currently shows the boot sequence");
+  for (const width of [320, 375, 768, 1024, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    const boxes = await page.locator("#home .sonar-tag").evaluateAll((tags) =>
+      tags.map((tag) => {
+        const r = tag.getBoundingClientRect();
+        return { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
+      }),
+    );
+    for (const box of boxes) {
+      expect(box.left, `label off the left edge at ${width}px`).toBeGreaterThanOrEqual(0);
+      expect(box.right, `label off the right edge at ${width}px`).toBeLessThanOrEqual(width);
+    }
+    for (let i = 0; i < boxes.length; i++) {
+      for (let j = i + 1; j < boxes.length; j++) {
+        const a = boxes[i];
+        const b = boxes[j];
+        const overlap = a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+        expect(overlap, `labels ${i} and ${j} overlap at ${width}px`).toBe(false);
+      }
+    }
   }
 });
 

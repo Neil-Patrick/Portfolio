@@ -30,8 +30,13 @@ export const site = {
   ],
   /** Shown as "Status" in the landing's system check. Neil: open to internships, jobs, and freelance work. */
   availability: "Open to Work",
-  /** Home landing (the boot sequence). Draft copy, true to the intro: edit freely. */
+  /** Home landing. Draft copy, true to the intro: edit freely. */
   landing: {
+    /**
+     * The animated piece beside the headline: "sonar" (projects ping on a sonar
+     * scope) or "boot" (a System Check panel that boots). Switch to compare.
+     */
+    visual: "sonar" as "sonar" | "boot",
     /** One line each; they decode in. Keep each line short enough to fit a phone. */
     headline: ["Web Apps Today.", "Data and AI Next."],
     primaryCta: "Work With Me",

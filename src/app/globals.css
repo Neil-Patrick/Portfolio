@@ -216,11 +216,14 @@
 }
 
 /* ==========================================================================
-   Home landing: the "boot sequence" (src/components/hero/Landing.tsx).
-   CSS only, from first paint: a progress bar fills, each system-check row
-   prints in (row --i every 220ms), its number counts up, then "Ready" and a
-   blinking cursor. The base state (reduced motion, old browsers) is simply
-   the final one.
+   Home landing (src/components/hero/Landing.tsx). Two visuals, switched in
+   site.ts: the "boot sequence" (BootPanel.tsx) and the "sonar" (SonarScope.tsx).
+   load-fade, live-pulse, and cue-bob are shared.
+
+   Boot sequence, CSS only, from first paint: a progress bar fills, each
+   system-check row prints in (row --i every 220ms), its number counts up,
+   then "Ready" and a blinking cursor. The base state (reduced motion, old
+   browsers) is simply the final one.
    ========================================================================== */
 
 /* An integer custom property, so numbers can count up in CSS alone. */
@@ -258,7 +261,7 @@
     transform: scaleX(0);
   }
 }
-@keyframes boot-fade {
+@keyframes load-fade {
   from {
     opacity: 0;
     translate: 0 0.5rem;
@@ -269,13 +272,13 @@
     opacity: 0;
   }
 }
-@keyframes boot-pulse {
+@keyframes live-pulse {
   50% {
     opacity: 0.35;
     scale: 0.7;
   }
 }
-@keyframes boot-bob {
+@keyframes cue-bob {
   50% {
     translate: 0 0.25rem;
   }
@@ -294,17 +297,117 @@
     transform-origin: left;
     animation: boot-fill 1200ms var(--ease-out-soft) 150ms both;
   }
-  .boot-fade {
-    animation: boot-fade 500ms var(--ease-out-soft) var(--fade-delay, 600ms) both;
+  .load-fade {
+    animation: load-fade 500ms var(--ease-out-soft) var(--fade-delay, 600ms) both;
   }
   .boot-cursor {
     animation: boot-blink 1s steps(1, end) infinite;
   }
-  .boot-pulse {
-    animation: boot-pulse 2s ease-in-out infinite;
+  .live-pulse {
+    animation: live-pulse 2s ease-in-out infinite;
   }
-  .boot-bob {
-    animation: boot-bob 1.6s ease-in-out infinite;
+  .cue-bob {
+    animation: cue-bob 1.6s ease-in-out infinite;
+  }
+}
+
+/* Sonar (SonarScope.tsx): the sweep turns once per --sonar-period, and each
+   contact pings as the leading edge passes its --bearing. Both use the same
+   period and start together, and a contact's delay is its bearing's share of
+   the turn, so they stay in step without JavaScript. Base state (reduced
+   motion): a still scope with every contact lit. */
+.sonar {
+  --sonar-period: 6s;
+}
+/* A teal tail that fades in behind the leading edge (at north before turning). */
+.sonar-sweep {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 250deg,
+    color-mix(in oklab, var(--color-accent) 5%, transparent) 290deg,
+    color-mix(in oklab, var(--color-accent) 26%, transparent) 360deg
+  );
+}
+.sonar-sweep::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: calc(50% - 1px);
+  width: 2px;
+  height: 50%;
+  background: linear-gradient(to top, transparent, var(--color-accent));
+}
+/* Each blip's echo ring, shown only while it pings. */
+.sonar-blip::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--color-accent);
+  border-radius: 9999px;
+  opacity: 0;
+}
+
+@keyframes sonar-sweep {
+  to {
+    rotate: 1turn;
+  }
+}
+@keyframes sonar-ping {
+  0% {
+    opacity: 1;
+    scale: 1.6;
+  }
+  8% {
+    scale: 1;
+  }
+  65%,
+  100% {
+    opacity: 0.4;
+    scale: 1;
+  }
+}
+@keyframes sonar-echo {
+  0% {
+    opacity: 0.8;
+    scale: 1;
+  }
+  30%,
+  100% {
+    opacity: 0;
+    scale: 4.5;
+  }
+}
+@keyframes sonar-tag {
+  0% {
+    border-color: var(--color-accent);
+  }
+  65%,
+  100% {
+    border-color: var(--color-line-strong);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sonar-sweep {
+    animation: sonar-sweep var(--sonar-period) linear infinite;
+  }
+  .sonar-blip,
+  .sonar-blip::after,
+  .sonar-tag {
+    animation-duration: var(--sonar-period);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    /* Negative, so every contact is already mid-cycle at load, in step with the sweep. */
+    animation-delay: calc((var(--bearing) / 360 - 1) * var(--sonar-period));
+  }
+  .sonar-blip {
+    animation-name: sonar-ping;
+  }
+  .sonar-blip::after {
+    animation-name: sonar-echo;
+  }
+  .sonar-tag {
+    animation-name: sonar-tag;
   }
 }
 
