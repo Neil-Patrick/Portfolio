@@ -832,3 +832,51 @@ test("every certification shows its Credly badge: saved locally, loaded, and nam
       .toBe(true);
   }
 });
+
+/* ---------- Behaviour: badge tiles and GitHub achievements ---------- */
+
+/** Whether a tile's flipper is turned around (rotateY 180deg leaves -1 in the matrix's first cell). */
+const flipped = (tile: ReturnType<Page["locator"]>) =>
+  tile.locator("> span").evaluate((el) => {
+    const m = getComputedStyle(el).transform;
+    const first = m.startsWith("matrix3d(") ? Number(m.slice(9, -1).split(",")[0]) : 1;
+    return first < 0;
+  });
+
+test("every certification is a badge tile with its code, flipping to the Credly badge on hover and focus", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/credentials");
+  const { certifications, featuredCertification } = await import("../../src/content/credentials");
+  const all = [featuredCertification, ...certifications];
+  const tiles = page.locator("main [data-badge-tile]");
+  await expect(tiles).toHaveCount(all.length);
+  const codes = await tiles.evaluateAll((els) => els.map((el) => el.querySelector(".font-display")?.textContent));
+  expect(codes).toEqual(all.map((cert) => cert.code));
+  expect(new Set(codes).size, "codes are unique").toBe(codes.length);
+
+  // Hover flips it to the real badge; with reduced motion it swaps without the spin.
+  const row = page.getByRole("link", { name: /^Data Fundamentals/ });
+  const tile = row.locator("[data-badge-tile]");
+  expect(await flipped(tile)).toBe(false);
+  await row.hover();
+  await expect.poll(() => flipped(tile)).toBe(true);
+  // Keyboard focus flips it too.
+  await page.mouse.move(0, 0);
+  const featured = page.getByRole("link", { name: new RegExp(`^${featuredCertification.name}`) });
+  await featured.focus();
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Shift+Tab");
+  await expect.poll(() => flipped(featured.locator("[data-badge-tile]"))).toBe(true);
+});
+
+test("the GitHub section lists the saved achievements as tiles linking to GitHub", async ({ page }) => {
+  const { achievements, ACHIEVEMENTS_URL } = await import("../../src/content/achievements");
+  await page.goto("/");
+  const list = page.locator("#github").getByRole("region", { name: "Achievements" });
+  for (const achievement of achievements) {
+    const link = list.getByRole("link", { name: new RegExp(achievement.name) });
+    await expect(link).toHaveAttribute("href", ACHIEVEMENTS_URL);
+    await expect(link.locator("[data-badge-tile]")).toContainText(achievement.code);
+    expect(existsSync(`public${achievement.image}`), achievement.image).toBe(true);
+  }
+});

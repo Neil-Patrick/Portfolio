@@ -67,7 +67,7 @@ Create a `.env.local` file (git-ignored; env files are never committed) with the
   - Loading screen: it plays on the first home visit in a tab (full motion) with the real counts, preloads and marks Assets "Ready", is still on screen at 3s and clears by itself (then the landing headline decodes), a click continues it, the page scrolls again afterwards, a reload in the same tab doesn't replay it but `/?intro` does, and with reduced motion it never shows. (Every other test marks the intro as seen, like a repeat visit.)
   - Hologram card: it holds the page's h1 and a labeled photo placeholder; with reduced motion it stays flat and still; with full motion its layers separate into depth, it tilts toward the cursor and a dragging finger, and a tap folds it flat and back, without console errors.
   - Compass menu on touch: dragging a finger aims the needle (the readout follows) and letting go opens the aimed page.
-  - About and Credentials: a labeled photo placeholder until a photo is set; every certification shows its Credly badge, saved locally, loaded, and named.
+  - About and Credentials: a labeled photo placeholder until a photo is set; every certification shows its Credly badge, saved locally, loaded, and named; every certification is a tile with its unique code that flips to the badge on hover and focus; the GitHub section lists the saved achievements as tiles linking to GitHub.
 
 Tests run with reduced motion by default (`playwright.config.ts`), so layout and accessibility checks see the settled page; the "full motion" tests switch animations back on.
 
@@ -132,8 +132,10 @@ src/
     intro.ts      Loading screen: pre-paint script (once per tab, ?intro replays), done event
     webgl.ts      WebGL support check for the 3D wave background
     css-vars.ts   Typed helper for CSS custom properties in inline styles
-public/           Static assets (images, icons); badges/ holds the Credly badge images
-scripts/          fetch-credly-badges.mjs: re-download the badge images from Credly
+public/           Static assets (images, icons); badges/ holds the Credly badge images,
+                  achievements/ the GitHub achievement art
+scripts/          fetch-credly-badges.mjs: re-download the badge images from Credly;
+                  fetch-github-achievements.mjs: re-read the GitHub profile achievements
 tests/ui/         Playwright UI checks
 ```
 
@@ -170,7 +172,8 @@ Text in `[square brackets]` in `src/content/` is placeholder content.
 - **Hologram card instead of a WebGL scene:** after trying a sonar, a boot panel, and three three.js scenes (compass, gyroscope, monolith), the landing settled on a profile card that starts as flat 2D and splits into floating layers (plate, photo, brackets, name tag, status) once the loader clears. It tilts toward the cursor or a dragging finger, a tap folds it flat and pops it back, and idle it sways. It's plain CSS 3D (`preserve-3d`, `translateZ`) driven by Motion springs and pointer events, so it works the same with touch, keeps real text (the h1), and costs no WebGL. With reduced motion it's a flat, still card. The photo is a clearly marked placeholder until `site.photo` is set.
 - **"Let's Build" kept simple:** one line on what I'm open to, then Email Me (a plain `mailto:`), Copy Email (with a "Copied" confirmation, for visitors without an email app), LinkedIn, and the Contact page. An earlier brief builder was dropped as more detail than needed.
 - **Compass menu follows a finger:** on touch, dragging on the dial aims the needle at the finger (the readout follows), and letting go after a real drag opens that page, like a game's radial menu; taps, mouse, and keys work as before.
-- **Credly badges served locally:** `scripts/fetch-credly-badges.mjs` saves each badge image from the public Credly profile into `public/badges/<badge id>.png`, so the site never calls Credly at runtime and `next/image` resizes them. On the Credentials page they sit in small HUD brackets in a teal duotone, and show their true colors on hover or focus.
+- **Badges as tiles, real art on the back:** each certification (and GitHub achievement) is a HUD tile: the issuer, a big short code (`code` in `credentials.ts`, editable), and a teal folded corner; large tiles add the month. Hovering or focusing its row flips it in 3D (CSS `backface-visibility`) to the real badge; with reduced motion it swaps without the spin. The tile text is decorative; the row's link names the credential.
+- **Credly badges and GitHub achievements saved locally:** `scripts/fetch-credly-badges.mjs` saves each badge image from the public Credly profile into `public/badges/<badge id>.png`; `scripts/fetch-github-achievements.mjs` reads the public GitHub profile's achievements (GitHub has no API for them) into `src/content/achievements.json` plus `public/achievements/`. The site never calls either at runtime; re-run the scripts after earning something new. Achievements show in the home page's GitHub section.
 - **One folder per section page, not a `[section]` dynamic route:** each page will grow its own layout (project grid, credentials list, contact form). They share `SectionPage` for now to stay DRY.
 - **Brand logos from devicon:** full-color logos make the technology list scannable. devicon is a regular dependency so adding a logo is one import line; only the imported SVGs reach visitors (static files, no JS or CDN). Black-by-brand logos (Next.js, Vercel, GitHub, Express) are drawn in the text color through a CSS mask so they work in dark mode, and MySQL's dark blue sits on a light tile in dark mode. SQL and Turso have no devicon logo and use a database glyph.
 - **Technologies and projects linked by name:** a project's `stack` uses the exact names from `skills.ts`, and `src/lib/skill-usage.ts` derives the connection, so there's no second list to keep in sync (a test fails if a name doesn't match). The selected technology lives in the URL hash (`/technologies#tech-python`) so project chips can link straight to it; the hash avoids the Suspense boundary that search params would need.

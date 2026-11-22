@@ -1,0 +1,10 @@
+[
+  {
+    "slug": "pull-shark",
+    "name": "Pull Shark",
+    "tier": 1,
+    "unlocked": "2026-03-14",
+    "description": "Opened pull requests that have been merged.",
+    "image": "/achievements/pull-shark.png"
+  }
+]

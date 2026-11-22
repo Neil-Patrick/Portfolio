@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import type { ReactNode } from "react";
+import { BadgeTile } from "@/components/BadgeTile";
 import { Reveal, RevealItem } from "@/components/motion/Reveal";
 import { SectionPage } from "@/components/SectionPage";
 import {
@@ -31,28 +31,17 @@ function LogEntry({ title, date, children }: { title: string; date: string; chil
   );
 }
 
-/**
- * A badge image saved from Credly, in small HUD brackets. Rows show it in a teal
- * duotone (to sit in the theme) and in its true colors on hover or focus.
- */
-function Badge({ cert, size, duotone = true }: { cert: Certification; size: 14 | 20; duotone?: boolean }) {
-  const src = badgeImage(cert);
-  if (!src) return null;
-  const px = size * 4;
+/** A certification as a flip tile: the short code up front, the Credly badge on the back. */
+function Tile({ cert, size = "sm" }: { cert: Certification; size?: "sm" | "lg" }) {
   return (
-    <span className={`hud-corners grid shrink-0 place-items-center p-1.5 ${size === 20 ? "size-20" : "size-14"}`}>
-      <Image
-        src={src}
-        alt={`${cert.name} badge`}
-        width={px}
-        height={px}
-        sizes={`${px}px`}
-        data-badge
-        className={`size-full object-contain ${
-          duotone ? "badge-duotone group-hover:filter-none group-focus-visible:filter-none" : ""
-        }`}
-      />
-    </span>
+    <BadgeTile
+      issuer={cert.issuer.split(/[ ,]/)[0]}
+      code={cert.code}
+      date={formatMonth(cert.date)}
+      image={badgeImage(cert)}
+      alt={`${cert.name} badge`}
+      size={size}
+    />
   );
 }
 
@@ -85,9 +74,9 @@ export default function CredentialsPage() {
         <a
           href={featured.url}
           {...newTab}
-          className="hud-notch hud-scan relative mb-6 flex items-center gap-4 bg-accent px-4 py-4 text-on-accent focus-visible:-outline-offset-4 focus-visible:outline-on-accent sm:gap-5 sm:px-6"
+          className="group hud-notch hud-scan relative mb-6 flex items-center gap-4 bg-accent px-4 py-4 text-on-accent focus-visible:-outline-offset-4 focus-visible:outline-on-accent sm:gap-5 sm:px-6"
         >
-          <Badge cert={featured} size={20} duotone={false} />
+          <Tile cert={featured} size="lg" />
           <span className="flex-1">
             <span className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
               <span className="font-display text-2xl font-bold tracking-wide uppercase">{featured.name}</span>
@@ -109,7 +98,7 @@ export default function CredentialsPage() {
                 {...newTab}
                 className="group hud-row hud-row-link flex min-h-11 items-center gap-4 px-4 py-3"
               >
-                <Badge cert={cert} size={14} />
+                <Tile cert={cert} />
                 <span className="min-w-0 flex-1">
                   <LogEntry title={cert.name} date={formatMonth(cert.date)}>
                     {cert.issuer}

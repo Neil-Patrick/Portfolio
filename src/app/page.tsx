@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GitHubAchievements } from "@/components/GitHubAchievements";
 import { GitHubActivity } from "@/components/GitHubActivity";
 import { PageBackground } from "@/components/background/PageBackground";
 import { DepthGauge } from "@/components/nav/DepthGauge";
@@ -90,6 +91,7 @@ export default function HomePage() {
 
       <Section id="github" title="GitHub Activity">
         <GitHubActivity />
+        <GitHubAchievements />
       </Section>
 
       {/* The ask, right before the footer. */}

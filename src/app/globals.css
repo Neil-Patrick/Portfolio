@@ -163,11 +163,9 @@
   }
 }
 
-/* Credly badge images tinted to the teal accent, so a wall of colorful badges sits in
-   the theme; callers restore true colors on hover/focus (filter-none). */
-@utility badge-duotone {
-  filter: grayscale(1) sepia(1) hue-rotate(130deg) saturate(1.5);
-  transition: filter 300ms var(--ease-out-soft);
+/* The teal folded corner on badge tiles (BadgeTile.tsx): a triangle in the top-right. */
+@utility corner-fold {
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
 }
 
 /* Top-right corner cut. Clips outlines too, so pair with an inset focus ring. */
