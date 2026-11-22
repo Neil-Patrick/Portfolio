@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { DecodeText } from "./motion/DecodeText";
 import { TechIcon } from "./TechIcon";
 
 export type ExplorerSkill = {
@@ -61,7 +62,7 @@ export function SkillExplorer({ groups }: Props) {
           );
           return (
             <section key={group.name} aria-labelledby={`skill-group-${i}`}>
-              <h2 id={`skill-group-${i}`} className="mb-4 text-xl">
+              <h2 id={`skill-group-${i}`} className="mb-4 hud-label text-lg text-ink">
                 {group.name}
               </h2>
               <ul className="flex flex-wrap gap-3">
@@ -134,7 +135,7 @@ function UsagePanel({ skill }: { skill: ExplorerSkill | null }) {
     <div
       aria-live="polite"
       data-testid="skill-usage"
-      className="rounded-md border border-line-strong bg-surface p-5"
+      className="hud-corners border border-line-strong bg-surface p-5"
     >
       {/* Cross-fade between selections; instant with reduced motion. */}
       <AnimatePresence mode="wait" initial={false}>
@@ -147,12 +148,13 @@ function UsagePanel({ skill }: { skill: ExplorerSkill | null }) {
         >
           {skill ? (
             <>
-              <p className="flex items-center gap-2 text-lg font-semibold">
+              {/* The name decodes in each time a technology is picked. */}
+              <p className="flex items-center gap-2 font-display text-2xl font-bold">
                 <TechIcon name={skill.name} />
-                {skill.name}
+                <DecodeText text={skill.name} />
               </p>
               <p className="mt-2">{skill.description}</p>
-              <p className="mt-4 text-sm text-ink-muted">
+              <p className="mt-4 hud-label text-sm text-ink-muted">
                 {skill.projects.length > 0
                   ? `Used in ${skill.projects.length} ${skill.projects.length === 1 ? "Project" : "Projects"}`
                   : "Not in a listed project yet."}

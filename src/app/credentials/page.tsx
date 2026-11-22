@@ -30,9 +30,6 @@ function LogEntry({ title, date, children }: { title: string; date: string; chil
   );
 }
 
-const row = "block border border-l-4 border-line-strong bg-canvas px-4 py-3";
-/** Linked rows: the edge turns teal and the row nudges right on hover or keyboard focus. */
-const linkRow = `${row} min-h-11 transition-[color,border-color,translate] duration-200 hover:border-accent hover:text-accent focus-visible:border-accent motion-safe:hover:translate-x-1 motion-safe:focus-visible:translate-x-1`;
 
 export default function CredentialsPage() {
   return (
@@ -43,7 +40,7 @@ export default function CredentialsPage() {
         </h2>
         <Reveal as="ul" className="grid gap-3">
           {education.map((entry) => (
-            <RevealItem as="li" from="left" key={entry.school} className={row}>
+            <RevealItem as="li" from="left" key={entry.school} className="hud-row px-4 py-3">
               <LogEntry title={entry.program} date={entry.period}>
                 {entry.school}, {entry.location}
                 {entry.note && <span className="block text-accent">{entry.note}</span>}
@@ -82,7 +79,7 @@ export default function CredentialsPage() {
         <Reveal as="ul" className="grid gap-3">
           {certifications.map((cert) => (
             <RevealItem as="li" from="left" key={cert.name}>
-              <a href={cert.url} {...newTab} className={linkRow}>
+              <a href={cert.url} {...newTab} className="hud-row hud-row-link block min-h-11 px-4 py-3">
                 <LogEntry title={cert.name} date={formatMonth(cert.date)}>
                   {cert.issuer}
                 </LogEntry>

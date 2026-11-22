@@ -128,6 +128,35 @@
   letter-spacing: 0.12em;
 }
 
+/* Log-entry row: a framed line with a heavier left edge. Callers set display and padding. */
+@utility hud-row {
+  border: 1px solid var(--color-line-strong);
+  border-left-width: 4px;
+  background-color: var(--color-canvas);
+}
+
+/* A row that is a link: the edge turns teal and the row nudges right on hover
+   or keyboard focus (no nudge with reduced motion). */
+@utility hud-row-link {
+  transition:
+    color 200ms,
+    border-color 200ms,
+    translate 200ms var(--ease-out-soft);
+  &:hover {
+    color: var(--color-accent);
+  }
+  &:hover,
+  &:focus-visible {
+    border-color: var(--color-accent);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    &:hover,
+    &:focus-visible {
+      translate: 0.25rem 0;
+    }
+  }
+}
+
 /* Top-right corner cut. Clips outlines too, so pair with an inset focus ring. */
 @utility hud-notch {
   clip-path: polygon(0 0, calc(100% - var(--hud-notch)) 0, 100% var(--hud-notch), 100% 100%, 0 100%);

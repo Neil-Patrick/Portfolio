@@ -32,9 +32,9 @@ export function Reveal({
 }: {
   children: ReactNode;
   className?: string;
-  as?: "div" | "ul";
+  as?: "div" | "ul" | "dl";
 }) {
-  const Component = as === "ul" ? motion.ul : motion.div;
+  const Component = as === "ul" ? motion.ul : as === "dl" ? motion.dl : motion.div;
   return (
     <Component
       className={className}

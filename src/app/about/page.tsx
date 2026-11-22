@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Reveal, RevealItem } from "@/components/motion/Reveal";
 import { SectionPage } from "@/components/SectionPage";
 import { education, featuredCertification, formatMonth } from "@/content/credentials";
 import { getSection, site } from "@/content/site";
@@ -31,18 +32,24 @@ export default function AboutPage() {
           ))}
         </div>
 
-        <aside aria-labelledby="at-a-glance" className="self-start rounded-md border border-line-strong bg-surface p-6">
-          <h2 id="at-a-glance" className="mb-4 text-lg">
+        {/* HUD profile panel: caps field labels over teal values, printing in one by one. */}
+        <aside
+          aria-labelledby="at-a-glance"
+          className="hud-corners self-start border border-line-strong bg-surface p-6"
+        >
+          <h2 id="at-a-glance" className="mb-5 hud-label text-lg text-ink">
             At a Glance
           </h2>
-          <dl className="grid gap-4">
+          <Reveal as="dl" className="grid gap-5">
             {facts.map((fact) => (
-              <div key={fact.label}>
-                <dt className="text-sm text-ink-muted">{fact.label}</dt>
-                <dd className="font-medium">{fact.value}</dd>
-              </div>
+              <RevealItem key={fact.label} from="left">
+                <dt className="hud-label text-sm text-ink-muted">{fact.label}</dt>
+                <dd className="mt-0.5 font-display text-xl leading-snug font-semibold text-accent">
+                  {fact.value}
+                </dd>
+              </RevealItem>
             ))}
-          </dl>
+          </Reveal>
         </aside>
       </div>
     </SectionPage>
