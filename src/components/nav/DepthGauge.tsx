@@ -83,10 +83,10 @@ export function DepthGauge({ items }: { items: Item[] }) {
                       current ? "w-3.5 bg-accent" : "w-2 bg-line-strong group-hover:bg-ink-muted"
                     }`}
                   />
-                  {/* Label: shown on hover/focus, faintly for the current section. */}
+                  {/* Label: shown only on hover or keyboard focus. */}
                   <span
-                    className={`pointer-events-none absolute right-full mr-1 rounded-xs bg-canvas/85 px-2 py-0.5 text-xs whitespace-nowrap tracking-widest transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none ${
-                      current ? "text-accent opacity-60" : "text-ink-muted opacity-0"
+                    className={`pointer-events-none absolute right-full mr-1 rounded-xs bg-canvas/85 px-2 py-0.5 text-xs whitespace-nowrap tracking-widest opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100 motion-reduce:transition-none ${
+                      current ? "text-accent" : "text-ink-muted"
                     }`}
                   >
                     {item.label}

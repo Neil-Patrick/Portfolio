@@ -88,10 +88,7 @@ export const techIcons: Record<string, TechIconData> = {
   "VS Code": { src: vscode },
   Figma: { src: figma },
   Canva: { src: canva },
-  // No devicon logo: skills (Framer Motion, TanStack Query, NextAuth.js) get a neutral
-  // library glyph; project-only libraries and services (OpenRouter, Spotify Web API,
-  // Cloudflare Turnstile, MapLibre GL, Upstash Redis, Recharts, Zod, Render) get the
-  // service glyph explained by the Projects page legend. See TechIcon.tsx.
+  // Names with no devicon logo get a neutral glyph instead. See TechIcon.tsx.
 };
 
 /** Names without a devicon logo that are databases get a database glyph; others a neutral one. */

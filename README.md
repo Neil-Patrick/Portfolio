@@ -104,9 +104,8 @@ src/
     site.ts       Site info and section list: label, route, summary, detail, link text
                   (drives the header, home order, and section pages)
     credentials.ts  Education, featured certification, Credly badges
-    skills.ts      Technology groups for the Technologies page (CV plus main tools from
-                   the project repos), and projectOnly: libraries/services shown on
-                   projects but not listed as technologies
+    skills.ts      Technology groups and one-line descriptions for the Technologies
+                   page (CV plus main tools from the project repos)
     projects.ts    Projects: description, start month, stack (notable tools, checked
                    against each repo), links
     tech.ts        Logo for each technology name (devicon imports)
@@ -122,7 +121,7 @@ tests/ui/         Playwright UI checks
 
 Text in `[square brackets]` in `src/content/` is placeholder content.
 
-**Adding a technology:** add its name to a group in `src/content/skills.ts` (the file keeps its original name; it feeds the Technologies page). For a logo, find it on [devicon.dev](https://devicon.dev), import its `-original.svg` in `src/content/tech.ts`, and add one line to `techIcons` (use `mono: true` for black-by-brand logos, `darkBacking: true` for dark ones). If a project uses it, write the same name in that project's `stack` in `projects.ts` and the two connect automatically. A tool a project uses that you don't want on the Technologies page goes in `projectOnly` in `skills.ts` instead (it shows a neutral glyph, explained by the Projects page legend). Skills without a devicon logo get a neutral library glyph.
+**Adding a technology:** add its name to a group in `src/content/skills.ts` (the file keeps its original name; it feeds the Technologies page). For a logo, find it on [devicon.dev](https://devicon.dev), import its `-original.svg` in `src/content/tech.ts`, and add one line to `techIcons` (use `mono: true` for black-by-brand logos, `darkBacking: true` for dark ones). If a project uses it, write the same name in that project's `stack` in `projects.ts` and the two connect automatically. Every name in a project's `stack` must be a listed technology (a test checks this), so stacks list only notable tools, not small helper libraries or APIs. Skills without a devicon logo get a neutral library glyph.
 
 **Dev server note:** on this Windows setup, Turbopack sometimes keeps serving an old build of `globals.css` after an edit. If a style change doesn't show up, stop and restart `npm run dev`.
 
@@ -149,6 +148,6 @@ Text in `[square brackets]` in `src/content/` is placeholder content.
 - **Theming without a library:** an inline `<head>` script applies a saved light/dark choice before first paint (no flash), following the Next.js "preventing flash before hydration" guide. "System" removes `data-theme` so CSS follows the OS live. The choice is stored in `localStorage` and synced across tabs. `next-themes` was considered and skipped: it would be an extra dependency for about 40 lines of code.
 - **Home preview + section pages:** the home page shows a short preview of every section with a link to its page; each section has its own static route with the full content. Sections keep their `#id` anchors on the home page.
 - **One folder per section page, not a `[section]` dynamic route:** each page will grow its own layout (project grid, credentials list, contact form). They share `SectionPage` for now to stay DRY.
-- **Brand logos from devicon:** full-color logos make the technology list scannable. devicon is a regular dependency so adding a logo is one import line; only the imported SVGs reach visitors (static files, no JS or CDN). Black-by-brand logos (Next.js, Vercel, GitHub, Express) are drawn in the text color through a CSS mask so they work in dark mode, and MySQL's dark blue sits on a light tile in dark mode. SQL and Turso have no devicon logo and use a database glyph; services (OpenRouter, Spotify Web API, Cloudflare Turnstile) all use a neutral service glyph, explained by a legend on the Projects page.
+- **Brand logos from devicon:** full-color logos make the technology list scannable. devicon is a regular dependency so adding a logo is one import line; only the imported SVGs reach visitors (static files, no JS or CDN). Black-by-brand logos (Next.js, Vercel, GitHub, Express) are drawn in the text color through a CSS mask so they work in dark mode, and MySQL's dark blue sits on a light tile in dark mode. SQL and Turso have no devicon logo and use a database glyph.
 - **Technologies and projects linked by name:** a project's `stack` uses the exact names from `skills.ts`, and `src/lib/skill-usage.ts` derives the connection, so there's no second list to keep in sync (a test fails if a name doesn't match). The selected technology lives in the URL hash (`/technologies#tech-python`) so project chips can link straight to it; the hash avoids the Suspense boundary that search params would need.
 - **Plain top navigation:** text links in the header on large screens, a "Menu" disclosure on small ones, plus the same links in the footer. An earlier game-style radial menu was dropped with the pixel theme; a playful interactive piece may return later as its own section.

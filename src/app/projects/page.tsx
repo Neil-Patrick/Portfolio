@@ -8,28 +8,15 @@ import { formatMonth } from "@/content/credentials";
 import { projects } from "@/content/projects";
 import { getSection } from "@/content/site";
 import { NEW_TAB_NOTE, newTab } from "@/lib/links";
-import { isSkill, skillAnchor } from "@/lib/skill-usage";
+import { skillAnchor } from "@/lib/skill-usage";
 
 const section = getSection("projects");
 
 export const metadata: Metadata = { title: section.label };
 
-const chip = "inline-flex min-h-11 items-center gap-2 rounded-sm border px-3 py-1 text-sm";
-
 export default function ProjectsPage() {
   return (
     <SectionPage section={section}>
-      {/* One legend for every project's tech stack. */}
-      <ul
-        aria-label="Tech stack legend"
-        className="mb-8 flex flex-wrap gap-x-8 gap-y-2 text-sm text-ink-muted"
-      >
-        <li className="flex items-center gap-2">
-          <TechIcon name="Service" />
-          Library or service, not listed under Technologies
-        </li>
-      </ul>
-
       <div className="space-y-10">
         {projects.map((project) => (
           <article
@@ -75,21 +62,14 @@ export default function ProjectsPage() {
               <ul className="flex flex-wrap gap-2">
                 {project.stack.map((tool) => (
                   <li key={tool}>
-                    {/* Technologies link to the Technologies page with that one selected. */}
-                    {isSkill(tool) ? (
-                      <Link
-                        href={`/technologies#${skillAnchor(tool)}`}
-                        className={`${chip} border-line-strong bg-canvas hover:border-accent hover:text-accent`}
-                      >
-                        <TechIcon name={tool} />
-                        {tool}
-                      </Link>
-                    ) : (
-                      <span className={`${chip} border-line bg-canvas`}>
-                        <TechIcon name={tool} />
-                        {tool}
-                      </span>
-                    )}
+                    {/* Each opens the Technologies page with that one selected. */}
+                    <Link
+                      href={`/technologies#${skillAnchor(tool)}`}
+                      className="inline-flex min-h-11 items-center gap-2 rounded-sm border border-line-strong bg-canvas px-3 py-1 text-sm hover:border-accent hover:text-accent"
+                    >
+                      <TechIcon name={tool} />
+                      {tool}
+                    </Link>
                   </li>
                 ))}
               </ul>

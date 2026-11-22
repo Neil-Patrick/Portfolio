@@ -284,13 +284,12 @@ test("chart fits a 320px phone without overflow", async ({ page }) => {
 
 /* ---------- Behaviour: technologies ↔ projects ---------- */
 
-test("every project tool is a listed technology or a known project-only tool", async () => {
+test("every project tool is a listed technology", async () => {
   const { projects } = await import("../../src/content/projects");
   const { skillGroups } = await import("../../src/content/skills");
-  const { projectOnly } = await import("../../src/content/skills");
   const skills = new Set(skillGroups.flatMap((group) => group.skills));
   const unknown = projects.flatMap((project) =>
-    project.stack.filter((tool) => !skills.has(tool) && !projectOnly.has(tool)).map((tool) => `${project.name}: ${tool}`),
+    project.stack.filter((tool) => !skills.has(tool)).map((tool) => `${project.name}: ${tool}`),
   );
   expect(unknown, "stack names must match skills.ts exactly").toEqual([]);
 });
@@ -307,12 +306,12 @@ test("every technology shows an icon, and every logo loads", async ({ page }) =>
   for (const chip of await chips.all()) {
     await expect(chip.locator("[data-tech-icon]").first()).toBeAttached();
   }
-  // Only skills deliberately without a devicon logo use a fallback glyph (database or library).
+  // Only skills deliberately without a devicon logo use a fallback glyph.
   const fallbacks = await chips
     .filter({ has: page.locator('[data-tech-icon="fallback"]') })
     .allInnerTexts();
   // Button chips also contain a project count, so compare only the name (first line).
-  expect(fallbacks.map((t) => t.split("\n")[0].trim()).sort()).toEqual(["Framer Motion", "NextAuth.js", "SQL", "TanStack Query", "Turso (libSQL)"]);
+  expect(fallbacks.map((t) => t.split("\n")[0].trim()).sort()).toEqual(["SQL", "Turso (libSQL)"]);
 
   const broken = await page.evaluate(() =>
     [...document.querySelectorAll<HTMLImageElement>("img[data-tech-icon]")]
@@ -416,7 +415,8 @@ test("other pages have no 3D background", async ({ page }) => {
 test("GitHub section shows live stats or the documented fallback", async ({ page }) => {
   await page.goto("/");
   const section = page.locator("#github");
-  await expect(section.getByRole("heading", { name: /^GitHub activity$/i })).toBeVisible();
+  // The heading is visually hidden but still names the section for screen readers.
+  await expect(section.getByRole("heading", { name: /^GitHub activity$/i })).toBeAttached();
   const heatmap = section.getByTestId("heatmap");
   if ((await heatmap.count()) > 0) {
     // Token configured: full calendar (52-53 weeks) and streaks.

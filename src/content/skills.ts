@@ -1,7 +1,7 @@
 /**
  * Technical skills, grouped as on the CV, plus Node.js, Express, Laravel, and Sass
  * from the CV's project lines, and the main tools found in the project repos
- * (React Native, Expo, Vite, Framer Motion, TanStack Query, NextAuth.js, Docker, Jest). Names must match project stack entries exactly;
+ * (React Native, Expo, Vite, Docker, Jest). Every project stack name must match one of these exactly;
  * logos live in tech.ts. Proficiency tiers come later (ask before adding).
  */
 
@@ -24,8 +24,6 @@ export const skillGroups: SkillGroup[] = [
       "Tailwind CSS",
       "Bootstrap",
       "Sass (SCSS)",
-      "Framer Motion",
-      "TanStack Query",
     ],
   },
   {
@@ -38,29 +36,12 @@ export const skillGroups: SkillGroup[] = [
       "Node.js",
       "Express",
       "Laravel",
-      "NextAuth.js",
     ],
   },
   { name: "Hosting and Deployment", skills: ["Vercel"] },
   { name: "Tools and Platforms", skills: ["Git", "GitHub", "Docker", "Jest", "Visual Studio", "VS Code"] },
   { name: "Design and Prototyping", skills: ["Figma", "Canva"] },
 ];
-
-/**
- * Libraries and services that appear in project stacks but aren't listed as
- * technologies. Every other stack name must match skills.ts exactly (a test
- * checks this). They show the neutral service glyph (see the Projects legend).
- */
-export const projectOnly = new Set([
-  "OpenRouter",
-  "Spotify Web API",
-  "Cloudflare Turnstile",
-  "MapLibre GL",
-  "Upstash Redis",
-  "Recharts",
-  "Zod",
-  "Render",
-]);
 
 /** One plain sentence per technology: what it is. Shown on the Technologies page. */
 export const techDescriptions: Record<string, string> = {
@@ -83,8 +64,6 @@ export const techDescriptions: Record<string, string> = {
   "Tailwind CSS": "A utility-first CSS framework for styling directly in the markup.",
   Bootstrap: "A CSS framework of ready-made, responsive layout and interface components.",
   "Sass (SCSS)": "A CSS extension that adds variables, nesting, and reusable styles.",
-  "Framer Motion": "A React animation library for gestures, transitions, and layout animations.",
-  "TanStack Query": "A library that fetches, caches, and keeps server data up to date in React apps.",
   // Backend and Databases
   MySQL: "A popular open-source relational database.",
   PostgreSQL: "An advanced open-source relational database known for reliability and features.",
@@ -93,7 +72,6 @@ export const techDescriptions: Record<string, string> = {
   "Node.js": "A runtime that runs JavaScript on servers and the command line.",
   Express: "A minimal web framework for building APIs and servers with Node.js.",
   Laravel: "A PHP web framework with routing, an ORM, and authentication built in.",
-  "NextAuth.js": "An authentication library for Next.js that handles sign-in, sessions, and providers.",
   // Hosting and Deployment
   Vercel: "A cloud platform for deploying websites and frontend apps, made by the creators of Next.js.",
   // Tools and Platforms
