@@ -2,6 +2,8 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 import { homeIndex, sections, site } from "../../src/content/site";
 import { INTRO_SEEN_KEY } from "../../src/lib/intro";
+import { bearing } from "../../src/components/nav/compass-geometry";
+import { existsSync } from "node:fs";
 import { buildTimeline } from "../../src/lib/timeline";
 
 const WIDTHS = [320, 768, 1024, 1440];
@@ -120,8 +122,10 @@ test("home shows exactly the sections in homeIndex, in that order", async ({ pag
     homeIndex.map((item) => item.id),
   );
   expect(order, "sections appear top to bottom in homeIndex order").toEqual([...order].sort((a, b) => a - b));
-  // Credentials has no home section (the career timeline plots every certification).
-  await expect(page.locator("#credentials")).toHaveCount(0);
+  // These have their own pages only (the career timeline plots every certification).
+  for (const id of ["credentials", "about", "technologies"]) {
+    await expect(page.locator(`#${id}`), `#${id}`).toHaveCount(0);
+  }
 });
 
 test("each home preview links to its page", async ({ page }) => {
@@ -421,7 +425,7 @@ test("home shows the wave background (animated or static) behind readable text",
   // Tests run with reduced motion, so only the static lines show (no 3D download).
   await expect(layer.locator('[data-bg-fallback="waves"] path')).toHaveCount(6);
   await expect(layer.locator("canvas")).toHaveCount(0);
-  await expect(page.locator("#about").getByRole("heading", { level: 1 })).toHaveText("Neil Patrick Pajadan");
+  await expect(page.locator("#home").getByRole("heading", { level: 1 })).toHaveText("Neil Patrick Pajadan");
   const axe = await new AxeBuilder({ page }).include("#home").withTags(["wcag2aa"]).analyze();
   expect(axe.violations.map((v) => v.id)).toEqual([]);
 });
@@ -517,13 +521,13 @@ test("with full motion: anchor links land below the sticky header", async ({ pag
   // Jump via an in-page anchor, the way footer/home links use hashes.
   await page.evaluate(() => {
     const link = document.createElement("a");
-    link.href = "#technologies";
+    link.href = "#career-timeline";
     link.textContent = "test anchor";
     document.body.append(link);
     link.click();
   });
   await page.waitForTimeout(1600); // Lenis eases to the target
-  const top = await page.locator("#technologies").evaluate((el) => el.getBoundingClientRect().top);
+  const top = await page.locator("#career-timeline").evaluate((el) => el.getBoundingClientRect().top);
   expect(top, "section top sits just below the 64px header").toBeGreaterThanOrEqual(40);
   expect(top).toBeLessThanOrEqual(120);
 });
@@ -605,29 +609,12 @@ test("landing headline lines fit their column at every width", async ({ page }) 
   }
 });
 
-test("brief builder composes an email from the picks", async ({ page }) => {
+test("Let's Build: Email Me is a plain email link", async ({ page }) => {
   await page.goto("/");
-  const section = page.locator("#contact");
-  await section.getByText("A Freelance Project", { exact: true }).click();
-  await section.getByText("Web App", { exact: true }).click();
-  await section.getByText("Data or AI", { exact: true }).click();
-  await expect(section.getByTestId("brief-subject")).toHaveText("Freelance Project: Web App, Data or AI");
-
-  const href = (await section.getByRole("link", { name: "Email the Brief" }).getAttribute("href"))!;
-  const url = new URL(href);
-  expect(url.protocol).toBe("mailto:");
-  expect(url.pathname).toBe("neilpatrick.dev@gmail.com");
-  expect(url.searchParams.get("subject")).toBe("Freelance Project: Web App, Data or AI");
-  const body = url.searchParams.get("body")!;
-  expect(body).toContain("I'm reaching out about: A Freelance Project");
-  expect(body).toContain("Focus: Web App, Data or AI");
-  expect(body).toContain("Timeline:");
-
-  // Clicking a picked chip again unticks it. The chips are real, labelled form controls.
-  await section.getByText("Web App", { exact: true }).click();
-  await expect(section.getByTestId("brief-subject")).toHaveText("Freelance Project: Data or AI");
-  await expect(section.getByRole("checkbox", { name: "Web App" })).not.toBeChecked();
-  await expect(section.getByRole("radio", { name: "A Freelance Project" })).toBeChecked();
+  await expect(page.locator("#contact").getByRole("link", { name: "Email Me" })).toHaveAttribute(
+    "href",
+    "mailto:neilpatrick.dev@gmail.com",
+  );
 });
 
 test("Copy Email copies the address and says so", async ({ page, context }) => {
@@ -652,10 +639,10 @@ async function freshPage(context: BrowserContext, reducedMotion: "reduce" | "no-
 
 const introState = (page: Page) => page.evaluate(() => document.documentElement.dataset.intro ?? null);
 
-test("loading screen: plays on the first home visit with the real counts, skips on a key, and stays away for the tab", async ({ context }) => {
+test("loading screen: plays on the first home visit with the real counts, preloads, continues on a click, and stays away for the tab", async ({ context }) => {
   const page = await freshPage(context, "no-preference");
   const errors = collectErrors(page);
-  // Watch from the first byte: the loader is decided before first paint and lasts under 3s.
+  // Watch from the first byte: the loader is decided before first paint and lasts about 5s.
   await page.goto("/", { waitUntil: "commit" });
   const overlay = page.locator("[data-intro-overlay]");
   await expect(page.locator("html")).toHaveAttribute("data-intro", "play");
@@ -677,12 +664,15 @@ test("loading screen: plays on the first home visit with the real counts, skips 
     String(skillGroups.flatMap((g) => g.skills).length),
   ]);
 
-  // Once the page is interactive (the controller then holds the page still), any key skips it.
+  // Meanwhile it preloads the heavy parts, then says so.
+  await expect(overlay.locator("[data-intro-assets]")).toHaveText("Ready", { timeout: 6000 });
+
+  // Once the page is interactive (the controller then holds the page still), a click anywhere continues.
   await page.waitForFunction(
     () => document.documentElement.style.overflow === "hidden" || document.documentElement.dataset.intro === "done",
   );
   if ((await introState(page)) === "play") {
-    await page.keyboard.press("Shift");
+    await page.mouse.click(720, 450);
     await expect(page.locator("html")).toHaveAttribute("data-intro", "done", { timeout: 1500 });
   } else {
     test.info().annotations.push({
@@ -691,7 +681,7 @@ test("loading screen: plays on the first home visit with the real counts, skips 
     });
   }
   // Either way it ends, and the page scrolls again.
-  await expect(page.locator("html")).toHaveAttribute("data-intro", "done", { timeout: 5000 });
+  await expect(page.locator("html")).toHaveAttribute("data-intro", "done", { timeout: 8000 });
   await expect(overlay).toBeHidden();
   expect(await page.evaluate(() => document.documentElement.style.overflow)).toBe("");
   await page.mouse.wheel(0, 900);
@@ -707,10 +697,13 @@ test("loading screen: plays on the first home visit with the real counts, skips 
   expect(errors, "console errors").toEqual([]);
 });
 
-test("loading screen: clears on its own, then the landing headline decodes into place", async ({ context }) => {
+test("loading screen: stays about 5 seconds, clears on its own, then the landing headline decodes into place", async ({ context }) => {
   const page = await freshPage(context, "no-preference");
-  await page.goto("/");
-  await expect(page.locator("html")).toHaveAttribute("data-intro", "done", { timeout: 5000 });
+  await page.goto("/", { waitUntil: "commit" });
+  await expect(page.locator("html")).toHaveAttribute("data-intro", "play");
+  await page.waitForTimeout(3000);
+  expect(await introState(page), "still on screen after 3 seconds").toBe("play");
+  await expect(page.locator("html")).toHaveAttribute("data-intro", "done", { timeout: 6000 });
   await expect(page.locator("[data-intro-overlay]")).toBeHidden();
   const firstLine = page.locator("[data-landing-line] span[aria-hidden]").first();
   await expect(firstLine).toHaveText(site.landing.headline[0], { timeout: 3000 });
@@ -725,37 +718,117 @@ test("loading screen: never shows with reduced motion", async ({ context }) => {
   }
 });
 
-const welcomeKinds = ["compass", "gyroscope", "monolith"] as const;
+/* ---------- Behaviour: hologram card, compass touch, photo, badges ---------- */
 
-test("3D welcome: each visual shows its still version under reduced motion", async ({ page }) => {
+/** Rotation of an element's computed transform, rounded, so tilts can be compared. */
+const transformOf = (locator: ReturnType<Page["locator"]>) =>
+  locator.evaluate((el) => getComputedStyle(el).transform);
+/** How far a layer floats in front of the card (the translateZ in its computed matrix). */
+const depthOf = (locator: ReturnType<Page["locator"]>) =>
+  locator.evaluate((el) => {
+    const m = getComputedStyle(el).transform;
+    return m.startsWith("matrix3d(") ? Number(m.slice(9, -1).split(",")[14]) : 0;
+  });
+
+test("hologram card: holds the page's h1 and a labeled photo placeholder, and stays flat and still with reduced motion", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  await expect(page.locator("[data-welcome]")).toHaveAttribute("data-welcome", site.landing.visual);
-  for (const kind of welcomeKinds) {
-    await page.goto(`/?visual=${kind}`);
-    const visual = page.locator("[data-welcome]");
-    await expect(visual).toHaveAttribute("data-welcome", kind);
-    await expect(visual.locator("[data-welcome-still]")).toBeVisible();
-    await expect(visual.locator("[data-welcome-canvas]")).toHaveCount(0);
-  }
+  const card = page.locator("[data-hologram]");
+  await expect(card.getByRole("heading", { level: 1 })).toHaveText(site.name);
+  await expect(card.getByRole("img", { name: "Photo placeholder" })).toBeVisible();
+  await expect(card).toContainText(site.availability);
+  const body = card.locator("> div");
+  const before = await transformOf(body);
+  const box = (await body.boundingBox())!;
+  await page.mouse.move(box.x + box.width * 0.95, box.y + box.height * 0.1, { steps: 4 });
+  await page.waitForTimeout(400);
+  expect(await transformOf(body), "no tilt with reduced motion").toBe(before);
+  expect(await depthOf(card.locator('[data-layer="status"]')), "no depth with reduced motion").toBe(0);
 });
 
-test("3D welcome: with full motion each visual runs and follows the cursor without errors", async ({ page }) => {
+test("hologram card: pops into 3D, tilts toward the cursor and a dragging finger, and a tap folds it flat and back", async ({ page }) => {
   const errors = collectErrors(page);
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.setViewportSize({ width: 1440, height: 900 });
-  for (const kind of welcomeKinds) {
-    await page.goto(`/?visual=${kind}`);
-    await page.waitForLoadState("networkidle");
-    const visual = page.locator("[data-welcome]");
-    await expect(visual).toHaveAttribute("data-welcome", kind);
-    // The 3D canvas, or the still version where WebGL isn't available.
-    await expect(visual.locator("[data-welcome-canvas], [data-welcome-still]").first()).toBeAttached();
-    const box = (await visual.boundingBox())!;
-    for (const [fx, fy] of [[0.2, 0.2], [0.8, 0.3], [0.5, 0.5], [0.3, 0.85]]) {
-      await page.mouse.move(box.x + box.width * fx, box.y + box.height * fy, { steps: 4 });
-      await page.waitForTimeout(150);
-    }
-    await page.waitForTimeout(600);
+  await page.goto("/");
+  await page.waitForLoadState("networkidle");
+  const card = page.locator("[data-hologram]");
+  const body = card.locator("> div");
+  const status = card.locator('[data-layer="status"]');
+  await expect.poll(() => depthOf(status), { message: "layers separate into depth" }).toBeGreaterThan(60);
+
+  const box = (await body.boundingBox())!;
+  await page.mouse.move(box.x + box.width * 0.95, box.y + box.height * 0.5, { steps: 5 });
+  await page.waitForTimeout(600);
+  const right = await transformOf(body);
+  await page.mouse.move(box.x + box.width * 0.05, box.y + box.height * 0.5, { steps: 5 });
+  await page.waitForTimeout(600);
+  expect(await transformOf(body), "tilts toward the cursor").not.toBe(right);
+
+  // A finger dragged across it (touch pointer events) tilts it too.
+  await page.mouse.move(0, 0);
+  const y = box.y + box.height * 0.5;
+  await body.dispatchEvent("pointerdown", { pointerType: "touch", pointerId: 7, isPrimary: true, clientX: box.x + box.width * 0.5, clientY: y });
+  for (const fx of [0.6, 0.75, 0.9, 0.98]) {
+    await body.dispatchEvent("pointermove", { pointerType: "touch", pointerId: 7, isPrimary: true, clientX: box.x + box.width * fx, clientY: y });
   }
+  await page.waitForTimeout(500);
+  const dragged = await transformOf(body);
+  await body.dispatchEvent("pointerup", { pointerType: "touch", pointerId: 7, isPrimary: true, clientX: box.x + box.width * 0.98, clientY: y });
+  expect(dragged, "a dragging finger tilts it").not.toBe(right);
+
+  // A tap folds it flat, then it pops back out. (Clicked by position: the card never
+  // stops swaying, so Playwright's wait-until-still would never end.)
+  await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.3);
+  await expect.poll(() => depthOf(status), { message: "folds flat" }).toBeLessThan(30);
+  await expect.poll(() => depthOf(status), { message: "pops back out" }).toBeGreaterThan(60);
   expect(errors, "console errors").toEqual([]);
+});
+
+test("compass menu: on touch, the needle follows a dragging finger and letting go opens that page", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/about");
+  await page.getByRole("button", { name: "Open navigation" }).click();
+  const dial = page.locator("[data-compass-dial]");
+  await expect(dial).toBeVisible();
+  const box = (await dial.boundingBox())!;
+  const cx = box.x + box.width / 2;
+  const cy = box.y + box.height / 2;
+  const r = box.width * 0.3;
+  const at = (index: number) => {
+    const rad = (bearing(index, sections.length) * Math.PI) / 180;
+    return { clientX: cx + Math.sin(rad) * r, clientY: cy - Math.cos(rad) * r };
+  };
+  const target = sections.findIndex((section) => section.id === "projects");
+  const touch = { pointerType: "touch", pointerId: 11, isPrimary: true };
+
+  await dial.dispatchEvent("pointerdown", { ...touch, ...at(0) });
+  await dial.dispatchEvent("pointermove", { ...touch, ...at((target + sections.length - 1) % sections.length) });
+  await dial.dispatchEvent("pointermove", { ...touch, ...at(target) });
+  await expect(page.getByTestId("compass-aim")).toHaveText(sections[target].label);
+  await dial.dispatchEvent("pointerup", { ...touch, ...at(target) });
+  await expect(page).toHaveURL(new RegExp(`${sections[target].href}$`));
+});
+
+test("about page shows a labeled photo placeholder until a photo is set", async ({ page }) => {
+  test.skip(site.photo !== null, "a real photo is set");
+  await page.goto("/about");
+  await expect(page.getByRole("img", { name: "Photo placeholder" })).toBeVisible();
+  await expect(page.getByText("Photo Placeholder", { exact: true })).toBeVisible();
+});
+
+test("every certification shows its Credly badge: saved locally, loaded, and named", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/credentials");
+  const { badgeImage, certifications, featuredCertification } = await import("../../src/content/credentials");
+  for (const cert of [featuredCertification, ...certifications]) {
+    const src = badgeImage(cert)!;
+    expect(existsSync(`public${src}`), `${cert.name}: public${src}`).toBe(true);
+    const image = page.getByRole("img", { name: `${cert.name} badge` });
+    await image.scrollIntoViewIfNeeded();
+    await expect(image).toBeVisible();
+    await expect
+      .poll(() => image.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0), { message: `${cert.name} loads` })
+      .toBe(true);
+  }
 });

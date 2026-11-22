@@ -163,6 +163,13 @@
   }
 }
 
+/* Credly badge images tinted to the teal accent, so a wall of colorful badges sits in
+   the theme; callers restore true colors on hover/focus (filter-none). */
+@utility badge-duotone {
+  filter: grayscale(1) sepia(1) hue-rotate(130deg) saturate(1.5);
+  transition: filter 300ms var(--ease-out-soft);
+}
+
 /* Top-right corner cut. Clips outlines too, so pair with an inset focus ring. */
 @utility hud-notch {
   clip-path: polygon(0 0, calc(100% - var(--hud-notch)) 0, 100% var(--hud-notch), 100% 100%, 0 100%);
@@ -316,8 +323,9 @@
 /* ---------- Loading screen (src/components/intro/, src/lib/intro.ts) ----------
    Shown only while <html data-intro> is "play" or "skip": the first home visit
    in a tab, with motion allowed (decided before first paint). Timeline, about
-   2.7s: CRT power-on, flicker, the name glitching in, the system check
-   printing, "Access Granted", CRT power-off, fade out. "skip" fades it at once. */
+   5.4s (time the page uses to preload): CRT power-on, flicker, the name
+   glitching in, the system check printing, "Access Granted", CRT power-off,
+   fade out. A click or key ("skip") fades it at once. */
 .intro {
   display: none;
 }
@@ -334,7 +342,7 @@
   color-scheme: dark;
   background-color: var(--color-canvas);
   color: var(--color-ink);
-  animation: intro-out 450ms ease-in 2250ms forwards;
+  animation: intro-out 450ms ease-in 5000ms forwards;
 }
 :root[data-intro="skip"] .intro {
   animation: intro-skip 300ms ease-out forwards;
@@ -383,7 +391,7 @@
   animation:
     intro-crt-on 450ms var(--ease-out-soft) both,
     intro-flicker 900ms steps(1, end) 420ms both,
-    intro-crt-off 400ms ease-in 1950ms forwards;
+    intro-crt-off 400ms ease-in 4600ms forwards;
 }
 /* The name: two offset copies glitch over it in slices, then settle; one more glitch near the end. */
 .intro-name {
@@ -402,17 +410,17 @@
   color: var(--color-accent);
   animation:
     intro-glitch-a 1s steps(1, end) 380ms both,
-    intro-glitch-b 380ms steps(1, end) 1700ms forwards;
+    intro-glitch-b 380ms steps(1, end) 3700ms forwards;
 }
 .intro-name::after {
   color: color-mix(in oklab, var(--color-accent) 35%, var(--color-ink));
   animation:
     intro-glitch-b 1s steps(1, end) 430ms both,
-    intro-glitch-a 380ms steps(1, end) 1740ms forwards;
+    intro-glitch-a 380ms steps(1, end) 3740ms forwards;
 }
 .intro-granted {
   opacity: 0;
-  animation: intro-granted 500ms steps(1, end) 1500ms forwards;
+  animation: intro-granted 500ms steps(1, end) 4100ms forwards;
 }
 
 @keyframes intro-out {
@@ -585,7 +593,19 @@
   }
 }
 
-/* Hologram texture over the landing's 3D welcome visual (src/components/hero/welcome/). */
+/* A light band across the landing's hologram card; HologramCard slides it with the tilt. */
+.holo-sheen {
+  pointer-events: none;
+  background-image: linear-gradient(
+    105deg,
+    transparent 35%,
+    color-mix(in oklab, var(--color-accent) 16%, transparent) 50%,
+    transparent 65%
+  );
+  background-size: 250% 100%;
+}
+
+/* Hologram scanlines (the landing's hologram card). */
 .holo-scanlines {
   pointer-events: none;
   background: repeating-linear-gradient(

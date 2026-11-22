@@ -4,7 +4,7 @@ import { useLenis } from "lenis/react";
 import { X } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion, useSpring } from "motion/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { sections } from "@/content/site";
 import { Icon, SectionIcon } from "../icons";
@@ -112,14 +112,51 @@ function Dial({ current, onClose }: { current: number; onClose: () => void }) {
     else needle.set(angle.current);
   };
 
-  // Mouse direction from the center picks the item, like a game's radial menu.
-  const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
-    if (event.pointerType !== "mouse" || !dialRef.current) return;
+  /** Aims at the item in the pointer's direction from the center; null inside the center's dead zone. */
+  const aimFrom = (clientX: number, clientY: number) => {
+    if (!dialRef.current) return null;
     const rect = dialRef.current.getBoundingClientRect();
-    const dx = event.clientX - (rect.left + rect.width / 2);
-    const dy = event.clientY - (rect.top + rect.height / 2);
-    if (Math.hypot(dx, dy) < rect.width * 0.08) return; // dead zone in the middle
-    aimAt(nearestIndex(bearingOf(dx, dy), COUNT));
+    const dx = clientX - (rect.left + rect.width / 2);
+    const dy = clientY - (rect.top + rect.height / 2);
+    if (Math.hypot(dx, dy) < rect.width * 0.08) return null;
+    const index = nearestIndex(bearingOf(dx, dy), COUNT);
+    aimAt(index);
+    return index;
+  };
+
+  // Touch: drag a finger on the dial and the needle follows it; let go after a real
+  // drag to go to the page it points at, like a game's radial menu. Taps work as before.
+  const router = useRouter();
+  const drag = useRef<{ id: number; x: number; y: number; moved: boolean } | null>(null);
+  /** When a drag last navigated, so the click that touch may leave behind is ignored. */
+  const draggedAt = useRef(-Infinity);
+
+  const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "mouse") return;
+    drag.current = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
+  };
+
+  // Mouse direction from the center picks the item; so does a dragging finger.
+  const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "mouse") {
+      aimFrom(event.clientX, event.clientY);
+      return;
+    }
+    const current = drag.current;
+    if (!current || current.id !== event.pointerId) return;
+    if (!current.moved && Math.hypot(event.clientX - current.x, event.clientY - current.y) > 20) current.moved = true;
+    if (current.moved) aimFrom(event.clientX, event.clientY);
+  };
+
+  const onPointerUp = (event: PointerEvent<HTMLDivElement>) => {
+    const current = drag.current;
+    drag.current = null;
+    if (!current || current.id !== event.pointerId || !current.moved) return;
+    const index = aimFrom(event.clientX, event.clientY);
+    if (index === null) return;
+    draggedAt.current = event.timeStamp;
+    router.push(sections[index].href);
+    onClose();
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
@@ -171,8 +208,14 @@ function Dial({ current, onClose }: { current: number; onClose: () => void }) {
 
         <div
           ref={dialRef}
+          data-compass-dial
+          onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
-          className="relative aspect-square w-[min(92vw,78vh,38rem)]"
+          onPointerUp={onPointerUp}
+          onPointerCancel={() => {
+            drag.current = null;
+          }}
+          className="relative aspect-square w-[min(92vw,78vh,38rem)] touch-none"
         >
           {/* HUD corner brackets lock on around the dial as it opens. */}
           <motion.div
@@ -249,7 +292,11 @@ function Dial({ current, onClose }: { current: number; onClose: () => void }) {
                       }}
                       href={section.href}
                       aria-current={i === current ? "page" : undefined}
-                      onClick={onClose}
+                      onClick={(event) => {
+                        // A drag that just navigated already closed the menu.
+                        if (event.timeStamp - draggedAt.current < 500) event.preventDefault();
+                        else onClose();
+                      }}
                       onPointerEnter={(event) => event.pointerType === "mouse" && aimAt(i)}
                       onFocus={() => aimAt(i)}
                       className="group relative flex flex-col items-center outline-none"

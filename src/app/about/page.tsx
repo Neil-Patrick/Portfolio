@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Reveal, RevealItem } from "@/components/motion/Reveal";
+import { ProfilePhoto } from "@/components/ProfilePhoto";
 import { SectionPage } from "@/components/SectionPage";
 import { education, featuredCertification, formatMonth } from "@/content/credentials";
 import { getSection, site } from "@/content/site";
@@ -37,6 +38,9 @@ export default function AboutPage() {
           aria-labelledby="at-a-glance"
           className="hud-corners self-start border border-line-strong bg-surface p-6"
         >
+          <div className="mb-6">
+            <ProfilePhoto sizes="(min-width: 1024px) 19rem, 90vw" />
+          </div>
           <h2 id="at-a-glance" className="mb-5 hud-label text-lg text-ink">
             At a Glance
           </h2>

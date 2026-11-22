@@ -38,6 +38,15 @@ export type Certification = {
 
 const credly = (id: string) => `https://www.credly.com/badges/${id}`;
 
+/**
+ * The badge image saved from Credly (public/badges/<badge id>.png, by
+ * scripts/fetch-credly-badges.mjs), or undefined for a credential without one.
+ */
+export function badgeImage(cert: Certification) {
+  const id = cert.url?.match(/credly\.com\/badges\/([0-9a-f-]+)/)?.[1];
+  return id ? `/badges/${id}.png` : undefined;
+}
+
 /** Shown first and larger: the most relevant credential for data and AI roles. */
 export const featuredCertification: Certification = {
   name: "IT Specialist – Artificial Intelligence",

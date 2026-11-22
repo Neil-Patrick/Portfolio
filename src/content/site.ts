@@ -28,43 +28,24 @@ export const site = {
     "Now I'm moving toward data and AI: analysis, automation, and building with AI models. In 2026 I earned the IT Specialist – Artificial Intelligence certification, and my next projects are in that direction.",
     "Before university, I took the STEM track at Laguna Science National High School and graduated with honors.",
   ],
-  /** Shown under the landing's buttons and in the loading screen's system check. Neil: open to internships, jobs, and freelance work. */
+  /** Shown on the landing's hologram card and in the loading screen's system check. Neil: open to internships, jobs, and freelance work. */
   availability: "Open to Work",
+  /**
+   * Profile photo, a path under public/ (for example "/me.jpg"). While null, the
+   * landing card and the About page show a clearly marked placeholder.
+   */
+  photo: null as string | null,
   /** Home landing. Draft copy, true to the intro: edit freely. */
   landing: {
-    /**
-     * The 3D welcome animation beside the headline: "compass", "gyroscope", or
-     * "monolith". Being compared (also via /?visual=…); the others go once one is chosen.
-     */
-    visual: "compass" as "compass" | "gyroscope" | "monolith",
     /** One line each; they decode in. Keep each line short enough to fit a phone. */
     headline: ["Web Apps Today.", "Data and AI Next."],
     primaryCta: "Work With Me",
     secondaryCta: "See the Work",
   },
-  /** Home "Let's Build" section: the project brief builder composes an email from these. */
+  /** Home "Let's Build" section. */
   collaborate: {
     heading: "Let's Build Something",
-    lead: "I'm open to internships, jobs, and freelance projects. Pick what fits, and your email app opens with a ready outline.",
-    /** Subject and outline when no reason is picked. */
-    defaultSubject: "Hello From Your Portfolio",
-    defaultOutline: ["What you have in mind:", "Links:"],
-    reasons: [
-      {
-        id: "role",
-        label: "An Internship or Job",
-        subject: "Internship or Job",
-        outline: ["About the role:", "Company and location:", "Start date:", "Links:"],
-      },
-      {
-        id: "freelance",
-        label: "A Freelance Project",
-        subject: "Freelance Project",
-        outline: ["About the project:", "Timeline:", "Budget:", "Links:"],
-      },
-    ],
-    /** Each backed by real work: web projects, Statera (mobile), AI certification and Python, Figma and UX. */
-    focuses: ["Web App", "Mobile App", "Data or AI", "UI Design"],
+    lead: "I'm open to internships, jobs, and freelance projects.",
   },
 };
 
@@ -74,9 +55,7 @@ export const site = {
  */
 export const homeIndex = [
   { id: "home", label: "Home" },
-  { id: "about", label: "About" },
   { id: "projects", label: "Projects" },
-  { id: "technologies", label: "Technologies" },
   { id: "career-timeline", label: "Career Timeline" },
   { id: "github", label: "GitHub Activity" },
   { id: "contact", label: "Contact" },

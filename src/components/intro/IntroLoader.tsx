@@ -29,7 +29,8 @@ const leader = <span className="min-w-4 flex-1 border-b border-dotted border-lin
  * are CSS (globals.css, "Loading screen"): a CRT power-on, flicker, the name
  * glitching in, a system check with real numbers, "Access Granted", and a CRT
  * power-off that reveals the landing. IntroController handles skipping and
- * the handoff. Decorative for assistive tech: everything here is also on the page.
+ * preloading and the handoff. It lasts about 5 seconds, or until a click or key.
+ * Decorative for assistive tech: everything here is also on the page.
  */
 export function IntroLoader() {
   return (
@@ -56,19 +57,19 @@ export function IntroLoader() {
               <span className="relative h-1.5 flex-1 bg-line">
                 <span
                   className="boot-fill absolute inset-0 bg-accent"
-                  style={cssVars({ "--fill-delay": "450ms", "--fill-duration": "1000ms" })}
+                  style={cssVars({ "--fill-delay": "500ms", "--fill-duration": "3600ms" })}
                 />
               </span>
               <span className="shrink-0 text-accent tabular-nums">
                 <span
                   className="boot-count"
-                  style={cssVars({ "--to": 100, "--count-delay": "450ms", "--count-duration": "1000ms" })}
+                  style={cssVars({ "--to": 100, "--count-delay": "500ms", "--count-duration": "3600ms" })}
                 />
                 %
               </span>
             </div>
 
-            <dl className="mt-5 grid max-w-md gap-2" style={cssVars({ "--row-start": "650ms", "--row-step": "160ms" })}>
+            <dl className="mt-5 grid max-w-md gap-2" style={cssVars({ "--row-start": "900ms", "--row-step": "550ms" })}>
               {checks.map((check, i) => (
                 <div key={check.label} className="boot-row flex items-baseline gap-3" style={cssVars({ "--i": i })}>
                   <dt className="flex flex-1 items-baseline gap-3 hud-label text-xs text-ink-muted sm:text-sm">
@@ -87,6 +88,16 @@ export function IntroLoader() {
                 </dt>
                 <dd className="hud-label text-xs text-accent sm:text-sm">{site.availability}</dd>
               </div>
+              {/* Real: IntroController preloads the heavy parts meanwhile and flips this to "Ready". */}
+              <div className="boot-row flex items-baseline gap-3" style={cssVars({ "--i": checks.length + 1 })}>
+                <dt className="flex flex-1 items-baseline gap-3 hud-label text-xs text-ink-muted sm:text-sm">
+                  Assets
+                  {leader}
+                </dt>
+                <dd data-intro-assets className="hud-label text-xs text-accent sm:text-sm">
+                  Loading
+                </dd>
+              </div>
             </dl>
 
             <p className="intro-granted mt-6 font-display text-2xl font-bold tracking-widest text-accent uppercase sm:text-3xl">
@@ -95,7 +106,7 @@ export function IntroLoader() {
           </div>
 
           <p className="load-fade text-center hud-label text-xs text-ink-muted" style={cssVars({ "--fade-delay": "600ms" })}>
-            Press Any Key to Skip
+            Click Anywhere to Continue
           </p>
         </div>
       </div>

@@ -4,18 +4,17 @@ import { cssVars } from "@/lib/css-vars";
 import { Icon } from "../icons";
 import { DecodeText } from "../motion/DecodeText";
 import { Magnetic } from "../motion/Tilt";
-import { WelcomeVisual } from "./welcome/WelcomeVisual";
+import { HologramCard } from "./HologramCard";
 
 /**
- * Home landing: a huge headline that decodes in, the two main actions and the
- * availability status, with a 3D welcome animation beside them
- * (`site.landing.visual`). On the first visit in a tab the cyberpunk loading
- * screen plays first (src/components/intro/), and the headline and the 3D
- * entrance start as it clears. With reduced motion everything is shown at
- * rest. The h1 (the name) is in the intro below.
+ * Home landing: a huge headline that decodes in and the two main actions, with
+ * the hologram card beside them (photo, name as the page's h1, role, status).
+ * On the first visit in a tab the cyberpunk loading screen plays first
+ * (src/components/intro/), and the headline and the card's 3D pop start as it
+ * clears. With reduced motion everything is shown at rest.
  */
 export function Landing() {
-  const { headline, primaryCta, secondaryCta, visual } = site.landing;
+  const { headline, primaryCta, secondaryCta } = site.landing;
 
   return (
     <section
@@ -52,26 +51,18 @@ export function Landing() {
               {secondaryCta}
             </a>
           </div>
-
-          <p
-            className="load-fade mt-6 flex items-center gap-2 hud-label text-sm text-accent"
-            style={cssVars({ "--fade-delay": "800ms" })}
-          >
-            <span aria-hidden className="live-pulse size-2 shrink-0 rounded-full bg-accent" />
-            {site.availability}
-          </p>
         </div>
 
-        <WelcomeVisual kind={visual} />
+        <HologramCard />
       </div>
 
       <a
-        href="#about"
+        href="#projects"
         className="load-fade absolute inset-x-0 bottom-4 mx-auto flex min-h-11 w-fit flex-col items-center justify-center px-3 hud-label text-xs text-ink-muted transition-colors hover:text-accent"
         style={cssVars({ "--fade-delay": "1800ms" })}
       >
         <span>
-          Scroll<span className="sr-only"> to the Intro</span>
+          Scroll<span className="sr-only"> to the Projects</span>
         </span>
         <Icon icon={ChevronDown} className="cue-bob" />
       </a>

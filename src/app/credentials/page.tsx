@@ -1,14 +1,15 @@
-import { Award } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import type { ReactNode } from "react";
-import { Icon } from "@/components/icons";
 import { Reveal, RevealItem } from "@/components/motion/Reveal";
 import { SectionPage } from "@/components/SectionPage";
 import {
+  badgeImage,
   certifications,
   education,
   featuredCertification as featured,
   formatMonth,
+  type Certification,
 } from "@/content/credentials";
 import { getSection } from "@/content/site";
 import { NEW_TAB_NOTE, newTab } from "@/lib/links";
@@ -30,6 +31,30 @@ function LogEntry({ title, date, children }: { title: string; date: string; chil
   );
 }
 
+/**
+ * A badge image saved from Credly, in small HUD brackets. Rows show it in a teal
+ * duotone (to sit in the theme) and in its true colors on hover or focus.
+ */
+function Badge({ cert, size, duotone = true }: { cert: Certification; size: 14 | 20; duotone?: boolean }) {
+  const src = badgeImage(cert);
+  if (!src) return null;
+  const px = size * 4;
+  return (
+    <span className={`hud-corners grid shrink-0 place-items-center p-1.5 ${size === 20 ? "size-20" : "size-14"}`}>
+      <Image
+        src={src}
+        alt={`${cert.name} badge`}
+        width={px}
+        height={px}
+        sizes={`${px}px`}
+        data-badge
+        className={`size-full object-contain ${
+          duotone ? "badge-duotone group-hover:filter-none group-focus-visible:filter-none" : ""
+        }`}
+      />
+    </span>
+  );
+}
 
 export default function CredentialsPage() {
   return (
@@ -62,7 +87,7 @@ export default function CredentialsPage() {
           {...newTab}
           className="hud-notch hud-scan relative mb-6 flex items-center gap-4 bg-accent px-4 py-4 text-on-accent focus-visible:-outline-offset-4 focus-visible:outline-on-accent sm:gap-5 sm:px-6"
         >
-          <Icon icon={Award} size={28} className="shrink-0" />
+          <Badge cert={featured} size={20} duotone={false} />
           <span className="flex-1">
             <span className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
               <span className="font-display text-2xl font-bold tracking-wide uppercase">{featured.name}</span>
@@ -79,10 +104,17 @@ export default function CredentialsPage() {
         <Reveal as="ul" className="grid gap-3">
           {certifications.map((cert) => (
             <RevealItem as="li" from="left" key={cert.name}>
-              <a href={cert.url} {...newTab} className="hud-row hud-row-link block min-h-11 px-4 py-3">
-                <LogEntry title={cert.name} date={formatMonth(cert.date)}>
-                  {cert.issuer}
-                </LogEntry>
+              <a
+                href={cert.url}
+                {...newTab}
+                className="group hud-row hud-row-link flex min-h-11 items-center gap-4 px-4 py-3"
+              >
+                <Badge cert={cert} size={14} />
+                <span className="min-w-0 flex-1">
+                  <LogEntry title={cert.name} date={formatMonth(cert.date)}>
+                    {cert.issuer}
+                  </LogEntry>
+                </span>
                 <span className="sr-only">{NEW_TAB_NOTE}</span>
               </a>
             </RevealItem>
