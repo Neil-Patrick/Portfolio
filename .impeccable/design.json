@@ -1,0 +1,345 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-23T16:14:32+00:00",
+  "title": "Design System: Neil Patrick Pajadan Portfolio",
+  "extensions": {
+    "colorMeta": {
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Void Canvas",
+        "tonalRamp": [
+          "oklch(15% 0.003 250)",
+          "oklch(25% 0.006 250)",
+          "oklch(36% 0.009 250)",
+          "oklch(47% 0.01 250)",
+          "oklch(58% 0.01 250)",
+          "oklch(70% 0.009 250)",
+          "oklch(82% 0.006 250)",
+          "oklch(95% 0.003 250)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Instrument Surface",
+        "tonalRamp": [
+          "oklch(15% 0.004 250)",
+          "oklch(25% 0.008 250)",
+          "oklch(36% 0.011 250)",
+          "oklch(47% 0.012 250)",
+          "oklch(58% 0.012 250)",
+          "oklch(70% 0.011 250)",
+          "oklch(82% 0.008 250)",
+          "oklch(95% 0.004 250)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Instrument Ink",
+        "tonalRamp": [
+          "oklch(15% 0.014 255)",
+          "oklch(25% 0.025 255)",
+          "oklch(36% 0.037 255)",
+          "oklch(47% 0.04 255)",
+          "oklch(58% 0.04 255)",
+          "oklch(70% 0.037 255)",
+          "oklch(82% 0.025 255)",
+          "oklch(95% 0.014 255)"
+        ]
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Readout Grey",
+        "tonalRamp": [
+          "oklch(15% 0.01 255)",
+          "oklch(25% 0.019 255)",
+          "oklch(36% 0.028 255)",
+          "oklch(47% 0.03 255)",
+          "oklch(58% 0.03 255)",
+          "oklch(70% 0.028 255)",
+          "oklch(82% 0.019 255)",
+          "oklch(95% 0.01 255)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "tonalRamp": [
+          "oklch(15% 0.005 250)",
+          "oklch(25% 0.01 250)",
+          "oklch(36% 0.014 250)",
+          "oklch(47% 0.015 250)",
+          "oklch(58% 0.015 250)",
+          "oklch(70% 0.014 250)",
+          "oklch(82% 0.01 250)",
+          "oklch(95% 0.005 250)"
+        ]
+      },
+      "line-strong": {
+        "role": "neutral",
+        "displayName": "Frame Line",
+        "tonalRamp": [
+          "oklch(15% 0.01 255)",
+          "oklch(25% 0.019 255)",
+          "oklch(36% 0.028 255)",
+          "oklch(47% 0.03 255)",
+          "oklch(58% 0.03 255)",
+          "oklch(70% 0.028 255)",
+          "oklch(82% 0.019 255)",
+          "oklch(95% 0.01 255)"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Signal Teal",
+        "tonalRamp": [
+          "oklch(15% 0.038 182)",
+          "oklch(25% 0.07 182)",
+          "oklch(36% 0.101 182)",
+          "oklch(47% 0.11 182)",
+          "oklch(58% 0.11 182)",
+          "oklch(70% 0.101 182)",
+          "oklch(82% 0.07 182)",
+          "oklch(95% 0.038 182)"
+        ]
+      },
+      "on-accent": {
+        "role": "primary",
+        "displayName": "On-Signal",
+        "tonalRamp": [
+          "oklch(15% 0.0 182)",
+          "oklch(25% 0.0 182)",
+          "oklch(36% 0.0 182)",
+          "oklch(47% 0.0 182)",
+          "oklch(58% 0.0 182)",
+          "oklch(70% 0.0 182)",
+          "oklch(82% 0.0 182)",
+          "oklch(95% 0.0 182)"
+        ]
+      },
+      "series-cert": {
+        "role": "tertiary",
+        "displayName": "Certificate Teal",
+        "tonalRamp": [
+          "oklch(15% 0.035 178)",
+          "oklch(25% 0.064 178)",
+          "oklch(36% 0.092 178)",
+          "oklch(47% 0.1 178)",
+          "oklch(58% 0.1 178)",
+          "oklch(70% 0.092 178)",
+          "oklch(82% 0.064 178)",
+          "oklch(95% 0.035 178)"
+        ]
+      },
+      "series-project": {
+        "role": "tertiary",
+        "displayName": "Project Amber",
+        "tonalRamp": [
+          "oklch(15% 0.045 65)",
+          "oklch(25% 0.083 65)",
+          "oklch(36% 0.12 65)",
+          "oklch(47% 0.13 65)",
+          "oklch(58% 0.13 65)",
+          "oklch(70% 0.12 65)",
+          "oklch(82% 0.083 65)",
+          "oklch(95% 0.045 65)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "landing": {
+        "displayName": "Landing",
+        "purpose": "The home headline only; sized to its column with container units."
+      },
+      "display": {
+        "displayName": "Display",
+        "purpose": "Section page titles inside the HUD panel."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "h2 and h3 headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Paragraphs and descriptions at a readable measure."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Short uppercase HUD labels: tags, buttons, dates, issuers."
+      }
+    },
+    "shadows": [
+      {
+        "name": "aim-glow",
+        "value": "0 0 0 3px color-mix(in oklab, var(--color-accent) 22%, transparent), 0 0 28px color-mix(in oklab, var(--color-accent) 40%, transparent)",
+        "purpose": "The item the compass needle points at. Glow means aimed; never on resting elements."
+      },
+      {
+        "name": "aim-glow-filter",
+        "value": "drop-shadow(0 0 10px color-mix(in oklab, var(--color-accent) 55%, transparent))",
+        "purpose": "The same glow for clipped or SVG shapes (compass hexagons)."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-soft",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "Default easing for reveals, nudges, lock-on and wipes."
+      },
+      {
+        "name": "duration-draw",
+        "value": "1200ms",
+        "purpose": "Line and chart draw-ins."
+      },
+      {
+        "name": "hud-lock",
+        "value": "700ms",
+        "purpose": "Section panel brackets locking on, once per page."
+      },
+      {
+        "name": "hud-scan",
+        "value": "1100ms",
+        "purpose": "One light sweep across a featured row or primary button."
+      },
+      {
+        "name": "hover",
+        "value": "200ms",
+        "purpose": "Color, border and nudge transitions on rows and buttons."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "40rem"
+      },
+      {
+        "name": "md",
+        "value": "48rem"
+      },
+      {
+        "name": "lg",
+        "value": "64rem"
+      },
+      {
+        "name": "xl",
+        "value": "80rem"
+      },
+      {
+        "name": "2xl",
+        "value": "96rem"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The main call to action (Work With Me, Email Me): teal fill, caps label, notched corner.",
+      "html": "<a class=\"ds-btn-primary\" href=\"#\">Work With Me</a>",
+      "css": ":host{--color-canvas:light-dark(#f7f8fa,#000);--color-surface:light-dark(#eceff3,#0f0f0f);--color-ink:light-dark(#13233a,#ededed);--color-ink-muted:light-dark(#4a5a70,#a1a1a1);--color-line:light-dark(#d5dbe3,#262626);--color-line-strong:light-dark(#74839a,#6b6b6b);--color-accent:light-dark(#0b7268,#4fd1c1);--color-on-accent:light-dark(#fff,#000);}.ds-btn-primary{display:inline-flex;align-items:center;min-height:44px;padding:8px 24px;background:var(--color-accent);color:var(--color-on-accent);text-decoration:none;font-size:1rem;font-family:'Saira Condensed','IBM Plex Sans',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.12em;clip-path:polygon(0 0,calc(100% - .75rem) 0,100% .75rem,100% 100%,0 100%);transition:filter .2s}.ds-btn-primary:hover{filter:brightness(1.08)}.ds-btn-primary:focus-visible{outline:2px solid var(--color-on-accent);outline-offset:-4px}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "The quieter companion action (See the Work): frame-line border, turns teal on hover.",
+      "html": "<a class=\"ds-btn-secondary\" href=\"#\">See the Work</a>",
+      "css": ":host{--color-canvas:light-dark(#f7f8fa,#000);--color-surface:light-dark(#eceff3,#0f0f0f);--color-ink:light-dark(#13233a,#ededed);--color-ink-muted:light-dark(#4a5a70,#a1a1a1);--color-line:light-dark(#d5dbe3,#262626);--color-line-strong:light-dark(#74839a,#6b6b6b);--color-accent:light-dark(#0b7268,#4fd1c1);--color-on-accent:light-dark(#fff,#000);}.ds-btn-secondary{display:inline-flex;align-items:center;min-height:44px;padding:8px 24px;border:1px solid var(--color-line-strong);color:var(--color-ink);text-decoration:none;font-size:1rem;font-family:'Saira Condensed','IBM Plex Sans',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.12em;transition:color .2s,border-color .2s}.ds-btn-secondary:hover{color:var(--color-accent);border-color:var(--color-accent)}.ds-btn-secondary:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}"
+    },
+    {
+      "name": "Log Row Link",
+      "kind": "custom",
+      "refersTo": "hud-row",
+      "description": "A project, credential or achievement as a framed log entry with a heavy left edge; nudges right and turns teal on hover or focus.",
+      "html": "<a class=\"ds-row\" href=\"#\"><span class=\"ds-row-title\">Data Fundamentals</span><span class=\"ds-row-meta\">IBM SkillsBuild · May 2026</span></a>",
+      "css": ":host{--color-canvas:light-dark(#f7f8fa,#000);--color-surface:light-dark(#eceff3,#0f0f0f);--color-ink:light-dark(#13233a,#ededed);--color-ink-muted:light-dark(#4a5a70,#a1a1a1);--color-line:light-dark(#d5dbe3,#262626);--color-line-strong:light-dark(#74839a,#6b6b6b);--color-accent:light-dark(#0b7268,#4fd1c1);--color-on-accent:light-dark(#fff,#000);}.ds-row{display:flex;flex-direction:column;gap:2px;min-height:44px;padding:12px 16px;border:1px solid var(--color-line-strong);border-left-width:4px;background:var(--color-canvas);color:var(--color-ink);text-decoration:none;font-family:'IBM Plex Sans',sans-serif;transition:color .2s,border-color .2s,translate .2s cubic-bezier(.22,1,.36,1)}.ds-row-title{font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:1.25rem}.ds-row-meta{font-size:.875rem;color:var(--color-ink-muted)}.ds-row:hover{color:var(--color-accent)}.ds-row:hover,.ds-row:focus-visible{border-color:var(--color-accent);translate:.25rem 0}.ds-row:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}@media (prefers-reduced-motion:reduce){.ds-row:hover,.ds-row:focus-visible{translate:none}}"
+    },
+    {
+      "name": "Featured Row",
+      "kind": "custom",
+      "refersTo": "hud-row-featured",
+      "description": "The one highlighted entry per page (top credential, contact email): inverted teal fill with a notch.",
+      "html": "<a class=\"ds-row-featured\" href=\"#\"><span class=\"ds-row-featured-label\">Featured</span><span class=\"ds-row-featured-title\">IT Specialist – Artificial Intelligence</span></a>",
+      "css": ":host{--color-canvas:light-dark(#f7f8fa,#000);--color-surface:light-dark(#eceff3,#0f0f0f);--color-ink:light-dark(#13233a,#ededed);--color-ink-muted:light-dark(#4a5a70,#a1a1a1);--color-line:light-dark(#d5dbe3,#262626);--color-line-strong:light-dark(#74839a,#6b6b6b);--color-accent:light-dark(#0b7268,#4fd1c1);--color-on-accent:light-dark(#fff,#000);}.ds-row-featured{display:flex;flex-direction:column;gap:4px;min-height:44px;padding:16px;background:var(--color-accent);color:var(--color-on-accent);text-decoration:none;clip-path:polygon(0 0,calc(100% - .75rem) 0,100% .75rem,100% 100%,0 100%);}.ds-row-featured-label{font-size:.75rem;font-family:'Saira Condensed','IBM Plex Sans',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.12em;}.ds-row-featured-title{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:1.5rem}.ds-row-featured:focus-visible{outline:2px solid var(--color-on-accent);outline-offset:-4px}"
+    },
+    {
+      "name": "HUD Tag",
+      "kind": "chip",
+      "refersTo": "hud-tag",
+      "description": "A short caps label naming a destination or state, as the compass menu uses them.",
+      "html": "<span class=\"ds-tag\">Projects</span>",
+      "css": ":host{--color-canvas:light-dark(#f7f8fa,#000);--color-surface:light-dark(#eceff3,#0f0f0f);--color-ink:light-dark(#13233a,#ededed);--color-ink-muted:light-dark(#4a5a70,#a1a1a1);--color-line:light-dark(#d5dbe3,#262626);--color-line-strong:light-dark(#74839a,#6b6b6b);--color-accent:light-dark(#0b7268,#4fd1c1);--color-on-accent:light-dark(#fff,#000);}.ds-tag{display:inline-block;padding:2px 8px;background:var(--color-surface);color:var(--color-ink);border-left:2px solid var(--color-accent);font-size:.75rem;font-family:'Saira Condensed','IBM Plex Sans',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.12em;clip-path:polygon(0 0,calc(100% - .75rem) 0,100% .75rem,100% 100%,0 100%);}"
+    },
+    {
+      "name": "Arrow Link",
+      "kind": "button",
+      "refersTo": "arrow-link",
+      "description": "Round 44px link to a section's own page; fills teal on hover.",
+      "html": "<a class=\"ds-arrow\" href=\"#\" aria-label=\"See all projects\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></a>",
+      "css": ":host{--color-canvas:light-dark(#f7f8fa,#000);--color-surface:light-dark(#eceff3,#0f0f0f);--color-ink:light-dark(#13233a,#ededed);--color-ink-muted:light-dark(#4a5a70,#a1a1a1);--color-line:light-dark(#d5dbe3,#262626);--color-line-strong:light-dark(#74839a,#6b6b6b);--color-accent:light-dark(#0b7268,#4fd1c1);--color-on-accent:light-dark(#fff,#000);}.ds-arrow{display:grid;place-items:center;width:44px;height:44px;border-radius:9999px;border:1px solid var(--color-line-strong);color:var(--color-accent);transition:color .2s,background-color .2s,border-color .2s}.ds-arrow svg{transition:transform .2s}.ds-arrow:hover{background:var(--color-accent);border-color:var(--color-accent);color:var(--color-on-accent)}.ds-arrow:hover svg{transform:translateX(2px)}.ds-arrow:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}@media (prefers-reduced-motion:reduce){.ds-arrow:hover svg{transform:none}}"
+    },
+    {
+      "name": "HUD Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "The bracketed frame that opens each section page, holding the title and lead.",
+      "html": "<section class=\"ds-panel\"><h1 class=\"ds-panel-title\">Projects</h1><p class=\"ds-panel-lead\">Team builds, from the database to the interface.</p></section>",
+      "css": ":host{--color-canvas:light-dark(#f7f8fa,#000);--color-surface:light-dark(#eceff3,#0f0f0f);--color-ink:light-dark(#13233a,#ededed);--color-ink-muted:light-dark(#4a5a70,#a1a1a1);--color-line:light-dark(#d5dbe3,#262626);--color-line-strong:light-dark(#74839a,#6b6b6b);--color-accent:light-dark(#0b7268,#4fd1c1);--color-on-accent:light-dark(#fff,#000);}.ds-panel{padding:32px;border:1px solid var(--color-line);color:var(--color-ink);background-image:linear-gradient(var(--color-accent) 0 0),linear-gradient(var(--color-accent) 0 0),linear-gradient(var(--color-accent) 0 0),linear-gradient(var(--color-accent) 0 0),linear-gradient(var(--color-accent) 0 0),linear-gradient(var(--color-accent) 0 0),linear-gradient(var(--color-accent) 0 0),linear-gradient(var(--color-accent) 0 0);background-size:.875rem 2px,2px .875rem,.875rem 2px,2px .875rem,.875rem 2px,2px .875rem,.875rem 2px,2px .875rem;background-position:0 0,0 0,100% 0,100% 0,0 100%,0 100%,100% 100%,100% 100%;background-repeat:no-repeat;background-origin:border-box;}.ds-panel-title{margin:0 0 12px;font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:clamp(2.5rem,1.75rem + 3vw,3.75rem);line-height:1.1}.ds-panel-lead{margin:0;max-width:65ch;font-family:'IBM Plex Sans',sans-serif;font-size:1.125rem;line-height:1.6;color:var(--color-ink-muted)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Operator's HUD",
+    "overview": "The site is a heads-up display that the visitor operates, not a page they read past. They steer with a compass, and panels lock on as they arrive. Rows read like log entries, and readouts report Neil's work as live system data. Every HUD device has a job: brackets frame what matters, notches mark what's active, and the scan sweep points at the one thing to do next. The cyberpunk feel comes from precision and response, not from neon saturation.\n\nThe system is restrained at rest and alive on interaction. Surfaces are flat canvas and surface tones divided by 1–2px lines. Teal is the only signal color, and motion answers the visitor:\n- a row nudges toward the cursor;\n- a badge flips;\n- the hologram card tilts toward a finger.\n\nThe one big orchestrated moment is the first-visit loading screen; after that, effects stay small.\n\nIt works in both themes. Dark mode is a pure black void with a bright signal teal; light mode is a cool instrument-panel grey with a deep teal. Neither theme is an afterthought.",
+    "keyCharacteristics": [
+      "One signal color (teal) on neutral canvas and surface tones.",
+      "Corner brackets, cut corners and heavy-left-edge rows instead of filled cards and soft shadows.",
+      "A condensed display face (Saira Condensed) for titles and short caps labels; IBM Plex Sans for everything else.",
+      "Motion is feedback (lock-on, wipe, scan, flip, tilt), always with a settled reduced-motion state.",
+      "No neon palettes, no glowing body text, no monospace costume."
+    ],
+    "rules": [
+      {
+        "name": "The One Signal Rule",
+        "body": "Teal is the only accent. Never add a second accent hue (no magenta, matrix green or neon cyan) for decoration. The amber series color exists only inside the career timeline chart.",
+        "section": "colors"
+      },
+      {
+        "name": "The Token-Only Rule",
+        "body": "Tailwind's default palette is removed (`--color-*: initial`). Every color comes from these tokens, and new tints are `color-mix()` of them, never new hex values.",
+        "section": "colors"
+      },
+      {
+        "name": "The Caps-for-Labels-Only Rule",
+        "body": "Uppercase is for short HUD labels of one to three words. Headings, links and sentences stay in Title Case or sentence case, never all caps.",
+        "section": "typography"
+      },
+      {
+        "name": "The No-Costume-Mono Rule",
+        "body": "There is no monospace face. Numbers and dates use Plex with `tabular-nums`. Don't add a monospace font to look technical.",
+        "section": "typography"
+      },
+      {
+        "name": "The Glow-Means-Aimed Rule",
+        "body": "Glow appears only on the thing the visitor is currently aiming at. It never decorates resting cards, text or buttons.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use Signal Teal as the only accent, and mix tints from it with `color-mix()`.",
+      "Do frame important content with corner brackets, notches and frame lines instead of filled, shadowed cards.",
+      "Do give every animation a settled final state under `prefers-reduced-motion` (content is fully visible and nothing hides behind motion).",
+      "Do make motion answer the visitor (hover, focus, drag, press), and keep idle motion to the hologram card's sway and the loader.",
+      "Do design and check both themes, with AA contrast for every text and background pair.",
+      "Do keep labels in Title Case and reserve caps for short HUD labels."
+    ],
+    "donts": [
+      "Don't add neon magenta, matrix green or a second accent hue.",
+      "Don't put glow or `text-shadow` on body text, headings or resting elements. Glow means \"aimed\".",
+      "Don't add a monospace font for a technical look. Use `tabular-nums` for figures.",
+      "Don't add constant glitching or CRT flicker outside the loading screen.",
+      "Don't use heavy blur or frosted-glass panels; the hologram card owns the holographic look.",
+      "Don't build a dark-only effect. Every treatment must work in light mode too.",
+      "Don't round HUD elements; radii are for the few soft controls only."
+    ]
+  }
+}
