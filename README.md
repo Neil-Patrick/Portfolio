@@ -137,7 +137,8 @@ public/           Static assets (images, icons); badges/ holds the Credly badge 
 scripts/          fetch-credly-badges.mjs: re-download the badge images from Credly;
                   fetch-github-achievements.mjs: re-read the GitHub profile achievements
 tests/ui/         Playwright UI checks
-.claude/skills/   Claude Code skills: impeccable (design), verify-ui (Playwright checks),
+.claude/skills/   Claude Code skills: impeccable (design; its engine downloads to
+                  ~/.impeccable on first run, checksum-verified), verify-ui (Playwright checks),
                   web-design-guidelines (UI review), seo-schema and seo-sitemap
                   (reference only, see below)
 ```
