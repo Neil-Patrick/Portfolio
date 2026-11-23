@@ -137,7 +137,12 @@ public/           Static assets (images, icons); badges/ holds the Credly badge 
 scripts/          fetch-credly-badges.mjs: re-download the badge images from Credly;
                   fetch-github-achievements.mjs: re-read the GitHub profile achievements
 tests/ui/         Playwright UI checks
+.claude/skills/   Claude Code skills: impeccable (design), verify-ui (Playwright checks),
+                  web-design-guidelines (UI review), seo-schema and seo-sitemap
+                  (reference only, see below)
 ```
+
+**SEO skills:** `seo-schema` and `seo-sitemap` are copied from [AgriciDaniel/claude-seo](https://github.com/AgriciDaniel/claude-seo) (MIT, commit `468ed5b`, v2.6.2), skill files only. Their Python scripts, hook, and setup aren't installed, so steps that call `scripts/claude-seo` don't work; they serve as reference for JSON-LD and sitemap rules.
 
 Text in `[square brackets]` in `src/content/` is placeholder content.
 
