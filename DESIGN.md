@@ -205,9 +205,12 @@ Precise and responsive: square, labeled in caps, at least 44px tall.
 - **Arrow link** ("go to the section page"): a round 44px button with a Frame Line border and a teal arrow. On hover it fills Signal Teal, the arrow turns On-Signal and nudges right, and the magnetic wrapper applies.
 
 ### Log Rows (signature)
-Each project, credential and achievement is a framed log entry: a 1px Frame Line border with a 4px left edge, on Void Canvas.
+Projects, education and contact entries are framed log entries: a 1px Frame Line border with a 4px left edge, on Void Canvas.
 - **Link rows:** on hover or focus the edge and text turn teal and the row nudges 0.25rem right (no nudge with reduced motion).
-- **The featured row** (the top credential, the contact email): inverts to a Signal Teal fill with On-Signal text, adds the notch, and plays one scan sweep. There is one per page at most.
+- **The featured row** (the contact email): inverts to a Signal Teal fill with On-Signal text, adds the notch, and plays one scan sweep. There is one per page at most.
+
+### Filter Chips
+Caps labels with a count, at least 44px tall, wrapping on phones (Credentials categories, Technologies). Resting: a Frame Line border that turns Signal Teal on hover. Selected: a Signal Teal fill with On-Signal text, and the count inverts. They're toggle buttons (`aria-pressed`), and the choice lives in the URL hash.
 
 ### HUD Tags
 Short caps labels on Instrument Surface with a 2px teal left edge and the notch. The compass menu uses them to name each destination.
@@ -215,8 +218,15 @@ Short caps labels on Instrument Surface with a 2px teal left edge and the notch.
 ### Panels
 A HUD panel is a Hairline border with corner brackets, open to the canvas behind it (no fill). On section pages its brackets "lock on" once (sliding out from the center over 700ms) as the title decodes.
 
+### Credential Chips (signature)
+Every certification is the same microchip card; none is singled out. Grid of 2 (phones) to 5 (xl) per row, newest first in each category.
+- **Package:** a square die framed by Frame Line pins on all four sides (`chip-pins`, drawn as backgrounds).
+- **Die front:** Instrument Surface with corner brackets; the issuer in small caps, a pin-1 dot, the short code big in the display face, the month in teal, and a status LED.
+- **Aimed (hover or focus):** pins, LED and name turn Signal Teal, and the die flips in 3D to the real Credly badge. With reduced motion it swaps without the spin.
+- **Under the package:** the full name in the display face and the issuer in Readout Grey. The whole card is the link.
+
 ### Badge Tiles
-Square tiles (80px small, 112px large).
+Square tiles (80px small, 112px large), used for GitHub achievements.
 - **Front:** the issuer label, a big code in the display face (for example "AI" or "DATA"), and a teal corner fold.
 - **Back:** hover or focus on the parent link flips the tile in 3D to the real badge art. With reduced motion it swaps without the spin.
 

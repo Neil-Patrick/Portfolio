@@ -97,8 +97,8 @@ export const sections: SiteSection[] = [
     label: "Credentials",
     cta: "See All Credentials",
     href: "/credentials",
-    tab: "Education and Badges",
-    detail: "My education and certifications, newest first. Each badge links to its verification page on Credly.",
+    tab: "Certifications",
+    detail: "My certifications, grouped by field. Filter by one, or see them all; each badge links to its verification page on Credly.",
   },
   {
     id: "technologies",

@@ -168,6 +168,29 @@
   clip-path: polygon(0 0, 100% 0, 100% 100%);
 }
 
+/* Microchip pins (CredentialChip.tsx): short bars along all four edges, drawn as
+   backgrounds in the padding around the die. Set --pin to recolor them (teal on hover). */
+@utility chip-pins {
+  --pin-len: 0.4rem;
+  padding: var(--pin-len);
+  background-image:
+    repeating-linear-gradient(to right, var(--pin, var(--color-line-strong)) 0 2px, transparent 2px 10px),
+    repeating-linear-gradient(to right, var(--pin, var(--color-line-strong)) 0 2px, transparent 2px 10px),
+    repeating-linear-gradient(to bottom, var(--pin, var(--color-line-strong)) 0 2px, transparent 2px 10px),
+    repeating-linear-gradient(to bottom, var(--pin, var(--color-line-strong)) 0 2px, transparent 2px 10px);
+  background-size:
+    70% var(--pin-len),
+    70% var(--pin-len),
+    var(--pin-len) 70%,
+    var(--pin-len) 70%;
+  background-position:
+    50% 0,
+    50% 100%,
+    0 50%,
+    100% 50%;
+  background-repeat: no-repeat;
+}
+
 /* Top-right corner cut. Clips outlines too, so pair with an inset focus ring. */
 @utility hud-notch {
   clip-path: polygon(0 0, calc(100% - var(--hud-notch)) 0, 100% var(--hud-notch), 100% 100%, 0 100%);

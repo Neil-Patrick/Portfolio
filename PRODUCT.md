@@ -46,9 +46,9 @@ Web first, data and AI next. Neil ships real full-stack web apps with his team n
   - Statera: an Android app linking phone habits to grades, started January 2026;
   - Untold Diaries: an anonymous message board with an AI cat.
   - All are team builds with his thesis teammates.
-- **Certifications** (`src/content/credentials.ts`): 15 Credly badges, with images in `public/badges/`. The featured one is IT Specialist – Artificial Intelligence (Certiport, 2026).
+- **Certifications** (`src/content/credentials.ts`): 15 Credly badges, with images in `public/badges/`, in five categories (AI and Data, Web Development, IT Foundations, Design and UX, Project Management) that the Credentials page filters by. The featured one is IT Specialist – Artificial Intelligence (Certiport, 2026).
 - **GitHub:** the Pull Shark achievement and live contribution activity.
-- **Education:** LSPU BS Computer Science (2023 to present), and Laguna Science National High School STEM, With Honors.
+- **Education** (shown on the About page): LSPU BS Computer Science (2023 to present), and Laguna Science National High School STEM, With Honors.
 - **Absences that must not be fabricated:**
   - a profile photo;
   - testimonials;

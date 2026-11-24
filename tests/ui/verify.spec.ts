@@ -589,6 +589,52 @@ test("credential log entries keep their Credly links, opening safely in a new ta
   }
 });
 
+test("credentials filter: All shows every badge, each category shows exactly its own, and the hash selects one", async ({ page }) => {
+  const { certifications, featuredCertification, credentialCategories } = await import("../../src/content/credentials");
+  const all = [featuredCertification, ...certifications];
+  await page.goto("/credentials");
+  const filters = page.getByRole("navigation", { name: "Filter credentials" });
+  const badgeLinks = page.locator('main a[href^="https://www.credly.com/badges/"]');
+  const button = (label: string) => filters.getByRole("button", { name: new RegExp(`^${label} \\(`) });
+
+  // All by default: every category is a group, every badge listed.
+  await expect(button("All")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("[data-category]")).toHaveCount(credentialCategories.length);
+  await expect(badgeLinks).toHaveCount(all.length);
+
+  for (const category of credentialCategories) {
+    const expected = all.filter((cert) => cert.category === category.id);
+    await button(category.label).click();
+    await expect(button(category.label)).toHaveAttribute("aria-pressed", "true");
+    await expect(button("All")).toHaveAttribute("aria-pressed", "false");
+    await expect(page).toHaveURL(new RegExp(`#${category.id}$`));
+    await expect(page.locator("[data-category]")).toHaveCount(1);
+    await expect(badgeLinks).toHaveCount(expected.length);
+    for (const cert of expected) await expect(badgeLinks.filter({ hasText: cert.name })).toHaveCount(1);
+    await expect(page.getByText(`Showing ${expected.length} of ${all.length} credentials`)).toBeAttached();
+  }
+
+  await button("All").click();
+  await expect(badgeLinks).toHaveCount(all.length);
+  // Back returns to the previous category.
+  await page.goBack();
+  await expect(button(credentialCategories.at(-1)!.label)).toHaveAttribute("aria-pressed", "true");
+
+  // A link straight to a category preselects it.
+  await page.goto("/credentials#design-and-ux");
+  await expect(button("Design and UX")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("[data-category]")).toHaveAttribute("data-category", "design-and-ux");
+});
+
+test("Education lives on the About page, not Credentials", async ({ page }) => {
+  const { education } = await import("../../src/content/credentials");
+  await page.goto("/about");
+  const section = page.getByRole("region", { name: "Education" });
+  for (const entry of education) await expect(section.getByText(entry.program)).toBeVisible();
+  await page.goto("/credentials");
+  await expect(page.getByRole("heading", { name: "Education" })).toHaveCount(0);
+});
+
 /* ---------- Behaviour: home landing and "Let's Build" ---------- */
 
 test("landing headline lines fit their column at every width", async ({ page }) => {
@@ -845,8 +891,12 @@ test("every certification is a badge tile with its code, flipping to the Credly 
   const all = [featuredCertification, ...certifications];
   const tiles = page.locator("main [data-badge-tile]");
   await expect(tiles).toHaveCount(all.length);
+  // Every credential is the same microchip card; none is singled out with a teal fill.
+  await expect(page.locator("main [data-chip]")).toHaveCount(all.length);
+  await expect(page.locator("main a.bg-accent")).toHaveCount(0);
   const codes = await tiles.evaluateAll((els) => els.map((el) => el.querySelector(".font-display")?.textContent));
-  expect(codes).toEqual(all.map((cert) => cert.code));
+  // Grouped by category, so compare as sets rather than in date order.
+  expect([...codes].sort()).toEqual(all.map((cert) => cert.code).sort());
   expect(new Set(codes).size, "codes are unique").toBe(codes.length);
 
   // Hover flips it to the real badge; with reduced motion it swaps without the spin.

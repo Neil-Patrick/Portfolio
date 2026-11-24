@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { CareerTimeline } from "@/components/CareerTimeline";
 import { GitHubAchievements } from "@/components/GitHubAchievements";
 import { GitHubActivity } from "@/components/GitHubActivity";
+import { LogEntry } from "@/components/LogEntry";
 import { Reveal, RevealItem } from "@/components/motion/Reveal";
 import { ProfilePhoto } from "@/components/ProfilePhoto";
 import { SectionPage } from "@/components/SectionPage";
@@ -61,6 +62,22 @@ export default function AboutPage() {
           </Reveal>
         </aside>
       </div>
+
+      <section aria-labelledby="education" className="mt-16 sm:mt-20">
+        <h2 id="education" className="mb-5 hud-label text-xl text-ink">
+          Education
+        </h2>
+        <Reveal as="ul" className="grid gap-3">
+          {education.map((entry) => (
+            <RevealItem as="li" from="left" key={entry.school} className="hud-row px-4 py-3">
+              <LogEntry title={entry.program} date={entry.period}>
+                {entry.school}, {entry.location}
+                {entry.note && <span className="block text-accent">{entry.note}</span>}
+              </LogEntry>
+            </RevealItem>
+          ))}
+        </Reveal>
+      </section>
 
       {/* The chart names itself (its caption reads "Career Timeline"). */}
       <section id="career-timeline" aria-label="Career Timeline" className="mt-16 sm:mt-20">
