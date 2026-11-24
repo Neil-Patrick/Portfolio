@@ -214,6 +214,11 @@ Projects, education and contact entries are framed log entries: a 1px Frame Line
 - **Module:** a bracketed panel of canvas-tinted glass. Header bar: the name in a caps label, a Hairline rule across, and a teal status readout from real data (a pulsing marker when the data is live).
 - **Education trace:** entries hang off a vertical Signal Teal line by solder-pad nodes (a teal ring with a dot on canvas); the line draws downward when the tab opens, static with reduced motion.
 
+### Spotify Module (About)
+A console module below the tabs. Status reads "Live" with the pulsing marker while a song plays, "Idle" otherwise.
+- **Now Playing deck** (only while playing): album art in corner brackets, a four-bar Signal Teal level meter (still under reduced motion), the song in the display face and the artist in Readout Grey.
+- **Recently Played:** the last three tracks as log rows with a thumbnail, title, artist and a caps "how long ago" label; on phones the time sits under the artist.
+
 ### Filter Chips
 Caps labels with a count, at least 44px tall, wrapping on phones (Credentials categories, Technologies). Resting: a Frame Line border that turns Signal Teal on hover. Selected: a Signal Teal fill with On-Signal text, and the count inverts. They're toggle buttons (`aria-pressed`), and the choice lives in the URL hash.
 

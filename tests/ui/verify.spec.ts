@@ -636,31 +636,60 @@ test("Education lives on the About page, not Credentials", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Education" })).toHaveCount(0);
 });
 
-test("Now Playing: shows the track from /api/now-playing, and hides when Spotify is off", async ({ page, request }) => {
-  // The real route always answers with a valid shape ("off" without keys).
-  const live = await request.get("/api/now-playing");
-  expect(live.ok()).toBe(true);
-  expect(["playing", "recent", "off"]).toContain((await live.json()).status);
+test("Spotify module: now playing and the last 3 tracks from /api/now-playing, hidden when there's nothing", async ({ page, request }) => {
+  // The real route always answers with a valid shape (empty without keys).
+  const live = await (await request.get("/api/now-playing")).json();
+  expect(live).toHaveProperty("now");
+  expect(Array.isArray(live.recent)).toBe(true);
+  expect(live.recent.length).toBeLessThanOrEqual(3);
 
-  // A track playing (mocked, so the test doesn't depend on Neil's listening).
-  await page.route("**/api/now-playing", (route) =>
-    route.fulfill({
-      json: { status: "playing", title: "Test Song", artist: "Test Artist", url: "https://open.spotify.com/track/test" },
-    }),
-  );
+  // Mocked, so the test doesn't depend on what Neil is listening to.
+  const track = (n: number) => ({ title: `Song ${n}`, artist: `Artist ${n}`, url: `https://open.spotify.com/track/${n}` });
+  const minutesAgo = (m: number) => new Date(Date.now() - m * 60_000).toISOString();
+  const recent = [
+    { ...track(1), playedAt: minutesAgo(5) },
+    { ...track(2), playedAt: minutesAgo(130) },
+    { ...track(3), playedAt: minutesAgo(60 * 30) },
+  ];
+  await page.route("**/api/now-playing", (route) => route.fulfill({ json: { now: track(0), recent } }));
   await page.goto("/about");
-  const widget = page.locator("[data-now-playing]");
-  await expect(widget).toHaveAttribute("data-now-playing", "playing");
-  await expect(widget).toContainText("Now Playing");
-  await expect(widget.getByRole("link", { name: /Test Song/ })).toHaveAttribute("href", "https://open.spotify.com/track/test");
-  await expect(widget.locator(".eq-bar")).toHaveCount(3);
+  const spotify = page.getByRole("region", { name: "Spotify" });
+  await expect(spotify).toBeVisible();
+  // Below the console's tabs.
+  const tabsBottom = await page.getByRole("tablist").evaluate((el) => el.getBoundingClientRect().bottom);
+  expect(await spotify.evaluate((el) => el.getBoundingClientRect().top)).toBeGreaterThan(tabsBottom);
+  // Now playing deck: link, label, level meter, "Live" status.
+  const deck = spotify.locator("[data-now-playing]");
+  await expect(deck).toContainText("Now Playing");
+  await expect(deck).toHaveAttribute("href", "https://open.spotify.com/track/0");
+  await expect(deck.locator(".eq-bar")).toHaveCount(4);
+  await expect(spotify).toContainText("Live");
+  // Recently played: three rows, newest first, each with a link and a time.
+  const rows = spotify.getByRole("listitem");
+  await expect(rows).toHaveCount(3);
+  for (const [i, row] of (await rows.all()).entries()) {
+    await expect(row.getByRole("link")).toHaveAttribute("href", recent[i].url);
+    // Two copies of the time (under the artist on phones, a right-hand column on wider screens); one shows.
+    await expect(row.locator("time").first()).toHaveAttribute("datetime", recent[i].playedAt);
+    await expect(row.locator("time:visible")).toHaveCount(1);
+  }
+  // At a Glance no longer carries its own copy.
+  await expect(page.getByRole("complementary", { name: "At a Glance" }).locator("[data-now-playing]")).toHaveCount(0);
 
-  // Off: nothing at all.
+  // Nothing playing: no deck, "Idle", the log stays.
   await page.unroute("**/api/now-playing");
-  await page.route("**/api/now-playing", (route) => route.fulfill({ json: { status: "off" } }));
+  await page.route("**/api/now-playing", (route) => route.fulfill({ json: { now: null, recent } }));
+  await page.reload();
+  await expect(spotify).toContainText("Idle");
+  await expect(spotify.locator("[data-now-playing]")).toHaveCount(0);
+  await expect(rows).toHaveCount(3);
+
+  // Not set up: no module at all.
+  await page.unroute("**/api/now-playing");
+  await page.route("**/api/now-playing", (route) => route.fulfill({ json: { now: null, recent: [] } }));
   await page.reload();
   await page.waitForLoadState("networkidle");
-  await expect(page.locator("[data-now-playing]")).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "Spotify" })).toHaveCount(0);
 });
 
 test("About console: tabs switch by click and arrow keys, follow the hash, and hide the other panels", async ({ page }) => {

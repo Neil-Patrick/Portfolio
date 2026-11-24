@@ -1,6 +1,6 @@
-import { getNowPlaying } from "@/lib/spotify";
+import { getSpotifyFeed } from "@/lib/spotify";
 
-/** Polled by the About page's "Now Playing" readout. Cached about 30s in lib/spotify.ts. */
+/** Polled by the About page's Spotify module. Cached about 30s in lib/spotify.ts. */
 export async function GET() {
-  return Response.json(await getNowPlaying());
+  return Response.json(await getSpotifyFeed());
 }

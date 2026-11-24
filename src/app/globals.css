@@ -313,7 +313,7 @@
     translate: 0 0.25rem;
   }
 }
-/* The "Now Playing" equalizer bars (About, NowPlaying.tsx). */
+/* The "Now Playing" level meter bars (About, SpotifyModule.tsx). */
 @keyframes eq-bounce {
   0%,
   100% {

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { AboutConsole } from "@/components/about/AboutConsole";
 import { ConsoleModule } from "@/components/about/ConsoleModule";
 import { EducationTrace } from "@/components/about/EducationTrace";
-import { NowPlaying } from "@/components/about/NowPlaying";
+import { SpotifyModule } from "@/components/about/SpotifyModule";
 import { CareerTimeline } from "@/components/CareerTimeline";
 import { GitHubAchievements } from "@/components/GitHubAchievements";
 import { GitHubActivity } from "@/components/GitHubActivity";
@@ -66,8 +66,6 @@ export default function AboutPage() {
               </RevealItem>
             ))}
           </Reveal>
-          {/* Live from Spotify (hidden until there's a track, or if it isn't set up). */}
-          <NowPlaying />
         </aside>
       </div>
 
@@ -107,6 +105,11 @@ export default function AboutPage() {
             },
           ]}
         />
+      </div>
+
+      {/* Live from Spotify: now playing and the last three tracks (hidden if Spotify isn't set up). */}
+      <div className="mt-12 sm:mt-16">
+        <SpotifyModule />
       </div>
     </SectionPage>
   );
