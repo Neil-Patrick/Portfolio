@@ -209,6 +209,11 @@ Projects, education and contact entries are framed log entries: a 1px Frame Line
 - **Link rows:** on hover or focus the edge and text turn teal and the row nudges 0.25rem right (no nudge with reduced motion).
 - **The featured row** (the contact email): inverts to a Signal Teal fill with On-Signal text, adds the notch, and plays one scan sweep. There is one per page at most.
 
+### Console Tabs and Modules (About)
+- **Tabs:** notched caps tabs on a 2px Signal Teal rail; the active one is filled Signal Teal with On-Signal text, the rest sit on Instrument Surface in Readout Grey and turn teal on hover. One row of three equal tabs on phones.
+- **Module:** a bracketed panel of canvas-tinted glass. Header bar: the name in a caps label, a Hairline rule across, and a teal status readout from real data (a pulsing marker when the data is live).
+- **Education trace:** entries hang off a vertical Signal Teal line by solder-pad nodes (a teal ring with a dot on canvas); the line draws downward when the tab opens, static with reduced motion.
+
 ### Filter Chips
 Caps labels with a count, at least 44px tall, wrapping on phones (Credentials categories, Technologies). Resting: a Frame Line border that turns Signal Teal on hover. Selected: a Signal Teal fill with On-Signal text, and the count inverts. They're toggle buttons (`aria-pressed`), and the choice lives in the URL hash.
 

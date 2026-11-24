@@ -313,6 +313,12 @@
     translate: 0 0.25rem;
   }
 }
+/* A circuit trace drawing itself downward (About's Education module). */
+@keyframes trace-draw {
+  from {
+    scale: 1 0;
+  }
+}
 /* A pressed control glitches: its glyph splits into offset copies and jitters, then settles. */
 @keyframes glitch-press {
   0% {
@@ -357,6 +363,11 @@
   }
   .cue-bob {
     animation: cue-bob 1.6s ease-in-out infinite;
+  }
+  /* Runs each time its panel is shown (a `hidden` panel restarts its animations). */
+  .trace-draw {
+    transform-origin: top;
+    animation: trace-draw 700ms var(--ease-out-soft) 150ms both;
   }
   .glitch-press {
     display: block;

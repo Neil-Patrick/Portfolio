@@ -1,17 +1,22 @@
 import type { Metadata } from "next";
+import { AboutConsole } from "@/components/about/AboutConsole";
+import { ConsoleModule } from "@/components/about/ConsoleModule";
+import { EducationTrace } from "@/components/about/EducationTrace";
 import { CareerTimeline } from "@/components/CareerTimeline";
 import { GitHubAchievements } from "@/components/GitHubAchievements";
 import { GitHubActivity } from "@/components/GitHubActivity";
-import { LogEntry } from "@/components/LogEntry";
 import { Reveal, RevealItem } from "@/components/motion/Reveal";
 import { ProfilePhoto } from "@/components/ProfilePhoto";
 import { SectionPage } from "@/components/SectionPage";
-import { education, featuredCertification, formatMonth } from "@/content/credentials";
+import { certifications, education, featuredCertification, formatMonth } from "@/content/credentials";
+import { projects } from "@/content/projects";
 import { getSection, site } from "@/content/site";
 import { buildTimeline } from "@/lib/timeline";
 
 const section = getSection("about");
 const timeline = buildTimeline();
+/** The timeline module's readout, counted from the content files. */
+const timelineStatus = `${certifications.length + 1} Certifications, ${projects.length} Projects`;
 
 export const metadata: Metadata = { title: section.label };
 
@@ -63,34 +68,43 @@ export default function AboutPage() {
         </aside>
       </div>
 
-      <section aria-labelledby="education" className="mt-16 sm:mt-20">
-        <h2 id="education" className="mb-5 hud-label text-xl text-ink">
-          Education
-        </h2>
-        <Reveal as="ul" className="grid gap-3">
-          {education.map((entry) => (
-            <RevealItem as="li" from="left" key={entry.school} className="hud-row px-4 py-3">
-              <LogEntry title={entry.program} date={entry.period}>
-                {entry.school}, {entry.location}
-                {entry.note && <span className="block text-accent">{entry.note}</span>}
-              </LogEntry>
-            </RevealItem>
-          ))}
-        </Reveal>
-      </section>
-
-      {/* The chart names itself (its caption reads "Career Timeline"). */}
-      <section id="career-timeline" aria-label="Career Timeline" className="mt-16 sm:mt-20">
-        <CareerTimeline points={timeline} />
-      </section>
-
-      <section id="github" aria-labelledby="github-heading" className="mt-16 grid gap-6 sm:mt-20">
-        <h2 id="github-heading" className="hud-label text-xl text-ink">
-          GitHub Activity
-        </h2>
-        <GitHubActivity />
-        <GitHubAchievements />
-      </section>
+      {/* The console: one HUD module at a time, picked by tab (or the URL hash). */}
+      <div className="mt-16 sm:mt-20">
+        <AboutConsole
+          panels={[
+            {
+              id: "education",
+              label: "Education",
+              content: (
+                <ConsoleModule title="Education" status={`${education.length} Records`}>
+                  <EducationTrace />
+                </ConsoleModule>
+              ),
+            },
+            {
+              id: "career-timeline",
+              label: "Career Timeline",
+              content: (
+                <ConsoleModule title="Career Timeline" status={timelineStatus}>
+                  <CareerTimeline points={timeline} />
+                </ConsoleModule>
+              ),
+            },
+            {
+              id: "github",
+              label: "GitHub Activity",
+              content: (
+                <ConsoleModule title="GitHub Activity" status="Synced Hourly" live>
+                  <div className="grid gap-6">
+                    <GitHubActivity />
+                    <GitHubAchievements />
+                  </div>
+                </ConsoleModule>
+              ),
+            },
+          ]}
+        />
+      </div>
     </SectionPage>
   );
 }

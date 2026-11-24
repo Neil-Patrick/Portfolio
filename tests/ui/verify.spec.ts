@@ -269,7 +269,7 @@ test("with full motion: the theme reveal runs without errors and lands on the ri
 /* ---------- Behaviour: career timeline (About page) ---------- */
 
 test("chart plots every timeline item and lists them all in the table", async ({ page }) => {
-  await page.goto("/about");
+  await page.goto("/about#career-timeline");
   const markers = chartPlot(page).locator("[data-kind]");
   await expect(markers).toHaveCount(timeline.length);
   await expect(chartPlot(page).locator('[data-kind="project"]')).toHaveCount(
@@ -282,7 +282,7 @@ test("chart plots every timeline item and lists them all in the table", async ({
 
 test("chart selection works with keyboard and pointer", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/about");
+  await page.goto("/about#career-timeline");
   await page.waitForLoadState("networkidle");
   const newest = timeline[timeline.length - 1];
   const oldest = timeline[0];
@@ -306,8 +306,8 @@ test("chart selection works with keyboard and pointer", async ({ page }) => {
 
 test("chart fits a 320px phone without overflow", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 800 });
-  await page.goto("/about");
-  const figure = (await chartFigure(page).boundingBox())!;
+  await page.goto("/about#career-timeline");
+  const figure =(await chartFigure(page).boundingBox())!;
   expect(figure.x).toBeGreaterThanOrEqual(0);
   expect(figure.x + figure.width).toBeLessThanOrEqual(320);
 });
@@ -443,8 +443,8 @@ test("other pages have no 3D background", async ({ page }) => {
 });
 
 test("GitHub section (About page) shows live stats or the documented fallback", async ({ page }) => {
-  await page.goto("/about");
-  const section = page.locator("#github");
+  await page.goto("/about#github");
+  const section = page.getByRole("tabpanel", { name: "GitHub Activity" });
   await expect(section.getByRole("heading", { name: /^GitHub activity$/i })).toBeVisible();
   const heatmap = section.getByTestId("heatmap");
   if ((await heatmap.count()) > 0) {
@@ -513,19 +513,19 @@ test("with full motion: home animates, scrolls, and hovers without errors", asyn
 test("with full motion: anchor links land below the sticky header", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.setViewportSize({ width: 1440, height: 900 });
-  // About is long enough to bring a section all the way up under the header.
-  await page.goto("/about");
+  // Credentials is long enough to bring its last group all the way up under the header.
+  await page.goto("/credentials");
   await page.waitForLoadState("networkidle");
   // Jump via an in-page anchor, the way footer/home links use hashes.
   await page.evaluate(() => {
     const link = document.createElement("a");
-    link.href = "#career-timeline";
+    link.href = "#group-design-and-ux";
     link.textContent = "test anchor";
     document.body.append(link);
     link.click();
   });
   await page.waitForTimeout(1600); // Lenis eases to the target
-  const top = await page.locator("#career-timeline").evaluate((el) => el.getBoundingClientRect().top);
+  const top = await page.locator("#group-design-and-ux").evaluate((el) => el.getBoundingClientRect().top);
   expect(top, "section top sits just below the 64px header").toBeGreaterThanOrEqual(40);
   expect(top).toBeLessThanOrEqual(120);
 });
@@ -629,10 +629,45 @@ test("credentials filter: All shows every badge, each category shows exactly its
 test("Education lives on the About page, not Credentials", async ({ page }) => {
   const { education } = await import("../../src/content/credentials");
   await page.goto("/about");
-  const section = page.getByRole("region", { name: "Education" });
+  // Education is the console's first tab, open by default.
+  const section = page.getByRole("tabpanel", { name: "Education" });
   for (const entry of education) await expect(section.getByText(entry.program)).toBeVisible();
   await page.goto("/credentials");
   await expect(page.getByRole("heading", { name: "Education" })).toHaveCount(0);
+});
+
+test("About console: tabs switch by click and arrow keys, follow the hash, and hide the other panels", async ({ page }) => {
+  await page.goto("/about");
+  const tablist = page.getByRole("tablist", { name: "About sections" });
+  const tab = (name: string) => tablist.getByRole("tab", { name });
+  const panel = (name: string) => page.getByRole("tabpanel", { name });
+
+  // Education first; one visible panel at a time.
+  await expect(tab("Education")).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("tabpanel")).toHaveCount(1);
+
+  await tab("GitHub Activity").click();
+  await expect(tab("GitHub Activity")).toHaveAttribute("aria-selected", "true");
+  await expect(panel("GitHub Activity")).toBeVisible();
+  await expect(panel("Education")).toBeHidden();
+  await expect(page).toHaveURL(/#github$/);
+
+  // Arrow keys move and select (wrapping); only the active tab is tabbable.
+  await page.keyboard.press("ArrowRight");
+  await expect(tab("Education")).toBeFocused();
+  await expect(tab("Education")).toHaveAttribute("aria-selected", "true");
+  await page.keyboard.press("ArrowRight");
+  await expect(tab("Career Timeline")).toHaveAttribute("aria-selected", "true");
+  await expect(chartFigure(page)).toBeVisible();
+  await expect(tablist.locator('[role="tab"][tabindex="0"]')).toHaveCount(1);
+  await page.keyboard.press("End");
+  await expect(tab("GitHub Activity")).toHaveAttribute("aria-selected", "true");
+
+  // Back returns to the previous tab; a direct link opens its tab.
+  await page.goBack();
+  await expect(tab("Career Timeline")).toHaveAttribute("aria-selected", "true");
+  await page.goto("/about#github");
+  await expect(panel("GitHub Activity")).toBeVisible();
 });
 
 /* ---------- Behaviour: home landing and "Let's Build" ---------- */
@@ -916,8 +951,8 @@ test("every certification is a badge tile with its code, flipping to the Credly 
 
 test("the GitHub section lists the saved achievements as tiles linking to GitHub", async ({ page }) => {
   const { achievements, ACHIEVEMENTS_URL } = await import("../../src/content/achievements");
-  await page.goto("/about");
-  const list = page.locator("#github").getByRole("region", { name: "Achievements" });
+  await page.goto("/about#github");
+  const list = page.getByRole("tabpanel", { name: "GitHub Activity" }).getByRole("region", { name: "Achievements" });
   for (const achievement of achievements) {
     const link = list.getByRole("link", { name: new RegExp(achievement.name) });
     await expect(link).toHaveAttribute("href", ACHIEVEMENTS_URL);
