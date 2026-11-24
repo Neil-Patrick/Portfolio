@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { CalendarDays, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import { GitHubLogo, Icon } from "@/components/icons";
+import { ProjectMedia } from "@/components/ProjectMedia";
 import { Reveal, RevealItem } from "@/components/motion/Reveal";
 import { SectionPage } from "@/components/SectionPage";
 import { TechIcon } from "@/components/TechIcon";
@@ -26,9 +27,10 @@ export default function ProjectsPage() {
               <article
                 id={project.id}
                 aria-labelledby={`project-${project.id}`}
-                className="hud-corners grid gap-8 border border-line-strong bg-surface p-5 sm:p-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-12"
+                className="hud-corners grid gap-8 border border-line-strong bg-surface p-5 sm:p-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-x-12"
               >
-                <div>
+                {/* Text: the left column on desktop, spanning both right-hand rows (screenshots, stack). */}
+                <div className="lg:col-start-1 lg:row-span-2 lg:row-start-1">
                   <h2
                     id={`project-${project.id}`}
                     className="font-display text-3xl font-bold sm:text-4xl"
@@ -69,7 +71,12 @@ export default function ProjectsPage() {
                   </ul>
                 </div>
 
-                <div>
+                {/* Screenshots: first in the card on phones; top of the right column on desktop. */}
+                <div className="order-first lg:order-none lg:col-start-2 lg:row-start-1">
+                  <ProjectMedia project={project} />
+                </div>
+
+                <div className="lg:col-start-2">
                   <h3 className="mb-3 hud-label text-sm text-ink-muted">
                     Tech Stack
                   </h3>

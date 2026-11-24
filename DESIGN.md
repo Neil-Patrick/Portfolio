@@ -222,6 +222,9 @@ A console module below the tabs. Status reads "Live" with the pulsing marker whi
 ### Filter Chips
 Caps labels with a count, at least 44px tall, wrapping on phones (Credentials categories, Technologies). Resting: a Frame Line border that turns Signal Teal on hover. Selected: a Signal Teal fill with On-Signal text, and the count inverts. They're toggle buttons (`aria-pressed`), and the choice lives in the URL hash.
 
+### Project Media
+A 16:9 frame with corner brackets and a Hairline border on Void Canvas, in each Projects page card. With screenshots: the first fills the frame (object-cover); extras are 80px-wide thumbnails that swap in, the selected one framed in Signal Teal. Without: a Frame Line browser-window outline (title bar, three dots, a few content lines) and a caps "Screenshot Placeholder" label below it, so it never reads as real content.
+
 ### HUD Tags
 Short caps labels on Instrument Surface with a 2px teal left edge and the notch. The compass menu uses them to name each destination.
 

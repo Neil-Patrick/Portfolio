@@ -51,7 +51,7 @@ export default function HomePage() {
       <Landing />
 
       <Section id="projects" title={projectsSection.label} href={projectsSection.href} cta={projectsSection.cta}>
-        <ul className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+        <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {projects.map((project) => (
             <li key={project.id}>
               <Tilt className="h-full">

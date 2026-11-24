@@ -1,6 +1,6 @@
 /**
- * Projects. All are team projects: Flood Forecast, GADvance, and Untold Diaries
- * with the thesis team, Statera with a class team. Work is shared across the
+ * Projects. All are team projects: GADvance and Untold Diaries with the thesis
+ * team, Statera with a class team. Work is shared across the
  * whole stack. Descriptions and stacks come from each project's code, README,
  * and live site (stacks list notable tools, not every small helper library).
  */
@@ -16,34 +16,16 @@ export type Project = {
   started: string;
   stack: string[];
   links: { label: string; href: string }[];
+  /**
+   * Screenshots, shown on the Projects page (the first one large). Put the files
+   * in public/projects/<id>/ and list them here, e.g.
+   *   images: [{ src: "/projects/gadvance/1.webp", alt: "GADvance learning module with a quiz" }],
+   * Until then, a labeled placeholder shows.
+   */
+  images?: { src: string; alt: string }[];
 };
 
 export const projects: Project[] = [
-  {
-    id: "flood-forecast",
-    name: "Flood Forecast",
-    summary: "Flood-risk predictions for any location and date.",
-    description:
-      "A flood-risk forecast app. Search for a location, and a Python forecasting API returns its predicted flood risk for the chosen date, so residents can prepare before the water rises.",
-    started: "2025-11",
-    stack: [
-      "Python",
-      "Node.js",
-      "Express",
-      "MySQL",
-      "React",
-      "React Router",
-      "TypeScript",
-      "Tailwind CSS",
-      "Vite",
-      "Docker",
-      "Vercel",
-    ],
-    links: [
-      { label: "Live Site", href: "https://flood-forecast-frontend-heyi.vercel.app" },
-      { label: "Source", href: "https://github.com/nathsuki73/flood-forecast-frontend" },
-    ],
-  },
   {
     id: "gadvance",
     name: "GADvance",

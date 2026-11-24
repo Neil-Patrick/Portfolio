@@ -24,7 +24,7 @@ export const site = {
   /** About page body, one string per paragraph. */
   about: [
     "I'm a Computer Science student at Laguna State Polytechnic University in San Pablo City, specializing in Intelligent Systems. I expect to graduate in 2027.",
-    "Most of what I've built so far is for the web: a flood-risk forecast app, an anonymous message board, and GADvance, a learning platform for our university's Gender and Development office. I build these with my thesis teammates, and we share the work across the whole stack, from the database to the interface.",
+    "Most of what I've built so far is for the web: an anonymous message board and GADvance, a learning platform for our university's Gender and Development office. I build these with my thesis teammates, and we share the work across the whole stack, from the database to the interface.",
     "Now I'm moving toward data and AI: analysis, automation, and building with AI models. In 2026 I earned the IT Specialist – Artificial Intelligence certification, and my next projects are in that direction.",
     "Before university, I took the STEM track at Laguna Science National High School and graduated with honors.",
   ],
@@ -114,7 +114,7 @@ export const sections: SiteSection[] = [
     cta: "See All Projects",
     href: "/projects",
     tab: "Team Builds",
-    detail: "Team projects: three with my thesis team, one with a class team. We split the work across the whole stack.",
+    detail: "Team projects: two with my thesis team, one with a class team. We split the work across the whole stack.",
   },
   {
     id: "contact",

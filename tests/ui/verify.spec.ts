@@ -362,8 +362,8 @@ test("selecting a technology lists the projects that use it", async ({ page }) =
   await typescript.click();
   await expect(typescript).toHaveAttribute("aria-pressed", "true");
   await expect(page).toHaveURL(/#tech-typescript$/);
-  await expect(panel).toContainText(/Used in 4 projects/i);
-  for (const name of ["Flood Forecast", "GADvance", "Statera", "Untold Diaries"]) {
+  await expect(panel).toContainText(/Used in 3 projects/i);
+  for (const name of ["GADvance", "Statera", "Untold Diaries"]) {
     await expect(panel.getByRole("link", { name })).toBeVisible();
   }
 
@@ -394,17 +394,38 @@ test("selecting a technology shows what it is, even when no project uses it", as
   await page.getByRole("button", { name: "Java", exact: true }).click();
   await expect(panel).toContainText(techDescriptions.Java);
   await expect(panel).toContainText("Not in a listed project yet.");
+  // Python is a skill with no listed project now; Laravel is used by GADvance.
   await page.getByRole("button", { name: /^Python/ }).click();
   await expect(panel).toContainText(techDescriptions.Python);
-  await expect(panel.getByRole("link", { name: "Flood Forecast" })).toBeVisible();
+  await expect(panel).toContainText("Not in a listed project yet.");
+  await page.getByRole("button", { name: /^Laravel/ }).click();
+  await expect(panel).toContainText(techDescriptions.Laravel);
+  await expect(panel.getByRole("link", { name: "GADvance" })).toBeVisible();
 });
 
 test("a project's tool chip opens the Technologies page with it selected", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/projects");
-  await page.locator("#flood-forecast").getByRole("link", { name: "Python", exact: true }).click();
-  await expect(page).toHaveURL(/\/technologies#tech-python$/);
-  await expect(page.getByRole("button", { name: /^Python/ })).toHaveAttribute("aria-pressed", "true");
+  await page.locator("#gadvance").getByRole("link", { name: "Laravel", exact: true }).click();
+  await expect(page).toHaveURL(/\/technologies#tech-laravel$/);
+  await expect(page.getByRole("button", { name: /^Laravel/ })).toHaveAttribute("aria-pressed", "true");
+});
+
+test("each project shows a labeled screenshot placeholder until photos are added, and Flood Forecast is gone", async ({ page }) => {
+  const { projects } = await import("../../src/content/projects");
+  expect(projects.map((p) => p.id)).not.toContain("flood-forecast");
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.goto("/projects");
+  for (const project of projects) {
+    const card = page.locator(`#${project.id}`);
+    if (project.images?.length) {
+      await expect(card.getByRole("img", { name: project.images[0].alt })).toBeVisible();
+    } else {
+      await expect(card.getByRole("img", { name: `Screenshot placeholder for ${project.name}` })).toBeVisible();
+    }
+  }
+  await expect(page.getByText(/flood/i)).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false);
 });
 
 test("on a phone, the usage panel opens under the selected technology's group", async ({ page }) => {
@@ -414,7 +435,7 @@ test("on a phone, the usage panel opens under the selected technology's group", 
   await page.getByRole("button", { name: /^MySQL/ }).click();
   const group = page.locator("section", { has: page.getByRole("heading", { name: "Backend and databases" }) });
   await expect(group.getByTestId("skill-usage")).toBeVisible();
-  await expect(group.getByTestId("skill-usage")).toContainText(/Used in 2 projects/i);
+  await expect(group.getByTestId("skill-usage")).toContainText(/Used in 1 project(?!s)/i);
 });
 
 /* ---------- Behaviour: motion, hero, GitHub ---------- */
