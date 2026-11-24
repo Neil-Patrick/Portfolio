@@ -1,11 +1,8 @@
 import Link from "next/link";
-import { GitHubAchievements } from "@/components/GitHubAchievements";
-import { GitHubActivity } from "@/components/GitHubActivity";
 import { PageBackground } from "@/components/background/PageBackground";
 import { DepthGauge } from "@/components/nav/DepthGauge";
 import { Landing } from "@/components/hero/Landing";
 import { Collaborate } from "@/components/home/Collaborate";
-import { CareerTimeline } from "@/components/CareerTimeline";
 import { Tilt } from "@/components/motion/Tilt";
 import { Section } from "@/components/Section";
 import { TechIcon } from "@/components/TechIcon";
@@ -13,9 +10,6 @@ import { projects } from "@/content/projects";
 import { getSection, homeIndex } from "@/content/site";
 import { techIcons } from "@/content/tech";
 import { isSkill } from "@/lib/skill-usage";
-import { buildTimeline } from "@/lib/timeline";
-
-const timeline = buildTimeline();
 
 /**
  * Up to six logos for a project preview card: technologies that have a real logo,
@@ -42,9 +36,9 @@ const projectsSection = getSection("projects");
 /**
  * Home, top to bottom (the same order as `homeIndex` in site.ts, which the
  * depth gauge reads), after the loading screen (rendered by the root layout):
- * the landing (with the hologram
- * card and the page's h1), projects, the career timeline (which also plots every
- * certification), GitHub activity, and the "Let's Build" invitation.
+ * the landing (with the hologram card and the page's h1), projects, and the
+ * "Let's Build" invitation. The career timeline and GitHub activity live on
+ * the About page.
  */
 export default function HomePage() {
   return (
@@ -78,17 +72,6 @@ export default function HomePage() {
             </li>
           ))}
         </ul>
-      </Section>
-
-      <section id="career-timeline" aria-label="Career Timeline" className="py-12 sm:py-16">
-        <div className="container-page">
-          <CareerTimeline points={timeline} />
-        </div>
-      </section>
-
-      <Section id="github" title="GitHub Activity">
-        <GitHubActivity />
-        <GitHubAchievements />
       </Section>
 
       {/* The ask, right before the footer. */}

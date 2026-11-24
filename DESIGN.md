@@ -84,6 +84,17 @@ components:
   panel:
     backgroundColor: "transparent"
     textColor: "{colors.ink}"
+  header-control:
+    backgroundColor: "transparent"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.sm}"
+    size: "44px"
+  header-control-hover:
+    textColor: "{colors.accent}"
+  back-to-top:
+    backgroundColor: "{colors.canvas}"
+    textColor: "{colors.ink}"
+    size: "44px"
 ---
 
 # Design System: Neil Patrick Pajadan Portfolio
@@ -120,7 +131,7 @@ A cool neutral instrument palette with a single teal signal, defined as `light-d
 
 ### Neutral
 - **Void Canvas** (canvas): the page background. Pure black in dark mode, a pale cool grey in light mode. Log rows sit directly on it.
-- **Instrument Surface** (surface): panels, cards, the header and bands, one step off the canvas.
+- **Instrument Surface** (surface): panels, cards and bands, one step off the canvas. The header is not one of them: scrolled, it's canvas-tinted glass, so it matches the page.
 - **Instrument Ink** (ink): primary text.
 - **Readout Grey** (ink-muted): secondary text, metadata and dates.
 - **Hairline** (line): decorative dividers only, never a control boundary.
@@ -183,7 +194,7 @@ The form language is angular. Corners are square, or cut at 45°, with almost no
 - **Corner fold** (`corner-fold`): a small solid teal triangle in the top-right of badge tiles.
 - **Hexagons:** compass menu buttons.
 - **Circles:** only the 44px arrow link and small status dots.
-- **Radii** (4px small, 8px medium) exist for the few soft controls, such as chips and the theme switcher. HUD elements stay square.
+- **Radii** (4px small, 8px medium) exist for the few soft controls, such as chips and the header's icon buttons. HUD elements stay square.
 
 ## Components
 
@@ -214,6 +225,19 @@ The primary navigation is a radial compass dial in corner brackets, with hexagon
 - **Aiming:** on desktop the needle follows the pointer. On touch it follows a dragging finger, and releasing after a real drag opens that page.
 - **The aimed item:** gets Aim Glow and a label that wipes in.
 - **Keyboard and taps** work as ordinary links.
+
+### Header Controls
+The theme chip and the compass trigger are borderless 44px squares in Instrument Ink that turn Signal Teal on hover. No outlines.
+- **Theme chip:** a glyph for the mode (sun, moon, or sun-and-moon for System) over three 6×2px ticks marking the stop in the Light → Dark → System cycle; the active tick is teal. A click glitches the glyph for 160ms (offset Signal Teal and Readout Grey copies), then the new theme spreads out from the chip in a circle.
+
+### Back to Top
+A 44px square, bottom right on every page, canvas-tinted glass with corner brackets. It fades in past the middle of the page. A Hairline outline fills with Signal Teal as you scroll, so it doubles as a progress readout. Hidden, it's inert.
+
+### Footer (Terminal Sign-off)
+A HUD panel of canvas-tinted glass with corner brackets and a short notched Signal Teal tab on its top edge.
+- **Sign-off line:** "// End of Transmission" in a Readout Grey label, with the live availability status and a pulsing teal marker.
+- **Links:** Pages and Get in Touch under caps labels. Every icon is one ink (brand logos too), and links turn teal on hover.
+- **Bottom bar:** the copyright year and the location.
 
 ### Hologram Card (signature)
 The landing's profile card starts flat like a printed card, then separates into floating 3D layers (back plate, photo, brackets, name tag, status chip) when the loader clears.

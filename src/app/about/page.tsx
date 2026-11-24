@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
+import { CareerTimeline } from "@/components/CareerTimeline";
+import { GitHubAchievements } from "@/components/GitHubAchievements";
+import { GitHubActivity } from "@/components/GitHubActivity";
 import { Reveal, RevealItem } from "@/components/motion/Reveal";
 import { ProfilePhoto } from "@/components/ProfilePhoto";
 import { SectionPage } from "@/components/SectionPage";
 import { education, featuredCertification, formatMonth } from "@/content/credentials";
 import { getSection, site } from "@/content/site";
+import { buildTimeline } from "@/lib/timeline";
 
 const section = getSection("about");
+const timeline = buildTimeline();
 
 export const metadata: Metadata = { title: section.label };
 
@@ -56,6 +61,19 @@ export default function AboutPage() {
           </Reveal>
         </aside>
       </div>
+
+      {/* The chart names itself (its caption reads "Career Timeline"). */}
+      <section id="career-timeline" aria-label="Career Timeline" className="mt-16 sm:mt-20">
+        <CareerTimeline points={timeline} />
+      </section>
+
+      <section id="github" aria-labelledby="github-heading" className="mt-16 grid gap-6 sm:mt-20">
+        <h2 id="github-heading" className="hud-label text-xl text-ink">
+          GitHub Activity
+        </h2>
+        <GitHubActivity />
+        <GitHubAchievements />
+      </section>
     </SectionPage>
   );
 }

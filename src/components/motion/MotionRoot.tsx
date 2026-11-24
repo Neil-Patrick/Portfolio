@@ -20,7 +20,8 @@ export function MotionRoot({ children }: { children: ReactNode }) {
       ) : (
         // anchors: smooth-scroll hash links. Lenis honors html's scroll-padding-top
         // (the header height), so no extra offset is needed.
-        <ReactLenis root options={{ lerp: 0.1, anchors: true }}>
+        // wheelMultiplier 0.7 + lerp 0.08: about 30% less travel per wheel notch, and a slightly longer glide.
+        <ReactLenis root options={{ lerp: 0.08, wheelMultiplier: 0.7, anchors: true }}>
           {children}
         </ReactLenis>
       )}

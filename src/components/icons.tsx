@@ -49,9 +49,9 @@ export function SectionIcon({ id, className }: { id: SectionId; className?: stri
   return <Icon icon={sectionIcons[id]} className={className} />;
 }
 
-/** Contact links by their label in site.contactLinks. */
-export function ContactIcon({ label }: { label: string }) {
-  if (label === "GitHub" || label === "LinkedIn") return <TechIcon name={label} />;
+/** Contact links by their label in site.contactLinks. `mono` draws brand logos in the text color too. */
+export function ContactIcon({ label, mono = false }: { label: string; mono?: boolean }) {
+  if (label === "GitHub" || label === "LinkedIn") return <TechIcon name={label} mono={mono} />;
   return <Icon icon={label === "Credly" ? BadgeCheck : Mail} />;
 }
 

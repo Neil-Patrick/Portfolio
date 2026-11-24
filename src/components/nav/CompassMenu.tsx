@@ -65,7 +65,7 @@ export function CompassMenu() {
         aria-haspopup="dialog"
         aria-expanded={open}
         title="Navigation"
-        className="group grid size-11 place-items-center rounded-sm border border-line-strong text-ink hover:border-accent"
+        className="group grid size-11 place-items-center rounded-sm text-ink transition-colors hover:text-accent"
       >
         <CompassRose size={28} className="transition-transform duration-500 motion-safe:group-hover:rotate-45" />
       </button>
@@ -196,7 +196,7 @@ function Dial({ current, onClose }: { current: number; onClose: () => void }) {
               type="button"
               onClick={onClose}
               aria-label="Close navigation"
-              className="pointer-events-auto grid size-11 place-items-center rounded-sm border border-line-strong hover:border-accent"
+              className="pointer-events-auto grid size-11 place-items-center rounded-sm transition-colors hover:text-accent"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}

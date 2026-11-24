@@ -210,7 +210,7 @@ test("footer links reach every page", async ({ page }) => {
 
 const themeDial = (page: Page) => page.getByRole("button", { name: /^Color theme:/i });
 
-test("theme dial turns Light, Dark, System, and the choice persists", async ({ page }) => {
+test("theme chip cycles Light, Dark, System, its ticks follow, and the choice persists", async ({ page }) => {
   for (const width of [1440, 375]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/");
@@ -218,13 +218,17 @@ test("theme dial turns Light, Dark, System, and the choice persists", async ({ p
     await page.reload();
     const html = page.locator("html");
     const dial = themeDial(page);
+    const activeTick = dial.locator("[data-theme-tick][data-active]");
     await expect(dial).toHaveAccessibleName(/System\. Switch to Light/i);
+    await expect(activeTick).toHaveAttribute("data-theme-tick", "system");
 
     await dial.click();
     await expect(html).toHaveAttribute("data-theme", "light");
     await expect(dial).toHaveAccessibleName(/Light\. Switch to Dark/i);
+    await expect(activeTick).toHaveAttribute("data-theme-tick", "light");
     await dial.click();
     await expect(html).toHaveAttribute("data-theme", "dark");
+    await expect(activeTick).toHaveAttribute("data-theme-tick", "dark");
 
     await page.reload();
     await expect(html).toHaveAttribute("data-theme", "dark");
@@ -254,7 +258,7 @@ test("with full motion: the theme reveal runs without errors and lands on the ri
   await page.goto("/");
   await page.waitForLoadState("networkidle");
   await themeDial(page).click();
-  await page.waitForTimeout(800); // circle reveal + dial spring
+  await page.waitForTimeout(800); // glitch + circle reveal
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   await themeDial(page).click();
   await page.waitForTimeout(800);
@@ -262,10 +266,10 @@ test("with full motion: the theme reveal runs without errors and lands on the ri
   expect(errors, "console errors").toEqual([]);
 });
 
-/* ---------- Behaviour: career timeline ---------- */
+/* ---------- Behaviour: career timeline (About page) ---------- */
 
 test("chart plots every timeline item and lists them all in the table", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/about");
   const markers = chartPlot(page).locator("[data-kind]");
   await expect(markers).toHaveCount(timeline.length);
   await expect(chartPlot(page).locator('[data-kind="project"]')).toHaveCount(
@@ -278,7 +282,7 @@ test("chart plots every timeline item and lists them all in the table", async ({
 
 test("chart selection works with keyboard and pointer", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/");
+  await page.goto("/about");
   await page.waitForLoadState("networkidle");
   const newest = timeline[timeline.length - 1];
   const oldest = timeline[0];
@@ -302,7 +306,7 @@ test("chart selection works with keyboard and pointer", async ({ page }) => {
 
 test("chart fits a 320px phone without overflow", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 800 });
-  await page.goto("/");
+  await page.goto("/about");
   const figure = (await chartFigure(page).boundingBox())!;
   expect(figure.x).toBeGreaterThanOrEqual(0);
   expect(figure.x + figure.width).toBeLessThanOrEqual(320);
@@ -438,11 +442,10 @@ test("other pages have no 3D background", async ({ page }) => {
   }
 });
 
-test("GitHub section shows live stats or the documented fallback", async ({ page }) => {
-  await page.goto("/");
+test("GitHub section (About page) shows live stats or the documented fallback", async ({ page }) => {
+  await page.goto("/about");
   const section = page.locator("#github");
-  // The heading is visually hidden but still names the section for screen readers.
-  await expect(section.getByRole("heading", { name: /^GitHub activity$/i })).toBeAttached();
+  await expect(section.getByRole("heading", { name: /^GitHub activity$/i })).toBeVisible();
   const heatmap = section.getByTestId("heatmap");
   if ((await heatmap.count()) > 0) {
     // Token configured: full calendar (52-53 weeks) and streaks.
@@ -497,12 +500,6 @@ test("with full motion: home animates, scrolls, and hovers without errors", asyn
       ).length,
   );
   expect(hidden, "elements still hidden after scrolling").toBe(0);
-  // The career timeline's wipe finished (its line and markers are uncovered).
-  const chartClip = await chartFigure(page)
-    .locator("[data-reveal]")
-    .first()
-    .evaluate((el) => getComputedStyle(el).clipPath);
-  expect(chartClip, "career timeline revealed").not.toContain("100%");
   // The compass menu plays its open and close animations without errors.
   await page.getByRole("button", { name: "Open navigation" }).click();
   await page.waitForTimeout(900);
@@ -516,7 +513,8 @@ test("with full motion: home animates, scrolls, and hovers without errors", asyn
 test("with full motion: anchor links land below the sticky header", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/");
+  // About is long enough to bring a section all the way up under the header.
+  await page.goto("/about");
   await page.waitForLoadState("networkidle");
   // Jump via an in-page anchor, the way footer/home links use hashes.
   await page.evaluate(() => {
@@ -868,7 +866,7 @@ test("every certification is a badge tile with its code, flipping to the Credly 
 
 test("the GitHub section lists the saved achievements as tiles linking to GitHub", async ({ page }) => {
   const { achievements, ACHIEVEMENTS_URL } = await import("../../src/content/achievements");
-  await page.goto("/");
+  await page.goto("/about");
   const list = page.locator("#github").getByRole("region", { name: "Achievements" });
   for (const achievement of achievements) {
     const link = list.getByRole("link", { name: new RegExp(achievement.name) });
@@ -876,4 +874,29 @@ test("the GitHub section lists the saved achievements as tiles linking to GitHub
     await expect(link.locator("[data-badge-tile]")).toContainText(achievement.code);
     expect(existsSync(`public${achievement.image}`), achievement.image).toBe(true);
   }
+});
+
+/* ---------- Behaviour: back to top, footer ---------- */
+
+test("back-to-top button appears past the middle of the page and returns to the top", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/about");
+  const button = page.getByRole("button", { name: "Back to Top" });
+  // Hidden at the top: invisible, and out of the tab order.
+  await expect(button).toHaveCSS("opacity", "0");
+  await expect(button).toHaveJSProperty("inert", true);
+
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await expect(button).toHaveCSS("opacity", "1");
+  await expect(button).toHaveJSProperty("inert", false);
+  await button.click();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  await expect(button).toHaveJSProperty("inert", true);
+});
+
+test("footer draws every contact logo in one ink, LinkedIn included", async ({ page }) => {
+  await page.goto("/");
+  const footer = page.locator("footer");
+  await expect(footer.locator('[data-tech-icon="color"]')).toHaveCount(0);
+  await expect(footer.locator('[data-tech-icon="mono"]')).toHaveCount(2); // GitHub and LinkedIn
 });

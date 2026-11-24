@@ -26,6 +26,7 @@ import javascript from "devicon/icons/javascript/javascript-original.svg";
 import jest from "devicon/icons/jest/jest-plain.svg";
 import laravel from "devicon/icons/laravel/laravel-original.svg";
 import linkedin from "devicon/icons/linkedin/linkedin-original.svg";
+import linkedinPlain from "devicon/icons/linkedin/linkedin-plain.svg"; // "in" cut out of the square, for the mono mask
 import mysql from "devicon/icons/mysql/mysql-original.svg";
 import nextjs from "devicon/icons/nextjs/nextjs-plain.svg"; // plain = N cut out of the disc, for the mono mask
 import nodejs from "devicon/icons/nodejs/nodejs-original.svg";
@@ -47,8 +48,14 @@ import vscode from "devicon/icons/vscode/vscode-original.svg";
  * A static .svg import: a URL string under Turbopack, an image object under webpack.
  * `mono`: black-by-brand logo, drawn in the text color.
  * `darkBacking`: dark brand color that needs a light tile in dark mode to stay visible.
+ * `monoSrc`: a cut-out variant for drawing a color logo in one ink (TechIcon's `mono` prop).
  */
-export type TechIconData = { src: StaticImageData | string; mono?: boolean; darkBacking?: boolean };
+export type TechIconData = {
+  src: StaticImageData | string;
+  mono?: boolean;
+  darkBacking?: boolean;
+  monoSrc?: StaticImageData | string;
+};
 
 export const techIcons: Record<string, TechIconData> = {
   // Languages
@@ -83,7 +90,7 @@ export const techIcons: Record<string, TechIconData> = {
   Jest: { src: jest },
   GitHub: { src: github, mono: true },
   // Contact links (not technologies; listed so the same logo component draws them)
-  LinkedIn: { src: linkedin },
+  LinkedIn: { src: linkedin, monoSrc: linkedinPlain },
   "Visual Studio": { src: visualstudio },
   "VS Code": { src: vscode },
   Figma: { src: figma },

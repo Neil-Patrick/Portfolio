@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { IntroLoader } from "@/components/intro/IntroLoader";
 import { MotionRoot } from "@/components/motion/MotionRoot";
+import { BackToTop } from "@/components/nav/BackToTop";
 import { site } from "@/content/site";
 import { introInitScript } from "@/lib/intro";
 import { themeInitScript } from "@/lib/theme";
@@ -67,6 +68,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             {children}
           </main>
           <SiteFooter />
+          <BackToTop />
         </MotionRoot>
       </body>
     </html>

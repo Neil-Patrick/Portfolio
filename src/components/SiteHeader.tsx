@@ -21,7 +21,7 @@ export function SiteHeader() {
   return (
     <header
       className={`sticky top-0 z-20 transition-colors duration-300 ${
-        scrolled ? "bg-surface/85 backdrop-blur-md" : "bg-transparent"
+        scrolled ? "bg-canvas/85 backdrop-blur-md" : "bg-transparent"
       }`}
     >
       <div className="container-page flex h-header items-center justify-between gap-4">

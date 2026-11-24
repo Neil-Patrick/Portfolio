@@ -56,8 +56,6 @@ export const site = {
 export const homeIndex = [
   { id: "home", label: "Home" },
   { id: "projects", label: "Projects" },
-  { id: "career-timeline", label: "Career Timeline" },
-  { id: "github", label: "GitHub Activity" },
   { id: "contact", label: "Contact" },
 ];
 

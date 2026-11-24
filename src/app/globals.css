@@ -290,6 +290,25 @@
     translate: 0 0.25rem;
   }
 }
+/* A pressed control glitches: its glyph splits into offset copies and jitters, then settles. */
+@keyframes glitch-press {
+  0% {
+    translate: -1px 0;
+    filter: drop-shadow(2px 0 0 var(--color-accent)) drop-shadow(-2px 0 0 var(--color-ink-muted));
+  }
+  25% {
+    translate: 1px -1px;
+    filter: drop-shadow(-2px 0 0 var(--color-accent)) drop-shadow(2px 0 0 var(--color-ink-muted));
+  }
+  50% {
+    translate: 0 1px;
+    filter: drop-shadow(1px 0 0 var(--color-accent));
+  }
+  75% {
+    translate: 1px 0;
+    filter: drop-shadow(-1px 0 0 var(--color-ink-muted));
+  }
+}
 
 @media (prefers-reduced-motion: no-preference) {
   .boot-row {
@@ -315,6 +334,10 @@
   }
   .cue-bob {
     animation: cue-bob 1.6s ease-in-out infinite;
+  }
+  .glitch-press {
+    display: block;
+    animation: glitch-press 160ms steps(1, end);
   }
 }
 

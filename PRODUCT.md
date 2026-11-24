@@ -26,7 +26,7 @@ Web first, data and AI next. Neil ships real full-stack web apps with his team n
 ## Operating Context
 
 - **Loader:** every full load of Home (a refresh included) opens with a ~5-second loading screen that preloads assets and continues on any click or key. It never shows with reduced motion, nor when navigating to Home within the site.
-- **Navigation:** a compass menu, which can be dragged with a finger on touch. Home is a single scroll (landing, Projects, Career Timeline, GitHub Activity, Contact), and each section also has its own page.
+- **Navigation:** a compass menu, which can be dragged with a finger on touch. Home is a short single scroll (landing, Projects, Contact); the Career Timeline and GitHub Activity sit on the About page, and each section also has its own page. A back-to-top button appears past the middle of any page.
 - **Themes and devices:** light and dark, following the OS or the theme switcher. Visitors arrive on both phones and desktops.
 - **Verification:** visitors check claims against external profiles: GitHub, LinkedIn and Credly links.
 
