@@ -16,9 +16,21 @@ export const site = {
   featuredSkills: ["Python", "SQL", "PostgreSQL", "TypeScript", "Next.js"],
   /** Footer and Contact page. Phone number deliberately left off the public site. */
   contactLinks: [
-    { label: "Email", href: "mailto:neilpatrick.dev@gmail.com", text: "neilpatrick.dev@gmail.com" },
-    { label: "LinkedIn", href: "https://www.linkedin.com/in/neil-patrick-pajadan/", text: "neil-patrick-pajadan" },
-    { label: "GitHub", href: "https://github.com/Neil-Patrick", text: "Neil-Patrick" },
+    {
+      label: "Email",
+      href: "mailto:neilpatrick.dev@gmail.com",
+      text: "neilpatrick.dev@gmail.com",
+    },
+    {
+      label: "LinkedIn",
+      href: "https://www.linkedin.com/in/neil-patrick-pajadan/",
+      text: "neil-patrick-pajadan",
+    },
+    {
+      label: "GitHub",
+      href: "https://github.com/Neil-Patrick",
+      text: "Neil-Patrick",
+    },
   ],
   /** About page body, one string per paragraph. */
   about: [
@@ -37,7 +49,7 @@ export const site = {
   /** Home landing. Draft copy, true to the intro: edit freely. */
   landing: {
     /** One line each; they decode in. Keep each line short enough to fit a phone. */
-    headline: ["CODE IN", "PROGRESS"],
+    headline: ["CODE IN", "PROGRESS."],
     primaryCta: "Work With Me",
     secondaryCta: "See the Work",
   },
@@ -82,7 +94,14 @@ export type SiteSection = {
 
 /** Order here is the order in the compass menu and the footer. The home page order is `homeIndex`. */
 export const sections: SiteSection[] = [
-  { id: "home", label: "Home", cta: "", href: "/", detail: "", tab: "Introduction" },
+  {
+    id: "home",
+    label: "Home",
+    cta: "",
+    href: "/",
+    detail: "",
+    tab: "Introduction",
+  },
   {
     id: "about",
     label: "About",
@@ -97,7 +116,8 @@ export const sections: SiteSection[] = [
     cta: "See All Credentials",
     href: "/credentials",
     tab: "Certifications",
-    detail: "My certifications, grouped by field. Filter by one, or see them all; each badge links to its verification page on Credly.",
+    detail:
+      "My certifications, grouped by field. Filter by one, or see them all; each badge links to its verification page on Credly.",
   },
   {
     id: "technologies",
@@ -105,7 +125,8 @@ export const sections: SiteSection[] = [
     cta: "See All Technologies",
     href: "/technologies",
     tab: "Tools and Skills",
-    detail: "The languages, frameworks, and tools I work with, grouped by area.",
+    detail:
+      "The languages, frameworks, and tools I work with, grouped by area.",
   },
   {
     id: "projects",
@@ -113,7 +134,8 @@ export const sections: SiteSection[] = [
     cta: "See All Projects",
     href: "/projects",
     tab: "Team Builds",
-    detail: "Team projects: two with my thesis team, one with a class team. We split the work across the whole stack.",
+    detail:
+      "Team projects: two with my thesis team, one with a class team. We split the work across the whole stack.",
   },
   {
     id: "contact",

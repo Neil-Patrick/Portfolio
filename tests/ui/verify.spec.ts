@@ -657,12 +657,12 @@ test("Education lives on the About page, not Credentials", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Education" })).toHaveCount(0);
 });
 
-test("Spotify module: now playing and the last 3 tracks from /api/now-playing, hidden when there's nothing", async ({ page, request }) => {
+test("Spotify module: now playing and the last 5 tracks from /api/now-playing, hidden when there's nothing", async ({ page, request }) => {
   // The real route always answers with a valid shape (empty without keys).
   const live = await (await request.get("/api/now-playing")).json();
   expect(live).toHaveProperty("now");
   expect(Array.isArray(live.recent)).toBe(true);
-  expect(live.recent.length).toBeLessThanOrEqual(3);
+  expect(live.recent.length).toBeLessThanOrEqual(5);
 
   // Mocked, so the test doesn't depend on what Neil is listening to.
   const track = (n: number) => ({ title: `Song ${n}`, artist: `Artist ${n}`, url: `https://open.spotify.com/track/${n}` });
@@ -671,6 +671,8 @@ test("Spotify module: now playing and the last 3 tracks from /api/now-playing, h
     { ...track(1), playedAt: minutesAgo(5) },
     { ...track(2), playedAt: minutesAgo(130) },
     { ...track(3), playedAt: minutesAgo(60 * 30) },
+    { ...track(4), playedAt: minutesAgo(60 * 50) },
+    { ...track(5), playedAt: minutesAgo(60 * 80) },
   ];
   await page.route("**/api/now-playing", (route) => route.fulfill({ json: { now: track(0), recent } }));
   await page.goto("/about");
@@ -685,9 +687,13 @@ test("Spotify module: now playing and the last 3 tracks from /api/now-playing, h
   await expect(deck).toHaveAttribute("href", "https://open.spotify.com/track/0");
   await expect(deck.locator(".eq-bar")).toHaveCount(4);
   await expect(spotify).toContainText("Live");
-  // Recently played: three rows, newest first, each with a link and a time.
+  // Spotify attribution: the official logo names the module, and a link back reads "Open Spotify".
+  await expect(spotify.getByRole("heading", { name: "Spotify" }).locator("svg[data-spotify-logo]")).toBeVisible();
+  expect((await spotify.locator("svg[data-spotify-logo]").boundingBox())!.width).toBeGreaterThanOrEqual(70);
+  await expect(spotify.getByRole("link", { name: /^Open Spotify/ })).toHaveAttribute("href", "https://open.spotify.com");
+  // Recently played: five rows, newest first, each with a link and a time.
   const rows = spotify.getByRole("listitem");
-  await expect(rows).toHaveCount(3);
+  await expect(rows).toHaveCount(5);
   for (const [i, row] of (await rows.all()).entries()) {
     await expect(row.getByRole("link")).toHaveAttribute("href", recent[i].url);
     // Two copies of the time (under the artist on phones, a right-hand column on wider screens); one shows.
@@ -703,7 +709,7 @@ test("Spotify module: now playing and the last 3 tracks from /api/now-playing, h
   await page.reload();
   await expect(spotify).toContainText("Idle");
   await expect(spotify.locator("[data-now-playing]")).toHaveCount(0);
-  await expect(rows).toHaveCount(3);
+  await expect(rows).toHaveCount(5);
 
   // Not set up: no module at all.
   await page.unroute("**/api/now-playing");

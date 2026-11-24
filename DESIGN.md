@@ -217,7 +217,8 @@ Projects, education and contact entries are framed log entries: a 1px Frame Line
 ### Spotify Module (About)
 A console module below the tabs. Status reads "Live" with the pulsing marker while a song plays, "Idle" otherwise.
 - **Now Playing deck** (only while playing): album art in corner brackets, a four-bar Signal Teal level meter (still under reduced motion), the song in the display face and the artist in Readout Grey.
-- **Recently Played:** the last three tracks as log rows with a thumbnail, title, artist and a caps "how long ago" label; on phones the time sits under the artist.
+- **Recently Played:** the last five tracks as log rows with a thumbnail, title, artist and a caps "how long ago" label; on phones the time sits under the artist.
+- **Spotify attribution (their brand rules):** the official full logo replaces the module's text title, about 28px tall (over 70px wide), with half the icon's height of clear space; black on the light canvas, Spotify Green `#1ed760` on the black dark canvas (`--color-spotify-logo`, the logo's only use). Album art stays unaltered: no border, overlay or crop, 4px corners on thumbnails and 8px on the large deck art. An "Open Spotify" link closes the module.
 
 ### Filter Chips
 Caps labels with a count, at least 44px tall, wrapping on phones (Credentials categories, Technologies). Resting: a Frame Line border that turns Signal Teal on hover. Selected: a Signal Teal fill with On-Signal text, and the count inverts. They're toggle buttons (`aria-pressed`), and the choice lives in the URL hash.

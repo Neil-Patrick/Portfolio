@@ -15,7 +15,7 @@ export type SpotifyFeed = {
 };
 
 /** How many recently played tracks the module lists. */
-export const RECENT_COUNT = 3;
+export const RECENT_COUNT = 5;
 
 type ApiTrack = {
   name: string;

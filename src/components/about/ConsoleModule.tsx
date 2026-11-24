@@ -11,7 +11,8 @@ export function ConsoleModule({
   live = false,
   children,
 }: {
-  title: string;
+  /** Usually text; a brand logo with its own accessible name also works (Spotify). */
+  title: ReactNode;
   status: string;
   live?: boolean;
   children: ReactNode;
@@ -19,7 +20,7 @@ export function ConsoleModule({
   return (
     <div className="hud-corners border border-line bg-canvas/80 px-4 py-6 backdrop-blur-sm sm:p-8">
       <div className="mb-8 flex flex-wrap items-center gap-x-4 gap-y-2">
-        <h2 className="hud-label text-xl text-ink">{title}</h2>
+        <h2 className="flex items-center hud-label text-xl text-ink">{title}</h2>
         <span aria-hidden className="h-px min-w-8 flex-1 bg-line" />
         <p className="flex items-center gap-2 hud-label text-sm text-accent tabular-nums">
           {live && <span aria-hidden className="live-pulse size-2 bg-accent" />}

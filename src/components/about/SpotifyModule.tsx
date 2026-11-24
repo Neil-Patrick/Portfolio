@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { SpotifyLogo } from "./SpotifyLogo";
 import type { SpotifyFeed, SpotifyTrack } from "@/lib/spotify";
 import { NEW_TAB_NOTE, newTab } from "@/lib/links";
 import { ConsoleModule } from "./ConsoleModule";
@@ -30,16 +31,16 @@ function Equalizer() {
   );
 }
 
-/** Album art in a hairline frame. A plain <img>: a small thumbnail from Spotify's CDN doesn't need next/image. */
+/** Album art, unaltered as Spotify requires (no border or overlay; 4px corners, 8px when large). A plain <img>: a small thumbnail from Spotify's CDN doesn't need next/image. */
 function Art({ track, className }: { track: SpotifyTrack; className: string }) {
   if (!track.image) return <span aria-hidden className={`shrink-0 border border-line-strong bg-surface ${className}`} />;
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={track.image} alt="" loading="lazy" className={`shrink-0 border border-line-strong object-cover ${className}`} />;
+  return <img src={track.image} alt="" loading="lazy" className={`shrink-0 object-cover ${className}`} />;
 }
 
 /**
  * The About page's Spotify module, under the console: when a song is on, a
- * "Now Playing" deck with large art and a level meter; then the last three
+ * "Now Playing" deck with large art and a level meter; then the last five
  * tracks played, as a log with how long ago each one ran. Every track links to
  * Spotify. Polls /api/now-playing every 45 seconds while the tab is visible,
  * and renders nothing until there's data (or at all, if Spotify isn't set up).
@@ -73,11 +74,11 @@ export function SpotifyModule() {
 
   return (
     <section aria-label="Spotify" data-spotify={now ? "playing" : "idle"}>
-      <ConsoleModule title="Spotify" status={now ? "Live" : "Idle"} live={Boolean(now)}>
+      <ConsoleModule title={<SpotifyLogo className="h-7 w-auto" />} status={now ? "Live" : "Idle"} live={Boolean(now)}>
         {now && (
           <a href={now.url} {...newTab} className="group mb-8 flex items-center gap-4 sm:gap-6" data-now-playing>
             <span className="relative shrink-0 p-1.5 hud-corners">
-              <Art track={now} className="size-20 sm:size-28" />
+              <Art track={now} className="size-20 rounded-sm sm:size-28 sm:rounded-md" />
             </span>
             <span className="min-w-0">
               <span className="flex items-center gap-2 hud-label text-sm text-accent">
@@ -104,7 +105,7 @@ export function SpotifyModule() {
               {recent.map((track) => (
                 <li key={track.playedAt} className="min-w-0">
                   <a href={track.url} {...newTab} className="group hud-row hud-row-link flex min-h-11 items-center gap-3 px-3 py-2">
-                    <Art track={track} className="size-12" />
+                    <Art track={track} className="size-12 rounded-sm" />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-display text-lg leading-snug font-semibold">{track.title}</span>
                       <span className="block truncate text-sm text-ink-muted">{track.artist}</span>
@@ -128,10 +129,14 @@ export function SpotifyModule() {
           </>
         )}
 
-        <p className="mt-6 text-right text-sm text-ink-muted">
-          Live from{" "}
-          <a href="https://open.spotify.com" {...newTab} className="text-accent underline underline-offset-4 hover:no-underline">
-            Spotify
+        {/* Spotify's guidelines: content links back to Spotify, with "Open Spotify" as the link text. */}
+        <p className="mt-6 text-right">
+          <a
+            href="https://open.spotify.com"
+            {...newTab}
+            className="inline-flex min-h-11 items-center gap-2 hud-label text-sm text-accent underline underline-offset-4 hover:no-underline"
+          >
+            Open Spotify
             <span className="sr-only">{NEW_TAB_NOTE}</span>
           </a>
         </p>

@@ -107,7 +107,7 @@ export default function AboutPage() {
         />
       </div>
 
-      {/* Live from Spotify: now playing and the last three tracks (hidden if Spotify isn't set up). */}
+      {/* Live from Spotify: now playing and the last five tracks (hidden if Spotify isn't set up). */}
       <div className="mt-12 sm:mt-16">
         <SpotifyModule />
       </div>
