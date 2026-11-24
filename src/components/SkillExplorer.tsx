@@ -18,7 +18,7 @@ export type ExplorerSkill = {
 type Props = { groups: { name: string; skills: ExplorerSkill[] }[] };
 
 const chipBase =
-  "inline-flex min-h-11 items-center gap-2 rounded-sm border px-3 py-1.5";
+  "hud-notch inline-flex min-h-11 items-center gap-2 border py-1.5 pr-4 pl-3 transition-colors focus-visible:-outline-offset-4";
 
 /**
  * Skill groups with logos. Every skill is a toggle button; selecting one shows
@@ -62,9 +62,16 @@ export function SkillExplorer({ groups }: Props) {
           );
           return (
             <section key={group.name} aria-labelledby={`skill-group-${i}`}>
-              <h2 id={`skill-group-${i}`} className="mb-4 hud-label text-lg text-ink">
-                {group.name}
-              </h2>
+              {/* Console-module header: name, a hairline, and the group's count. */}
+              <div className="mb-4 flex items-center gap-3">
+                <h2 id={`skill-group-${i}`} className="hud-label text-lg text-ink">
+                  {group.name}
+                </h2>
+                <span aria-hidden className="h-px min-w-6 flex-1 bg-line" />
+                <p className="hud-label text-sm text-accent tabular-nums">
+                  {group.skills.length} {group.skills.length === 1 ? "Tool" : "Tools"}
+                </p>
+              </div>
               <ul className="flex flex-wrap gap-3">
                 {group.skills.map((skill) => (
                   <li
@@ -78,7 +85,7 @@ export function SkillExplorer({ groups }: Props) {
                       onClick={() => select(skill)}
                       className={`${chipBase} ${
                         selected === skill.name
-                          ? "border-accent bg-accent text-on-accent"
+                          ? "border-accent bg-accent text-on-accent focus-visible:outline-on-accent"
                           : skill.projects.length > 0
                             ? "border-line-strong bg-surface hover:border-accent"
                             : "border-line text-ink hover:border-accent"
@@ -90,7 +97,7 @@ export function SkillExplorer({ groups }: Props) {
                         <>
                           <span
                             aria-hidden
-                            className={`rounded-xs px-1.5 text-xs font-semibold tabular-nums ${
+                            className={`px-1.5 text-xs font-semibold tabular-nums ${
                               selected === skill.name
                                 ? "bg-on-accent text-accent"
                                 : "bg-canvas text-ink-muted"
@@ -137,6 +144,10 @@ function UsagePanel({ skill }: { skill: ExplorerSkill | null }) {
       data-testid="skill-usage"
       className="hud-corners border border-line-strong bg-surface p-5"
     >
+      <div aria-hidden className="mb-4 flex items-center gap-3">
+        <span className="hud-label text-sm text-accent">Usage</span>
+        <span className="h-px flex-1 bg-line" />
+      </div>
       {/* Cross-fade between selections; instant with reduced motion. */}
       <AnimatePresence mode="wait" initial={false}>
         <motion.div

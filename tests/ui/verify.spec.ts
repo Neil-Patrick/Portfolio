@@ -1062,3 +1062,76 @@ test("footer draws every contact logo in one ink, LinkedIn included", async ({ p
   await expect(footer.locator('[data-tech-icon="color"]')).toHaveCount(0);
   await expect(footer.locator('[data-tech-icon="mono"]')).toHaveCount(2); // GitHub and LinkedIn
 });
+
+/* ---------- Behaviour: contact form ---------- */
+
+/** The form renders only when NEXT_PUBLIC_WEB3FORMS_KEY is set on the server under test. */
+async function openContactForm(page: Page) {
+  await page.goto("/contact");
+  const form = page.getByRole("form", { name: "Send a message" });
+  test.skip((await form.count()) === 0, "NEXT_PUBLIC_WEB3FORMS_KEY is not set on this server");
+  return form;
+}
+
+test("contact form: empty submit shows field errors and sends nothing", async ({ page }) => {
+  const form = await openContactForm(page);
+  let sent = 0;
+  await page.route("https://api.web3forms.com/**", (route) => {
+    sent++;
+    return route.fulfill({ json: { success: true } });
+  });
+  await form.getByRole("button", { name: "Send Message" }).click();
+  await expect(form.getByLabel("Name")).toHaveAttribute("aria-invalid", "true");
+  await expect(form.getByLabel("Name")).toBeFocused();
+  await expect(form.getByLabel("Email")).toHaveAccessibleDescription(/Enter your email/);
+  await expect(form.getByLabel("Message")).toHaveAccessibleDescription(/Write a message/);
+
+  await form.getByLabel("Email").fill("not-an-email");
+  await form.getByRole("button", { name: "Send Message" }).click();
+  await expect(form.getByLabel("Email")).toHaveAccessibleDescription(/name@example\.com/);
+  expect(sent).toBe(0);
+});
+
+test("contact form: a valid message posts to Web3Forms, confirms, and resets", async ({ page }) => {
+  const form = await openContactForm(page);
+  let payload: Record<string, unknown> = {};
+  await page.route("https://api.web3forms.com/submit", async (route) => {
+    payload = route.request().postDataJSON();
+    await route.fulfill({ json: { success: true, message: "Email sent successfully!" } });
+  });
+  await form.getByLabel("Name").fill("  Test Visitor ");
+  await form.getByLabel("Email").fill("visitor@example.com");
+  await form.getByLabel("Message").fill("Hello Neil, I'd like to talk about an internship.");
+  await form.getByRole("button", { name: "Send Message" }).click();
+
+  await expect(page.getByTestId("contact-status")).toContainText("Message sent");
+  expect(payload).toMatchObject({
+    name: "Test Visitor",
+    email: "visitor@example.com",
+    message: "Hello Neil, I'd like to talk about an internship.",
+    subject: "Portfolio message from Test Visitor",
+    botcheck: false,
+  });
+  expect(typeof payload.access_key).toBe("string");
+  await expect(form.getByLabel("Message")).toHaveValue("");
+});
+
+test("contact form: a rejected send explains it and offers the email address", async ({ page }) => {
+  const form = await openContactForm(page);
+  await page.route("https://api.web3forms.com/submit", (route) =>
+    route.fulfill({ status: 400, json: { success: false, message: "Invalid access key" } }),
+  );
+  await form.getByLabel("Name").fill("Test Visitor");
+  await form.getByLabel("Email").fill("visitor@example.com");
+  await form.getByLabel("Message").fill("This one should fail on purpose.");
+  await form.getByRole("button", { name: "Send Message" }).click();
+
+  const status = page.getByTestId("contact-status");
+  await expect(status).toContainText("didn't go through");
+  await expect(status.getByRole("link", { name: "neilpatrick.dev@gmail.com" })).toHaveAttribute(
+    "href",
+    "mailto:neilpatrick.dev@gmail.com",
+  );
+  // The visitor's text is kept so they can retry.
+  await expect(form.getByLabel("Message")).toHaveValue("This one should fail on purpose.");
+});

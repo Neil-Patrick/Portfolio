@@ -222,6 +222,12 @@ A console module below the tabs. Status reads "Live" with the pulsing marker whi
 ### Filter Chips
 Caps labels with a count, at least 44px tall, wrapping on phones (Credentials categories, Technologies). Resting: a Frame Line border that turns Signal Teal on hover. Selected: a Signal Teal fill with On-Signal text, and the count inverts. They're toggle buttons (`aria-pressed`), and the choice lives in the URL hash.
 
+### Technologies Chips
+Notched (top-right cut) like the HUD tags, square-cornered, at least 44px tall, with the project count as a square badge. Resting: Frame Line border on Instrument Surface (or a Hairline border when no project uses it); hover turns the border Signal Teal; selected is a Signal Teal fill with On-Signal text and an inset focus ring. Each group has a console-module header: caps name, a hairline, and a Signal Teal "N Tools" count. The usage panel opens with a "Usage" header bar.
+
+### Contact Form
+A console module ("Send a Message", status "Direct to Inbox") leading the Contact page. Caps labels above square inputs on Void Canvas with a Frame Line border that turns Signal Teal on hover and focus, at least 44px tall; Name and Email side by side from md, Message full width. An invalid field gets a 4px Ink left edge and a message below with a teal "!" (no new error color). Submit is a notched Signal Teal button ("Send Message", "Transmitting…" while sending); the result sits beside it in a polite live region: a teal confirmation, or an Ink-edged error with the direct email link.
+
 ### Project Media
 A 16:9 frame with corner brackets and a Hairline border on Void Canvas, in each Projects page card. With screenshots: the first fills the frame (object-cover); extras are 80px-wide thumbnails that swap in, the selected one framed in Signal Teal. Without: a Frame Line browser-window outline (title bar, three dots, a few content lines) and a caps "Screenshot Placeholder" label below it, so it never reads as real content.
 

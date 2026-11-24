@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ContactForm } from "@/components/ContactForm";
 import { ContactIcon } from "@/components/icons";
 import { Reveal, RevealItem } from "@/components/motion/Reveal";
 import { SectionPage } from "@/components/SectionPage";
@@ -12,9 +13,18 @@ export const metadata: Metadata = { title: section.label };
 /** Email is the main way to reach me, so it's the highlighted entry; the rest are log rows. */
 const [primary, ...others] = site.contactLinks;
 
+/** Web3Forms' public access key (see README). Without it the form is left out and the links remain. */
+const web3formsKey = process.env.NEXT_PUBLIC_WEB3FORMS_KEY;
+
 export default function ContactPage() {
   return (
     <SectionPage section={section}>
+      {web3formsKey && (
+        <div className="mb-10">
+          <ContactForm accessKey={web3formsKey} fallbackEmail={primary.text} />
+        </div>
+      )}
+
       <a
         href={primary.href}
         {...linkTarget(primary.href)}
