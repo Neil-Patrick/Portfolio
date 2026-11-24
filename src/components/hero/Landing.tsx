@@ -9,7 +9,7 @@ import { HologramCard } from "./HologramCard";
 /**
  * Home landing: a huge headline that decodes in and the two main actions, with
  * the hologram card beside them (photo, name as the page's h1, role, status).
- * On the first visit in a tab the cyberpunk loading screen plays first
+ * On every full load the cyberpunk loading screen plays first
  * (src/components/intro/), and the headline and the card's 3D pop start as it
  * clears. With reduced motion everything is shown at rest.
  */

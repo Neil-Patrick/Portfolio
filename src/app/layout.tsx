@@ -3,8 +3,10 @@ import { IBM_Plex_Sans, Saira_Condensed } from "next/font/google";
 import { InlineScript } from "@/components/InlineScript";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
+import { IntroLoader } from "@/components/intro/IntroLoader";
 import { MotionRoot } from "@/components/motion/MotionRoot";
 import { site } from "@/content/site";
+import { introInitScript } from "@/lib/intro";
 import { themeInitScript } from "@/lib/theme";
 import "./globals.css";
 
@@ -39,6 +41,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <head>
         <InlineScript html={themeInitScript} />
+        {/* Decides whether the home loading screen plays, before first paint (src/lib/intro.ts). */}
+        <InlineScript html={introInitScript} />
         {/* Without JavaScript, entrance animations never run: show their content as-is. */}
         <noscript>
           <style>{
@@ -54,6 +58,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to Content
         </a>
         <MotionRoot>
+          {/* The home loading screen. Here, not in the home page: it must come before the header and stay
+              outside the page transition's fade (template.tsx), or the page shows before it. Hidden unless
+              the <head> script turns it on (every full load of Home). */}
+          <IntroLoader />
           <SiteHeader />
           <main id="main" tabIndex={-1} className="flex-1 outline-none">
             {children}

@@ -319,8 +319,8 @@
 }
 
 /* ---------- Loading screen (src/components/intro/, src/lib/intro.ts) ----------
-   Shown only while <html data-intro> is "play" or "skip": the first home visit
-   in a tab, with motion allowed (decided before first paint). Timeline, about
+   Shown only while <html data-intro> is "play" or "skip": every full load of
+   Home (a refresh included), with motion allowed (decided before first paint). Timeline, about
    5.4s (time the page uses to preload): CRT power-on, flicker, the name
    glitching in, the system check printing, "Access Granted", CRT power-off,
    fade out. A click or key ("skip") fades it at once. */

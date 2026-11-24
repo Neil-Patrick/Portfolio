@@ -3,8 +3,6 @@ import { projects } from "@/content/projects";
 import { site } from "@/content/site";
 import { skillGroups } from "@/content/skills";
 import { cssVars } from "@/lib/css-vars";
-import { introInitScript } from "@/lib/intro";
-import { InlineScript } from "../InlineScript";
 import { IntroController } from "./IntroController";
 
 /** The system check reports real counts from the content files. */
@@ -23,9 +21,11 @@ const checks = [
 const leader = <span className="min-w-4 flex-1 border-b border-dotted border-line-strong" />;
 
 /**
- * The home page's cyberpunk loading screen. An inline script decides before
- * first paint whether it plays (first home visit in this tab, motion allowed;
- * src/lib/intro.ts), so the page never flashes first. The look and timeline
+ * The home page's cyberpunk loading screen. An inline script in the root
+ * layout's <head> decides before first paint whether it plays (every full load
+ * of Home, motion allowed; src/lib/intro.ts), so the page never
+ * flashes first. Rendered by the root layout, first in <body> and outside the
+ * page transition (whose fade would hide it until JavaScript loads). The look and timeline
  * are CSS (globals.css, "Loading screen"): a CRT power-on, flicker, the name
  * glitching in, a system check with real numbers, "Access Granted", and a CRT
  * power-off that reveals the landing. IntroController handles skipping and
@@ -35,11 +35,11 @@ const leader = <span className="min-w-4 flex-1 border-b border-dotted border-lin
 export function IntroLoader() {
   return (
     <>
-      <InlineScript html={introInitScript} />
       <div aria-hidden className="intro" data-intro-overlay>
         <div className="intro-roll" />
-        <div className="intro-screen relative z-1 flex h-full flex-col justify-between px-6 py-8 sm:px-12 sm:py-10">
-          <p className="flex items-center gap-2 hud-label text-xs text-ink-muted sm:text-sm">
+        {/* Three rows: the status line at the top, the name block centered, an empty row below for balance. */}
+        <div className="intro-screen relative z-1 grid h-full grid-rows-[1fr_auto_1fr] px-6 py-8 sm:px-12 sm:py-10">
+          <p className="flex items-center gap-2 self-start hud-label text-xs text-ink-muted sm:text-sm">
             Establishing Connection
             <span className="boot-cursor inline-block h-3.5 w-2 bg-accent" />
           </p>
@@ -104,10 +104,6 @@ export function IntroLoader() {
               Access Granted
             </p>
           </div>
-
-          <p className="load-fade text-center hud-label text-xs text-ink-muted" style={cssVars({ "--fade-delay": "600ms" })}>
-            Click Anywhere to Continue
-          </p>
         </div>
       </div>
       <IntroController />

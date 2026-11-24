@@ -14,8 +14,8 @@ const pages = sections.filter((s) => s.href !== "/");
 const homePages = pages.filter((s) => homeIndex.some((item) => item.id === s.id));
 const timeline = buildTimeline();
 
-// Ordinary tests skip the home loading screen, as on a repeat visit in the same
-// tab. Its own tests open fresh pages without this mark.
+// Ordinary tests skip the home loading screen with a test-only mark (the site
+// never sets it). Its own tests open fresh pages without this mark.
 test.beforeEach(async ({ page }) => {
   await page.addInitScript((key) => {
     try {
@@ -639,7 +639,7 @@ async function freshPage(context: BrowserContext, reducedMotion: "reduce" | "no-
 
 const introState = (page: Page) => page.evaluate(() => document.documentElement.dataset.intro ?? null);
 
-test("loading screen: plays on the first home visit with the real counts, preloads, continues on a click, and stays away for the tab", async ({ context }) => {
+test("loading screen: plays on the first home visit with the real counts, preloads, continues on a click, and plays again on a reload", async ({ context }) => {
   const page = await freshPage(context, "no-preference");
   const errors = collectErrors(page);
   // Watch from the first byte: the loader is decided before first paint and lasts about 5s.
@@ -688,11 +688,8 @@ test("loading screen: plays on the first home visit with the real counts, preloa
   await page.waitForTimeout(900);
   expect(await page.evaluate(() => window.scrollY), "page scrolls after the loader").toBeGreaterThan(100);
 
-  // Not again in this tab, unless asked for with ?intro.
-  await page.reload();
-  expect(await introState(page)).toBeNull();
-  await expect(overlay).toBeHidden();
-  await page.goto("/?intro", { waitUntil: "commit" });
+  // A refresh plays it again.
+  await page.reload({ waitUntil: "commit" });
   await expect(page.locator("html")).toHaveAttribute("data-intro", "play");
   expect(errors, "console errors").toEqual([]);
 });

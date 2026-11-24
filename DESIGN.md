@@ -223,7 +223,7 @@ The landing's profile card starts flat like a printed card, then separates into 
 - **Content:** its name tag is the page's h1.
 
 ### Loading Screen
-Shown on the first home visit per tab, for about 5 seconds:
+Shown on every full load of Home (a refresh included), for about 5 seconds:
 - the CRT powers on;
 - the name glitches in;
 - system-check rows print in, with real counts and a live Assets row;
