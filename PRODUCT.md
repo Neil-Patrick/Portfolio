@@ -28,7 +28,7 @@ Web first, data and AI next. Neil ships real full-stack web apps with his team n
 - **Loader:** every full load of Home (a refresh included) opens with a ~5-second loading screen that preloads assets and continues on any click or key. It never shows with reduced motion, nor when navigating to Home within the site.
 - **Navigation:** a compass menu, which can be dragged with a finger on touch. Home is a short single scroll (landing, Projects, Contact); the Career Timeline and GitHub Activity sit on the About page, and each section also has its own page. A back-to-top button appears past the middle of any page.
 - **Themes and devices:** light and dark, following the OS or the theme switcher. Visitors arrive on both phones and desktops.
-- **Verification:** visitors check claims against external profiles: GitHub, LinkedIn and Credly links.
+- **Verification:** visitors check claims against external profiles: GitHub and LinkedIn links, and each badge's own Credly verification page (the Credly profile link was removed from Contact and the footer at Neil's request).
 
 ## Capabilities and Constraints
 

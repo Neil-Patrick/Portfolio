@@ -736,6 +736,47 @@
   }
 }
 
+/* HUD cursor (public/cursors/): a teal dart, and a target reticle over anything
+   clickable. The SVGs carry fixed colors (cursor images can't read tokens): Signal
+   Teal (dark) with a near-black outline, so they read on both canvases. Only for
+   mouse-like pointers; text fields keep the I-beam; forced colors gets the system set. */
+@media (pointer: fine) {
+  html {
+    cursor: url("/cursors/arrow.svg") 2 2, auto;
+  }
+  a[href],
+  button,
+  [role="button"],
+  [role="tab"],
+  label[for],
+  summary,
+  select {
+    cursor: url("/cursors/reticle.svg") 16 16, pointer;
+  }
+  input:not([type="checkbox"], [type="radio"], [type="submit"], [type="button"], [type="hidden"]),
+  textarea,
+  [contenteditable="true"] {
+    cursor: text;
+  }
+  :disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}
+
+@media (forced-colors: active) {
+  html,
+  a[href],
+  button,
+  [role="button"],
+  [role="tab"],
+  label[for],
+  summary,
+  select {
+    cursor: revert;
+  }
+}
+
 /* Native smooth scrolling only when Lenis isn't running (Lenis is off under reduced motion). */
 @media (prefers-reduced-motion: no-preference) {
   html:not(.lenis) {

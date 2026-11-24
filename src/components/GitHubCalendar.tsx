@@ -149,7 +149,7 @@ function Grid({ weeks }: { weeks: ContributionDay[][] }) {
       </div>
 
       <details className="mt-2">
-        <summary className="inline-flex min-h-11 cursor-pointer items-center gap-2 text-accent">
+        <summary className="inline-flex min-h-11 items-center gap-2 text-accent">
           <Icon icon={Table2} />
           Show Monthly Totals
         </summary>

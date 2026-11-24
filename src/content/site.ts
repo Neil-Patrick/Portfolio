@@ -19,7 +19,6 @@ export const site = {
     { label: "Email", href: "mailto:neilpatrick.dev@gmail.com", text: "neilpatrick.dev@gmail.com" },
     { label: "LinkedIn", href: "https://www.linkedin.com/in/neil-patrick-pajadan/", text: "neil-patrick-pajadan" },
     { label: "GitHub", href: "https://github.com/Neil-Patrick", text: "Neil-Patrick" },
-    { label: "Credly", href: "https://www.credly.com/users/neil-patrick-pajadan", text: "neil-patrick-pajadan" },
   ],
   /** About page body, one string per paragraph. */
   about: [
@@ -38,7 +37,7 @@ export const site = {
   /** Home landing. Draft copy, true to the intro: edit freely. */
   landing: {
     /** One line each; they decode in. Keep each line short enough to fit a phone. */
-    headline: ["Web Apps Today.", "Data and AI Next."],
+    headline: ["CODE IN", "PROGRESS"],
     primaryCta: "Work With Me",
     secondaryCta: "See the Work",
   },

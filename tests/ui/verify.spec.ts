@@ -1135,3 +1135,37 @@ test("contact form: a rejected send explains it and offers the email address", a
   // The visitor's text is kept so they can retry.
   await expect(form.getByLabel("Message")).toHaveValue("This one should fail on purpose.");
 });
+
+/* ---------- Contact links, footer location, cursor ---------- */
+
+test("Contact page and footer list Email, LinkedIn and GitHub, without a Credly profile link", async ({ page }) => {
+  await page.goto("/contact");
+  const main = page.locator("main");
+  const footer = page.locator("footer");
+  for (const scope of [main, footer]) {
+    for (const label of ["Email", "LinkedIn", "GitHub"]) {
+      await expect(scope.getByRole("link", { name: new RegExp(`^${label}`) }).first()).toBeVisible();
+    }
+    await expect(scope.locator('a[href*="credly.com/users"]')).toHaveCount(0);
+  }
+});
+
+test("footer shows the location with a pin icon", async ({ page }) => {
+  await page.goto("/");
+  const location = page.locator("footer p", { hasText: "San Pablo City" });
+  await expect(location.locator("svg")).toHaveCount(1);
+});
+
+test("mouse pointers get the HUD cursor: the dart on the page, the reticle on links, the I-beam in text fields", async ({ page }) => {
+  await page.goto("/contact");
+  const cursor = (selector: string) =>
+    page.locator(selector).first().evaluate((el) => getComputedStyle(el).cursor);
+  expect(await cursor("main p")).toContain("cursors/arrow.svg");
+  expect(await cursor("main a[href]")).toContain("cursors/reticle.svg");
+  expect(await cursor("header button")).toContain("cursors/reticle.svg");
+  const form = page.getByRole("form", { name: "Send a message" });
+  if (await form.count()) expect(await form.getByLabel("Name").evaluate((el) => getComputedStyle(el).cursor)).toBe("text");
+  for (const file of ["arrow", "reticle"]) {
+    expect((await page.request.get(`/cursors/${file}.svg`)).ok(), file).toBe(true);
+  }
+});

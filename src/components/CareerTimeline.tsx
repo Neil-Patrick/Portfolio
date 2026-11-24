@@ -292,7 +292,7 @@ export function CareerTimeline({ points }: Props) {
       </p>
 
       <details className="mt-3">
-        <summary className="inline-flex min-h-11 cursor-pointer items-center gap-2 text-accent">
+        <summary className="inline-flex min-h-11 items-center gap-2 text-accent">
           <Icon icon={Table2} />
           Show as Table
         </summary>

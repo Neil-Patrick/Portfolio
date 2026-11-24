@@ -1,6 +1,5 @@
 import {
   Award,
-  BadgeCheck,
   FolderGit2,
   House,
   Layers,
@@ -52,7 +51,7 @@ export function SectionIcon({ id, className }: { id: SectionId; className?: stri
 /** Contact links by their label in site.contactLinks. `mono` draws brand logos in the text color too. */
 export function ContactIcon({ label, mono = false }: { label: string; mono?: boolean }) {
   if (label === "GitHub" || label === "LinkedIn") return <TechIcon name={label} mono={mono} />;
-  return <Icon icon={label === "Credly" ? BadgeCheck : Mail} />;
+  return <Icon icon={Mail} />;
 }
 
 /** GitHub mark, for links to repositories and the profile. */

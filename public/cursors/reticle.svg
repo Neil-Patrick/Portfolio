@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none" stroke-linecap="square">
+  <!-- Target reticle for links and buttons: corner brackets around a center dot, hotspot at (16,16). -->
+  <g stroke="#0b1a1f" stroke-width="4.5">
+    <path d="M5 11V5h6M21 5h6v6M27 21v6h-6M11 27H5v-6"/>
+  </g>
+  <g stroke="#4fd1c1" stroke-width="2">
+    <path d="M5 11V5h6M21 5h6v6M27 21v6h-6M11 27H5v-6"/>
+  </g>
+  <rect x="13.5" y="13.5" width="5" height="5" fill="#4fd1c1" stroke="#0b1a1f" stroke-width="1.5"/>
+</svg>

@@ -1,9 +1,10 @@
+import { MapPin } from "lucide-react";
 import { cacheLife } from "next/cache";
 import Link from "next/link";
 import { education } from "@/content/credentials";
 import { sections, site } from "@/content/site";
 import { NEW_TAB_NOTE, isExternal, linkTarget } from "@/lib/links";
-import { ContactIcon, SectionIcon } from "./icons";
+import { ContactIcon, Icon, SectionIcon } from "./icons";
 
 const linkClass = "inline-flex min-h-11 items-center gap-2 text-ink-muted transition-colors hover:text-accent";
 const headingClass = "mb-2 hud-label text-sm text-ink";
@@ -82,7 +83,10 @@ export function SiteFooter() {
           <p>
             © <CopyrightYear /> {site.name}
           </p>
-          <p>{education[0].location}</p>
+          <p className="inline-flex items-center gap-2">
+            <Icon icon={MapPin} />
+            {education[0].location}
+          </p>
         </div>
       </div>
     </footer>

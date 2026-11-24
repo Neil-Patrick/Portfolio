@@ -153,7 +153,7 @@ A cool neutral instrument palette with a single teal signal, defined as `light-d
 **Character:** Saira Condensed gives the HUD its tall, engineered voice in titles and labels. IBM Plex Sans keeps body text calm and technical, with tabular figures for dates and counts.
 
 ### Hierarchy
-- **Landing** (700, `clamp(2.25rem, 12cqi, 7.5rem)`, line-height 1): the home headline only ("Web Apps Today." / "Data and AI Next."). It's sized to its column with container units so each line always fits, and it decodes into place.
+- **Landing** (700, `clamp(2.25rem, 12cqi, 7.5rem)`, line-height 1): the home headline only ("CODE IN" / "PROGRESS", typed in caps by request; the one place large caps are used). It's sized to its column with container units so each line always fits, and it decodes into place.
 - **Display** (700, `clamp(2.5rem, 1.75rem + 3vw, 3.75rem)`, line-height 1.1): section page titles in the HUD panel, which decode in.
 - **Headline** (600, line-height 1.2, -0.01em): h2 and h3 headings in Plex.
 - **Body** (400, 1rem, line-height 1.6): paragraphs and descriptions, kept to a readable measure (`max-w-prose` or narrower).
@@ -261,6 +261,9 @@ The theme chip and the compass trigger are borderless 44px squares in Instrument
 
 ### Back to Top
 A 44px square, bottom right on every page, canvas-tinted glass with corner brackets. It fades in past the middle of the page. A Hairline outline fills with Signal Teal as you scroll, so it doubles as a progress readout. Hidden, it's inert.
+
+### Cursor
+Mouse pointers only (`@media (pointer: fine)`): a teal dart (`public/cursors/arrow.svg`, hotspot at its tip) across the page, and a target reticle (four corner brackets around a square dot, `reticle.svg`, hotspot at the center) over links, buttons, tabs and summaries. Fixed colors, since cursor images can't read tokens: dark-mode Signal Teal `#4fd1c1` with a `#0b1a1f` outline, readable on both canvases. Text fields keep the I-beam, disabled controls show not-allowed, and forced-colors mode gets the system cursors.
 
 ### Footer (Terminal Sign-off)
 A HUD panel of canvas-tinted glass with corner brackets and a short notched Signal Teal tab on its top edge.
