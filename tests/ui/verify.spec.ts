@@ -636,6 +636,33 @@ test("Education lives on the About page, not Credentials", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Education" })).toHaveCount(0);
 });
 
+test("Now Playing: shows the track from /api/now-playing, and hides when Spotify is off", async ({ page, request }) => {
+  // The real route always answers with a valid shape ("off" without keys).
+  const live = await request.get("/api/now-playing");
+  expect(live.ok()).toBe(true);
+  expect(["playing", "recent", "off"]).toContain((await live.json()).status);
+
+  // A track playing (mocked, so the test doesn't depend on Neil's listening).
+  await page.route("**/api/now-playing", (route) =>
+    route.fulfill({
+      json: { status: "playing", title: "Test Song", artist: "Test Artist", url: "https://open.spotify.com/track/test" },
+    }),
+  );
+  await page.goto("/about");
+  const widget = page.locator("[data-now-playing]");
+  await expect(widget).toHaveAttribute("data-now-playing", "playing");
+  await expect(widget).toContainText("Now Playing");
+  await expect(widget.getByRole("link", { name: /Test Song/ })).toHaveAttribute("href", "https://open.spotify.com/track/test");
+  await expect(widget.locator(".eq-bar")).toHaveCount(3);
+
+  // Off: nothing at all.
+  await page.unroute("**/api/now-playing");
+  await page.route("**/api/now-playing", (route) => route.fulfill({ json: { status: "off" } }));
+  await page.reload();
+  await page.waitForLoadState("networkidle");
+  await expect(page.locator("[data-now-playing]")).toHaveCount(0);
+});
+
 test("About console: tabs switch by click and arrow keys, follow the hash, and hide the other panels", async ({ page }) => {
   await page.goto("/about");
   const tablist = page.getByRole("tablist", { name: "About sections" });

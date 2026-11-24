@@ -313,6 +313,16 @@
     translate: 0 0.25rem;
   }
 }
+/* The "Now Playing" equalizer bars (About, NowPlaying.tsx). */
+@keyframes eq-bounce {
+  0%,
+  100% {
+    scale: 1 0.3;
+  }
+  50% {
+    scale: 1 1;
+  }
+}
 /* A circuit trace drawing itself downward (About's Education module). */
 @keyframes trace-draw {
   from {
@@ -363,6 +373,10 @@
   }
   .cue-bob {
     animation: cue-bob 1.6s ease-in-out infinite;
+  }
+  .eq-bar {
+    transform-origin: bottom;
+    animation: eq-bounce 0.9s ease-in-out infinite;
   }
   /* Runs each time its panel is shown (a `hidden` panel restarts its animations). */
   .trace-draw {

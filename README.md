@@ -34,9 +34,13 @@ Create a `.env.local` file (git-ignored; env files are never committed) with the
 
 | Variable | Needed for | Without it |
 | --- | --- | --- |
-| `GITHUB_TOKEN` | The home page GitHub section: stats (commits, PRs, issues, stars, repositories contributed to), all-time total and streaks, a contribution calendar per year, this month's activity, languages by code size | The section shows public stats only (repos, followers, primary languages) |
+| `SPOTIFY_CLIENT_ID`, `SPOTIFY_CLIENT_SECRET` | The About page "Now Playing" readout (from your app at developer.spotify.com, Web API, redirect URI `http://127.0.0.1:3000/callback`) | The readout is hidden |
+| `SPOTIFY_REFRESH_TOKEN` | The same; created once by `node scripts/spotify-auth.mjs`, which writes it into `.env.local` | The readout is hidden |
+| `GITHUB_TOKEN` | The About page GitHub section: stats (commits, PRs, issues, stars, repositories contributed to), all-time total and streaks, a contribution calendar per year, this month's activity, languages by code size | The section shows public stats only (repos, followers, primary languages) |
 
 `GITHUB_TOKEN` is read only on the server (`src/lib/github.ts`) and never reaches the browser. Use a **fine-grained personal access token** with *Public repositories (read-only)* access and no extra permissions. GitHub data is cached for hours, so the page stays static and GitHub is called a few times a day at most (two GraphQL queries per refresh). Only repositories the token can read are counted, so a repository it can't see is left out of this month's activity and the language totals.
+
+The Spotify variables are read only on the server (`src/lib/spotify.ts`). The browser polls `/api/now-playing`, which returns just the track name, artist, album art and link; the result is cached for about 30 seconds, so Spotify sees roughly two calls a minute however many people visit. To set it up: create the Spotify app (Web API only), put the client ID and secret in `.env.local`, run `node scripts/spotify-auth.mjs` in your own terminal and follow its three steps, then restart the dev server. Visitors see what you're listening to; a Spotify Private Session hides it.
 
 ## Commands
 
@@ -133,6 +137,8 @@ src/
     theme-transition.ts  Circular theme reveal (View Transitions API, instant fallback)
     timeline.ts   Builds the chart's dated points from the content files
     github.ts     Cached GitHub stats (GraphQL with token, REST fallback)
+    spotify.ts    Now playing / last played from Spotify (server only, cached ~30s),
+                  served to the About page at app/api/now-playing/route.ts
     skill-usage.ts  Links technologies and projects by name (which projects use each one)
     intro.ts      Loading screen: pre-paint script (every full load of Home), done event
     webgl.ts      WebGL support check for the 3D wave background
@@ -140,7 +146,8 @@ src/
 public/           Static assets (images, icons); badges/ holds the Credly badge images,
                   achievements/ the GitHub achievement art
 scripts/          fetch-credly-badges.mjs: re-download the badge images from Credly;
-                  fetch-github-achievements.mjs: re-read the GitHub profile achievements
+                  fetch-github-achievements.mjs: re-read the GitHub profile achievements;
+                  spotify-auth.mjs: one-time Spotify refresh token into .env.local
 tests/ui/         Playwright UI checks
 .claude/skills/   Claude Code skills: impeccable (design; its engine downloads to
                   ~/.impeccable on first run, checksum-verified), verify-ui (Playwright checks),
@@ -189,6 +196,7 @@ Text in `[square brackets]` in `src/content/` is placeholder content.
 - **Footer as a terminal sign-off:** a bracketed HUD panel (canvas-tinted glass) with a teal notched tab on its top edge, an "End of Transmission" line with the live availability status, the page and contact links under caps HUD headings, and the copyright year (a `'use cache'` component, since Cache Components won't let a prerender read the clock) and location. Every contact logo is drawn in one ink (LinkedIn through devicon's cut-out "plain" variant), teal on hover; the home "Let's Build" LinkedIn button keeps the brand color.
 - **Back-to-top button:** bottom right on every page, it fades in past the middle of the page. A HUD square with corner brackets whose teal outline traces how far down you are; it glides up with Lenis (or jumps, with reduced motion) and moves focus to the top of the content. Hidden, it's `inert`, so it never sits in the tab order.
 - **About as a tabbed console:** under the bio and At a Glance, three tabs (Education, Career Timeline, GitHub Activity) sit on a teal rail and switch one HUD module at a time. Each module has the same frame (`ConsoleModule`): bracketed glass, a header with the name, a hairline and a status readout from real data ("2 Records", the timeline's counts, "Synced Hourly" with a live marker). Education is a circuit trace: entries hang off a teal line by solder-pad nodes, and the line draws down when the tab opens. Real WAI-ARIA tabs; the open tab lives in the URL hash like the Credentials filter. All panels render on the server (the GitHub data stays a cached server component) and inactive ones are `hidden`. Tabs were chosen over stacked modules to keep the page short.
+- **Spotify "Now Playing" on About:** at the bottom of At a Glance, the current track (with a teal equalizer) or the last one played, linking to Spotify. The keys stay on the server; the widget polls a cached route every 45 seconds while the tab is visible, and hides itself when Spotify isn't set up or fails. The refresh token comes from a script you run yourself, so it never passes through anyone else. Album art is a plain `<img>` (a 48px thumbnail from Spotify's CDN), so no `next/image` remote config was needed. Attribution is a text "on Spotify" link; the official logo isn't bundled (devicon has none).
 - **Credentials grouped and filterable:** the 15 badges sit in five categories (AI and Data, Web Development, IT Foundations, Design and UX, Project Management; `category` on each entry in `credentials.ts`), AI and Data first, newest first within each. A chip bar filters to one category or shows All; the choice lives in the URL hash (pushState, so Back works and there's no anchor jump), like the Technologies page. Education moved to About, next to the rest of the background.
 - **One folder per section page, not a `[section]` dynamic route:** each page will grow its own layout (project grid, credentials list, contact form). They share `SectionPage` for now to stay DRY.
 - **Brand logos from devicon:** full-color logos make the technology list scannable. devicon is a regular dependency so adding a logo is one import line; only the imported SVGs reach visitors (static files, no JS or CDN). Black-by-brand logos (Next.js, Vercel, GitHub, Express) are drawn in the text color through a CSS mask so they work in dark mode, and MySQL's dark blue sits on a light tile in dark mode. SQL and Turso have no devicon logo and use a database glyph.
