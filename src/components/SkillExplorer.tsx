@@ -18,7 +18,7 @@ export type ExplorerSkill = {
 type Props = { groups: { name: string; skills: ExplorerSkill[] }[] };
 
 const chipBase =
-  "hud-notch inline-flex min-h-11 items-center gap-2 border py-1.5 pr-4 pl-3 transition-colors focus-visible:-outline-offset-4";
+  "hud-notch hud-notch-edge inline-flex min-h-11 items-center gap-2 border py-1.5 pr-4 pl-3 transition-colors focus-visible:-outline-offset-4";
 
 /**
  * Skill groups with logos. Every skill is a toggle button; selecting one shows
@@ -87,8 +87,8 @@ export function SkillExplorer({ groups }: Props) {
                         selected === skill.name
                           ? "border-accent bg-accent text-on-accent focus-visible:outline-on-accent"
                           : skill.projects.length > 0
-                            ? "border-line-strong bg-surface hover:border-accent"
-                            : "border-line text-ink hover:border-accent"
+                            ? "border-line-strong bg-surface hover:border-accent hover:[--edge:var(--color-accent)]"
+                            : "border-line text-ink [--edge:var(--color-line)] hover:border-accent hover:[--edge:var(--color-accent)]"
                       }`}
                     >
                       <TechIcon name={skill.name} />

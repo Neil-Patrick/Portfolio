@@ -196,6 +196,23 @@
   clip-path: polygon(0 0, calc(100% - var(--hud-notch)) 0, 100% var(--hud-notch), 100% 100%, 0 100%);
 }
 
+/* For bordered notched elements: the clip cuts the border away at the corner,
+   so this draws the missing diagonal edge. Color via --edge (defaults to the
+   control border); only background-image/size/position/origin are set. */
+@utility hud-notch-edge {
+  background-image: linear-gradient(
+    to top right,
+    transparent calc(50% - 1px),
+    var(--edge, var(--color-line-strong)) calc(50% - 1px),
+    var(--edge, var(--color-line-strong)) 50%,
+    transparent 50%
+  );
+  background-size: var(--hud-notch) var(--hud-notch);
+  background-position: top right;
+  background-repeat: no-repeat;
+  background-origin: border-box;
+}
+
 /* The one load moment on section pages: the panel's brackets "lock on",
    sliding out from the center to the corners. */
 @keyframes hud-lock {
