@@ -7,7 +7,7 @@ import { existsSync } from "node:fs";
 import { buildTimeline } from "../../src/lib/timeline";
 
 const WIDTHS = [320, 768, 1024, 1440];
-const SCHEMES = ["light", "dark"] as const;
+const SCHEMES = ["dark"] as const;
 const SCREENSHOT_DIR = "test-results/screenshots";
 const pages = sections.filter((s) => s.href !== "/");
 /** Section pages the home page links to with an arrow (Credentials has no home section). */
@@ -206,64 +206,14 @@ test("footer links reach every page", async ({ page }) => {
   }
 });
 
-/* ---------- Behaviour: theme ---------- */
+/* ---------- Dark only ---------- */
 
-const themeDial = (page: Page) => page.getByRole("button", { name: /^Color theme:/i });
-
-test("theme chip cycles Light, Dark, System, its ticks follow, and the choice persists", async ({ page }) => {
-  for (const width of [1440, 375]) {
-    await page.setViewportSize({ width, height: 900 });
-    await page.goto("/");
-    await page.evaluate(() => localStorage.clear());
-    await page.reload();
-    const html = page.locator("html");
-    const dial = themeDial(page);
-    const activeTick = dial.locator("[data-theme-tick][data-active]");
-    await expect(dial).toHaveAccessibleName(/System\. Switch to Light/i);
-    await expect(activeTick).toHaveAttribute("data-theme-tick", "system");
-
-    await dial.click();
-    await expect(html).toHaveAttribute("data-theme", "light");
-    await expect(dial).toHaveAccessibleName(/Light\. Switch to Dark/i);
-    await expect(activeTick).toHaveAttribute("data-theme-tick", "light");
-    await dial.click();
-    await expect(html).toHaveAttribute("data-theme", "dark");
-    await expect(activeTick).toHaveAttribute("data-theme-tick", "dark");
-
-    await page.reload();
-    await expect(html).toHaveAttribute("data-theme", "dark");
-    await expect(themeDial(page)).toHaveAccessibleName(/Dark\. Switch to System/i);
-
-    await themeDial(page).click();
-    await expect(html).not.toHaveAttribute("data-theme", /.*/);
-    await expect(themeDial(page)).toHaveAccessibleName(/System\. Switch to Light/i);
-  }
-});
-
-test("a first-time visitor gets the System theme, following their OS", async ({ page }) => {
-  // Fresh context: nothing in localStorage, like a brand-new visitor.
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.emulateMedia({ colorScheme: "dark" });
+test("the site is dark only: no theme control, dark color scheme, tinted (not pure black) canvas", async ({ page }) => {
   await page.goto("/");
-  await page.waitForLoadState("networkidle");
+  await expect(page.getByRole("button", { name: /theme/i })).toHaveCount(0);
   await expect(page.locator("html")).not.toHaveAttribute("data-theme", /.*/);
-  await expect(themeDial(page)).toHaveAccessibleName(/^Color theme: System/i);
-  expect(await page.evaluate(() => localStorage.getItem("theme"))).toBeNull();
-});
-
-test("with full motion: the theme reveal runs without errors and lands on the right theme", async ({ page }) => {
-  const errors = collectErrors(page);
-  await page.emulateMedia({ reducedMotion: "no-preference", colorScheme: "dark" });
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await page.goto("/");
-  await page.waitForLoadState("networkidle");
-  await themeDial(page).click();
-  await page.waitForTimeout(800); // glitch + circle reveal
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-  await themeDial(page).click();
-  await page.waitForTimeout(800);
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  expect(errors, "console errors").toEqual([]);
+  expect(await page.evaluate(() => getComputedStyle(document.documentElement).colorScheme)).toBe("dark");
+  expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).not.toBe("rgb(0, 0, 0)");
 });
 
 /* ---------- Behaviour: career timeline (About page) ---------- */
@@ -455,11 +405,13 @@ test("home shows the wave background (animated or static) behind readable text",
   expect(axe.violations.map((v) => v.id)).toEqual([]);
 });
 
-test("other pages have no 3D background", async ({ page }) => {
-  for (const path of ["/about", "/projects"]) {
+test("every page has the signal-line background: full on Home, calm on the section pages", async ({ page }) => {
+  for (const [path, intensity, lines] of [["/about", "calm", 4], ["/projects", "calm", 4], ["/", "full", 6]] as const) {
     await page.goto(path);
-    await page.waitForLoadState("networkidle");
-    await expect(page.locator("[data-bg]")).toHaveCount(0);
+    const layer = page.locator('[data-bg="waves"]');
+    await expect(layer).toHaveAttribute("data-intensity", intensity);
+    await expect(layer).toHaveCSS("position", "fixed");
+    await expect(layer.locator('[data-bg-fallback="waves"] path')).toHaveCount(lines);
   }
 });
 
@@ -534,19 +486,19 @@ test("with full motion: home animates, scrolls, and hovers without errors", asyn
 test("with full motion: anchor links land below the sticky header", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.setViewportSize({ width: 1440, height: 900 });
-  // Credentials is long enough to bring its last group all the way up under the header.
-  await page.goto("/credentials");
+  // Projects is long enough to bring its second project all the way up under the header.
+  await page.goto("/projects");
   await page.waitForLoadState("networkidle");
   // Jump via an in-page anchor, the way footer/home links use hashes.
   await page.evaluate(() => {
     const link = document.createElement("a");
-    link.href = "#group-design-and-ux";
+    link.href = "#statera";
     link.textContent = "test anchor";
     document.body.append(link);
     link.click();
   });
   await page.waitForTimeout(1600); // Lenis eases to the target
-  const top = await page.locator("#group-design-and-ux").evaluate((el) => el.getBoundingClientRect().top);
+  const top = await page.locator("#statera").evaluate((el) => el.getBoundingClientRect().top);
   expect(top, "section top sits just below the 64px header").toBeGreaterThanOrEqual(40);
   expect(top).toBeLessThanOrEqual(120);
 });
@@ -598,30 +550,48 @@ test("links to other sites open in a new tab, safely; email links don't", async 
 
 /* ---------- Behaviour: HUD section pages ---------- */
 
-test("credential log entries keep their Credly links, opening safely in a new tab", async ({ page }) => {
+test("credential carousel: every node shows its details and Credly link, opening safely in a new tab", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/credentials");
+  await page.waitForLoadState("networkidle"); // clicks need the carousel to be interactive
   const { certifications, featuredCertification } = await import("../../src/content/credentials");
-  const links = page.locator('main a[href^="https://www.credly.com/badges/"]');
-  await expect(links).toHaveCount(certifications.length + 1);
-  await expect(links.first()).toHaveAttribute("href", featuredCertification.url!);
-  for (const link of await links.all()) {
+  const all = [featuredCertification, ...certifications].sort((a, b) => a.date.localeCompare(b.date));
+  const tabs = page.getByRole("tablist", { name: "Credentials, oldest to newest" }).getByRole("tab");
+  const detail = page.getByRole("tabpanel");
+  await expect(tabs).toHaveCount(all.length);
+  // Oldest first, the newest selected on arrival.
+  await expect(tabs.last()).toHaveAttribute("aria-selected", "true");
+  await expect(detail.getByRole("heading", { level: 2 })).toHaveText(all.at(-1)!.name);
+  for (const [i, cert] of all.entries()) {
+    await tabs.nth(i).click();
+    await expect(tabs.nth(i)).toHaveAttribute("aria-selected", "true");
+    await expect(detail.getByRole("heading", { level: 2 })).toHaveText(cert.name);
+    const link = detail.getByRole("link", { name: /Verify on Credly/ });
+    await expect(link).toHaveAttribute("href", cert.url!);
     await expect(link).toHaveAttribute("target", "_blank");
     await expect(link).toHaveAttribute("rel", /noopener/);
   }
 });
 
-test("credentials filter: All shows every badge, each category shows exactly its own, and the hash selects one", async ({ page }) => {
+test("credentials browse: the field chips under the carousel list rows, All grouped by field, and the hash selects one", async ({ page }) => {
   const { certifications, featuredCertification, credentialCategories } = await import("../../src/content/credentials");
   const all = [featuredCertification, ...certifications];
   await page.goto("/credentials");
   const filters = page.getByRole("navigation", { name: "Filter credentials" });
-  const badgeLinks = page.locator('main a[href^="https://www.credly.com/badges/"]');
+  const browse = page.getByRole("region", { name: "Browse by Field" });
+  const rows = browse.locator("li.hud-row");
+  const tabs = page.getByRole("tablist", { name: "Credentials, oldest to newest" }).getByRole("tab");
   const button = (label: string) => filters.getByRole("button", { name: new RegExp(`^${label} \\(`) });
 
-  // All by default: every category is a group, every badge listed.
+  // The chips sit below the carousel.
+  const carouselBottom = await page.locator("[data-credential-path]").evaluate((el) => el.getBoundingClientRect().bottom);
+  expect(await filters.evaluate((el) => el.getBoundingClientRect().top)).toBeGreaterThan(carouselBottom);
+
+  // All by default: every field is a group, every credential a row with its Credly link.
   await expect(button("All")).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator("[data-category]")).toHaveCount(credentialCategories.length);
-  await expect(badgeLinks).toHaveCount(all.length);
+  await expect(browse.locator("[data-category]")).toHaveCount(credentialCategories.length);
+  await expect(rows).toHaveCount(all.length);
+  await expect(browse.locator('a[href^="https://www.credly.com/badges/"]')).toHaveCount(all.length);
 
   for (const category of credentialCategories) {
     const expected = all.filter((cert) => cert.category === category.id);
@@ -629,22 +599,27 @@ test("credentials filter: All shows every badge, each category shows exactly its
     await expect(button(category.label)).toHaveAttribute("aria-pressed", "true");
     await expect(button("All")).toHaveAttribute("aria-pressed", "false");
     await expect(page).toHaveURL(new RegExp(`#${category.id}$`));
-    await expect(page.locator("[data-category]")).toHaveCount(1);
-    await expect(badgeLinks).toHaveCount(expected.length);
-    for (const cert of expected) await expect(badgeLinks.filter({ hasText: cert.name })).toHaveCount(1);
+    await expect(browse.locator("[data-category]")).toHaveCount(1);
+    await expect(rows).toHaveCount(expected.length);
+    for (const cert of expected) await expect(rows.filter({ hasText: cert.name })).toHaveCount(1);
     await expect(page.getByText(`Showing ${expected.length} of ${all.length} credentials`)).toBeAttached();
+    // The carousel always keeps every credential; nothing in it is dimmed or disabled.
+    await expect(tabs).toHaveCount(all.length);
+    await expect(page.locator('[role="tab"][disabled]')).toHaveCount(0);
   }
 
   await button("All").click();
-  await expect(badgeLinks).toHaveCount(all.length);
-  // Back returns to the previous category.
+  await expect(rows).toHaveCount(all.length);
+  // Back returns to the previous field.
   await page.goBack();
   await expect(button(credentialCategories.at(-1)!.label)).toHaveAttribute("aria-pressed", "true");
 
-  // A link straight to a category preselects it.
+  // A link straight to a field preselects it; picking a row selects it in the carousel.
   await page.goto("/credentials#design-and-ux");
   await expect(button("Design and UX")).toHaveAttribute("aria-pressed", "true");
-  await expect(page.locator("[data-category]")).toHaveAttribute("data-category", "design-and-ux");
+  const first = all.filter((cert) => cert.category === "design-and-ux").sort((a, b) => b.date.localeCompare(a.date))[0];
+  await rows.first().getByRole("button").click();
+  await expect(page.getByRole("tabpanel").getByRole("heading", { level: 2 })).toHaveText(first.name);
 });
 
 test("Education lives on the About page, not Credentials", async ({ page }) => {
@@ -1063,15 +1038,18 @@ test("about page shows a labeled photo placeholder until a photo is set", async 
   await expect(page.getByText("Photo Placeholder", { exact: true })).toBeVisible();
 });
 
-test("every certification shows its Credly badge: saved locally, loaded, and named", async ({ page }) => {
+test("every certification shows its real Credly badge in the details: saved locally, loaded, and named", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/credentials");
+  await page.waitForLoadState("networkidle"); // clicks need the carousel to be interactive
   const { badgeImage, certifications, featuredCertification } = await import("../../src/content/credentials");
-  for (const cert of [featuredCertification, ...certifications]) {
+  const all = [featuredCertification, ...certifications].sort((a, b) => a.date.localeCompare(b.date));
+  const tabs = page.getByRole("tablist", { name: "Credentials, oldest to newest" }).getByRole("tab");
+  for (const [i, cert] of all.entries()) {
     const src = badgeImage(cert)!;
     expect(existsSync(`public${src}`), `${cert.name}: public${src}`).toBe(true);
-    const image = page.getByRole("img", { name: `${cert.name} badge` });
-    await image.scrollIntoViewIfNeeded();
+    await tabs.nth(i).click();
+    const image = page.getByRole("tabpanel").getByRole("img", { name: `${cert.name} badge` });
     await expect(image).toBeVisible();
     await expect
       .poll(() => image.evaluate((el: HTMLImageElement) => el.complete && el.naturalWidth > 0), { message: `${cert.name} loads` })
@@ -1079,54 +1057,95 @@ test("every certification shows its Credly badge: saved locally, loaded, and nam
   }
 });
 
-/* ---------- Behaviour: badge tiles and GitHub achievements ---------- */
+/* ---------- Behaviour: credential path and GitHub achievements ---------- */
 
-/** Whether a tile's flipper is turned around (rotateY 180deg leaves -1 in the matrix's first cell). */
-const flipped = (tile: ReturnType<Page["locator"]>) =>
-  tile.locator("> span").evaluate((el) => {
-    const m = getComputedStyle(el).transform;
-    const first = m.startsWith("matrix3d(") ? Number(m.slice(9, -1).split(",")[0]) : 1;
-    return first < 0;
-  });
-
-test("every certification is a badge tile with its code, flipping to the Credly badge on hover and focus", async ({ page }) => {
+test("credential carousel: chronological circle emblems that loop, no scrollbar or arrows, drag settles on a credential, click or keys center it", async ({ page }) => {
+  const { certifications, featuredCertification, formatMonth } = await import("../../src/content/credentials");
+  const all = [featuredCertification, ...certifications].sort((a, b) => a.date.localeCompare(b.date));
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/credentials");
-  const { certifications, featuredCertification } = await import("../../src/content/credentials");
-  const all = [featuredCertification, ...certifications];
-  const tiles = page.locator("main [data-badge-tile]");
-  await expect(tiles).toHaveCount(all.length);
-  // Every credential is the same microchip card; none is singled out with a teal fill.
-  await expect(page.locator("main [data-chip]")).toHaveCount(all.length);
-  await expect(page.locator("main a.bg-accent")).toHaveCount(0);
-  const codes = await tiles.evaluateAll((els) => els.map((el) => el.querySelector(".font-display")?.textContent));
-  // Grouped by category, so compare as sets rather than in date order.
-  expect([...codes].sort()).toEqual(all.map((cert) => cert.code).sort());
-  expect(new Set(codes).size, "codes are unique").toBe(codes.length);
+  const strip = page.locator("[data-credential-path]");
+  const tabs = page.getByRole("tablist", { name: "Credentials, oldest to newest" }).getByRole("tab");
+  // One real tab per credential, oldest first, each an emblem named for its credential.
+  await expect(tabs).toHaveCount(all.length);
+  for (const [i, cert] of all.entries()) {
+    await expect(tabs.nth(i)).toHaveAccessibleName(`${cert.name}, ${formatMonth(cert.date)}`);
+    await expect(tabs.nth(i).locator("[data-emblem]")).toHaveCount(1);
+  }
+  const x = (i: number) => tabs.nth(i).evaluate((el) => el.getBoundingClientRect().left);
+  expect(await x(1)).toBeGreaterThan(await x(0));
+  // It loops: copies of the set sit on either side (hidden from assistive tech).
+  await expect(strip.locator("[data-emblem]")).toHaveCount(all.length * 3);
+  // No visible scrollbar, and no arrow buttons.
+  await expect(strip).toHaveCSS("scrollbar-width", "none");
+  await expect(page.getByRole("button", { name: /previous credential|next credential/i })).toHaveCount(0);
 
-  // Hover flips it to the real badge; with reduced motion it swaps without the spin.
-  const row = page.getByRole("link", { name: /^Data Fundamentals/ });
-  const tile = row.locator("[data-badge-tile]");
-  expect(await flipped(tile)).toBe(false);
-  await row.hover();
-  await expect.poll(() => flipped(tile)).toBe(true);
-  // Keyboard focus flips it too.
-  await page.mouse.move(0, 0);
-  const featured = page.getByRole("link", { name: new RegExp(`^${featuredCertification.name}`) });
-  await featured.focus();
-  await page.keyboard.press("Tab");
-  await page.keyboard.press("Shift+Tab");
-  await expect.poll(() => flipped(featured.locator("[data-badge-tile]"))).toBe(true);
+  const stripCenter = await strip.evaluate((el) => {
+    const box = el.getBoundingClientRect();
+    return box.left + box.width / 2;
+  });
+  /** Distance from the strip's center to the nearest copy of credential i. */
+  const offCenter = (i: number) =>
+    strip.evaluate(
+      (el, { i, n, mid }) => {
+        const nodes = [...el.querySelectorAll("[role=tablist] > *")];
+        return Math.min(
+          ...[i, i + n, i + 2 * n].map((g) => {
+            const box = nodes[g].getBoundingClientRect();
+            return Math.abs(box.left + box.width / 2 - mid);
+          }),
+        );
+      },
+      { i, n: all.length, mid: stripCenter },
+    );
+
+  // The newest starts selected and centered.
+  await expect(tabs.last()).toHaveAttribute("aria-selected", "true");
+  expect(await offCenter(all.length - 1)).toBeLessThan(4);
+
+  // Dragging past the newest loops round to the oldest and settles on (and selects) a credential.
+  const box = (await strip.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + 60);
+  await page.mouse.down();
+  for (let i = 1; i <= 10; i++) await page.mouse.move(box.x + box.width / 2 - i * 30, box.y + 60);
+  await page.mouse.up();
+  await expect(tabs.last()).toHaveAttribute("aria-selected", "false");
+  const selectedIndex = Number((await page.getByRole("tab", { selected: true }).getAttribute("id"))!.split("-").at(-1));
+  expect(selectedIndex, "wrapped past the newest").toBeLessThan(all.length - 1);
+  await expect.poll(() => offCenter(selectedIndex)).toBeLessThan(4);
+
+  // Clicking an emblem selects it and brings it to the center.
+  await tabs.nth(5).click({ force: true });
+  await expect(tabs.nth(5)).toHaveAttribute("aria-selected", "true");
+  await expect.poll(() => offCenter(5)).toBeLessThan(4);
+  await expect(page.getByRole("tabpanel").getByRole("heading", { level: 2 })).toHaveText(all[5].name);
+
+  // Keyboard: arrows (wrapping round) and Home/End; only the selected tab is in the tab order.
+  await tabs.nth(5).focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(tabs.nth(6)).toBeFocused();
+  await expect(tabs.nth(6)).toHaveAttribute("aria-selected", "true");
+  await page.keyboard.press("Home");
+  await expect(tabs.first()).toHaveAttribute("aria-selected", "true");
+  await page.keyboard.press("ArrowLeft");
+  await expect(tabs.last()).toHaveAttribute("aria-selected", "true");
+  await expect(tabs.first()).toHaveAttribute("tabindex", "-1");
+
+  // Phones: the same carousel, swiped; the page itself never scrolls sideways.
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.reload();
+  await expect(tabs.last()).toHaveAttribute("aria-selected", "true");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
 });
 
-test("the GitHub section lists the saved achievements as tiles linking to GitHub", async ({ page }) => {
+test("the GitHub section lists the saved achievements as circle nodes linking to GitHub", async ({ page }) => {
   const { achievements, ACHIEVEMENTS_URL } = await import("../../src/content/achievements");
   await page.goto("/about#github");
   const list = page.getByRole("tabpanel", { name: "GitHub Activity" }).getByRole("region", { name: "Achievements" });
   for (const achievement of achievements) {
     const link = list.getByRole("link", { name: new RegExp(achievement.name) });
     await expect(link).toHaveAttribute("href", ACHIEVEMENTS_URL);
-    await expect(link.locator("[data-badge-tile]")).toContainText(achievement.code);
+    await expect(link.locator("[data-badge-tile]").getByRole("img", { name: `${achievement.name} achievement badge` })).toBeVisible();
     expect(existsSync(`public${achievement.image}`), achievement.image).toBe(true);
   }
 });
@@ -1153,7 +1172,7 @@ test("footer draws every contact logo in one ink, LinkedIn included", async ({ p
   await page.goto("/");
   const footer = page.locator("footer");
   await expect(footer.locator('[data-tech-icon="color"]')).toHaveCount(0);
-  await expect(footer.locator('[data-tech-icon="mono"]')).toHaveCount(2); // GitHub and LinkedIn
+  await expect(footer.locator('[data-tech-icon="mono"]')).toHaveCount(3); // LinkedIn (Let's Build), GitHub and LinkedIn (links)
 });
 
 /* ---------- Behaviour: contact form ---------- */
@@ -1249,16 +1268,23 @@ test("footer shows the location with a pin icon", async ({ page }) => {
   await expect(location.locator("svg")).toHaveCount(1);
 });
 
-test("mouse pointers get the HUD cursor: the dart on the page, the reticle on links, the I-beam in text fields", async ({ page }) => {
+test("mouse pointers get the glowing cursors: the dart on the page, the pointing hand on links, the open hand on the carousel, the I-beam in text fields", async ({ page }) => {
   await page.goto("/contact");
   const cursor = (selector: string) =>
     page.locator(selector).first().evaluate((el) => getComputedStyle(el).cursor);
-  expect(await cursor("main p")).toContain("cursors/arrow.svg");
-  expect(await cursor("main a[href]")).toContain("cursors/reticle.svg");
-  expect(await cursor("header button")).toContain("cursors/reticle.svg");
+  expect(await cursor("main p")).toContain("cursors/arrow");
+  expect(await cursor("main a[href]")).toContain("cursors/hand-point");
+  expect(await cursor("header button")).toContain("cursors/hand-point");
   const form = page.getByRole("form", { name: "Send a message" });
-  if (await form.count()) expect(await form.getByLabel("Name").evaluate((el) => getComputedStyle(el).cursor)).toBe("text");
-  for (const file of ["arrow", "reticle"]) {
-    expect((await page.request.get(`/cursors/${file}.svg`)).ok(), file).toBe(true);
+  if (await form.count()) expect(await form.getByLabel("Name").evaluate((el) => getComputedStyle(el).cursor)).toContain("cursors/text");
+  // No crosshair or reticle any more.
+  expect(await cursor("main a[href]")).not.toContain("reticle");
+  // Draggable: the credential carousel gets the open hand, and the closed hand while held.
+  await page.goto("/credentials");
+  expect(await page.locator("[data-credential-path]").evaluate((el) => getComputedStyle(el).cursor)).toContain("cursors/hand-open");
+  for (const file of ["arrow", "hand-point", "hand-open", "hand-grab", "text"]) {
+    for (const suffix of ["", "@2x"]) {
+      expect((await page.request.get(`/cursors/${file}${suffix}.png`)).ok(), file + suffix).toBe(true);
+    }
   }
 });

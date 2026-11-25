@@ -46,11 +46,8 @@ export default function AboutPage() {
             ))}
           </div>
 
-          {/* HUD profile panel: caps field labels over teal values, printing in one by one. */}
-          <aside
-            aria-labelledby="at-a-glance"
-            className="hud-corners self-start border border-line-strong bg-surface p-6"
-          >
+          {/* Profile column, open (no panel): a hairline rail on its left, caps field labels over values, printing in one by one. */}
+          <aside aria-labelledby="at-a-glance" className="self-start border-l border-line pl-6">
             <div className="mb-6">
               <ProfilePhoto sizes="(min-width: 1024px) 19rem, 90vw" />
             </div>
@@ -61,7 +58,7 @@ export default function AboutPage() {
               {facts.map((fact) => (
                 <RevealItem key={fact.label} from="left">
                   <dt className="hud-label text-sm text-ink-muted">{fact.label}</dt>
-                  <dd className="mt-0.5 font-display text-xl leading-snug font-semibold text-accent">
+                  <dd className="mt-0.5 font-display text-xl leading-snug font-semibold text-ink">
                     {fact.value}
                   </dd>
                 </RevealItem>

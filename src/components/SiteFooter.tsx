@@ -4,6 +4,7 @@ import Link from "next/link";
 import { education } from "@/content/credentials";
 import { sections, site } from "@/content/site";
 import { NEW_TAB_NOTE, isExternal, linkTarget } from "@/lib/links";
+import { FooterCta } from "./FooterCta";
 import { ContactIcon, Icon, SectionIcon } from "./icons";
 
 const linkClass = "inline-flex min-h-11 items-center gap-2 text-ink-muted transition-colors hover:text-accent";
@@ -21,20 +22,21 @@ async function CopyrightYear() {
 }
 
 /**
- * The site's sign-off, on every page: a bracketed HUD panel with a teal tab on
- * its top edge. A transmission-end line with the live availability status,
- * then the page and contact links (every icon in one ink, teal on hover), then
- * the copyright and location.
+ * The site's sign-off, on every page, in the open "Signal" layout (no panel):
+ * a hairline with a short teal rule on top, then "Let's Build Something" with
+ * the ways to reach me (so contact is on every page), the live availability
+ * status, the page and contact links (every icon in one ink, teal on hover),
+ * and the copyright and location.
  */
 export function SiteFooter() {
   return (
-    <footer className="container-page mt-12 pb-8">
-      {/* Canvas-tinted glass, so the home wave lines don't run through the text. */}
-      <div className="relative hud-corners border border-line bg-canvas/80 px-4 py-8 backdrop-blur-sm sm:px-8">
-        {/* The teal tab: a short notched bar riding the top edge. */}
-        <span aria-hidden className="absolute -top-px left-6 h-1 w-20 bg-accent hud-notch sm:left-10 sm:w-28" />
+    <footer className="container-page mt-16 pb-24 sm:mt-24">
+      <div className="relative border-t border-line pt-12 sm:pt-16">
+        <span aria-hidden className="absolute -top-px left-0 h-0.5 w-12 bg-accent" />
 
-        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+        <FooterCta />
+
+        <div className="mt-12 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
           <p aria-hidden className="hud-label text-sm text-ink-muted">
             {"// End of Transmission"}
           </p>

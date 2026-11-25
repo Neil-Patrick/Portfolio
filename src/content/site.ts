@@ -53,7 +53,7 @@ export const site = {
     primaryCta: "Work With Me",
     secondaryCta: "See the Work",
   },
-  /** Home "Let's Build" section. */
+  /** "Let's Build", the call to action at the top of the footer on every page (FooterCta.tsx). */
   collaborate: {
     heading: "Let's Build Something",
     lead: "I'm open to internships, jobs, and freelance projects.",
@@ -117,7 +117,7 @@ export const sections: SiteSection[] = [
     href: "/credentials",
     tab: "Certifications",
     detail:
-      "My certifications, grouped by field. Filter by one, or see them all; each badge links to its verification page on Credly.",
+      "My certifications in the order I earned them. Pick one to see its details and verify it on Credly, or filter by field.",
   },
   {
     id: "technologies",

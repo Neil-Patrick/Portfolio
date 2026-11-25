@@ -1,10 +1,20 @@
 /**
- * The home page's wave lines: shared math for the animated scene (WaveLines)
- * and the static version (WaveFallback), so both draw the same curves.
+ * The site background's "signal lines": shared math for the animated scene
+ * (WaveLines) and the static version (WaveFallback), so both draw the same
+ * curves.
  *
  * Kept deliberately quiet: a few hairlines, low opacity, very slow drift.
  * Units are CSS pixels; y grows downward from the top of the screen.
  */
+
+/** Full on Home; calm (fewer, dimmer lines and pulses) behind the reading pages. */
+export type Intensity = "full" | "calm";
+
+/** Which waves draw, and how bright, at each intensity. */
+export const INTENSITY: Record<Intensity, { lines: number; opacity: number; pulses: number[] }> = {
+  full: { lines: 6, opacity: 1, pulses: [0, 2, 4] },
+  calm: { lines: 4, opacity: 0.6, pulses: [1] },
+};
 
 export type Wave = {
   /** Resting height, as a share of the screen height (0 = top, 1 = bottom). */
@@ -28,7 +38,7 @@ export const WAVES: Wave[] = Array.from({ length: 6 }, (_, i) => ({
   a2: 6 + i * 2,
   l2: 380 + i * 70,
   s2: -(0.07 + i * 0.015),
-  opacity: 0.24 - i * 0.025,
+  opacity: 0.5 - i * 0.05,
 }));
 
 /** Points per line: smooth at any width, still cheap to update every frame. */

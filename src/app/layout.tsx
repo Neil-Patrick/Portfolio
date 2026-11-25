@@ -5,10 +5,11 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { IntroLoader } from "@/components/intro/IntroLoader";
 import { MotionRoot } from "@/components/motion/MotionRoot";
+import { PageBackground } from "@/components/background/PageBackground";
+import { ScrollRail } from "@/components/nav/ScrollRail";
 import { BackToTop } from "@/components/nav/BackToTop";
 import { site } from "@/content/site";
 import { introInitScript } from "@/lib/intro";
-import { themeInitScript } from "@/lib/theme";
 import "./globals.css";
 
 // One family for everything: engineering character, tabular figures for dates and counts.
@@ -34,14 +35,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      // The inline theme script sets data-theme before React hydrates.
+      // The intro script may set data-intro before React hydrates.
       suppressHydrationWarning
       // Smooth anchor scrolling, but instant jumps on route changes (Next.js reads this).
       data-scroll-behavior="smooth"
       className={`${plex.variable} ${saira.variable} h-full antialiased`}
     >
       <head>
-        <InlineScript html={themeInitScript} />
         {/* Decides whether the home loading screen plays, before first paint (src/lib/intro.ts). */}
         <InlineScript html={introInitScript} />
         {/* Without JavaScript, entrance animations never run: show their content as-is. */}
@@ -63,11 +63,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               outside the page transition's fade (template.tsx), or the page shows before it. Hidden unless
               the <head> script turns it on (every full load of Home). */}
           <IntroLoader />
+          {/* The one background behind every page (fixed, behind everything). */}
+          <PageBackground />
           <SiteHeader />
           <main id="main" tabIndex={-1} className="flex-1 outline-none">
             {children}
           </main>
           <SiteFooter />
+          <ScrollRail />
           <BackToTop />
         </MotionRoot>
       </body>

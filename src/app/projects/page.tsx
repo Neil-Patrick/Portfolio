@@ -19,7 +19,7 @@ export const metadata: Metadata = { title: section.label };
 export default function ProjectsPage() {
   return (
     <SectionPage section={section}>
-      <div className="space-y-10">
+      <div className="space-y-16 lg:space-y-20">
         {projects.map((project) => (
           // Each project rises in on its own as it scrolls into view.
           <Reveal key={project.id}>
@@ -27,7 +27,7 @@ export default function ProjectsPage() {
               <article
                 id={project.id}
                 aria-labelledby={`project-${project.id}`}
-                className="hud-corners grid gap-8 border border-line-strong bg-surface p-5 sm:p-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-x-12"
+                className="grid scroll-mt-8 gap-8 border-t border-line pt-10 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-x-12 lg:pt-14"
               >
                 {/* Text: the left column on desktop, spanning both right-hand rows (screenshots, stack). */}
                 <div className="lg:col-start-1 lg:row-span-2 lg:row-start-1">
@@ -51,7 +51,7 @@ export default function ProjectsPage() {
                         <a
                           href={link.href}
                           {...newTab}
-                          className="inline-flex min-h-11 items-center gap-2 rounded-sm border border-line-strong bg-canvas px-4 font-semibold hover:border-accent hover:text-accent"
+                          className="hud-notch hud-notch-edge inline-flex min-h-11 items-center gap-2 border border-line-strong py-2 pr-6 pl-4 font-semibold transition-colors hover:border-accent hover:text-accent hover:[--edge:var(--color-accent)] focus-visible:-outline-offset-4"
                         >
                           {/* Repository links get the GitHub mark; everything else is an outside site. */}
                           {link.href.startsWith("https://github.com/") ? (
@@ -86,7 +86,7 @@ export default function ProjectsPage() {
                         {/* Each opens the Technologies page with that one selected. */}
                         <Link
                           href={`/technologies#${skillAnchor(tool)}`}
-                          className="inline-flex min-h-11 items-center gap-2 rounded-sm border border-line-strong bg-canvas px-3 py-1 text-sm hover:border-accent hover:text-accent"
+                          className="hud-notch hud-notch-edge inline-flex min-h-11 items-center gap-2 border border-line-strong py-1 pr-4 pl-3 text-sm transition-colors hover:border-accent hover:text-accent hover:[--edge:var(--color-accent)] focus-visible:-outline-offset-4"
                         >
                           <TechIcon name={tool} />
                           {tool}

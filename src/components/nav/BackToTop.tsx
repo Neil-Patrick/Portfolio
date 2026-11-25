@@ -11,10 +11,11 @@ const SHOW_AFTER = 0.5;
 
 /**
  * Back-to-top control, bottom right on every page. It appears once you're
- * past the middle of the page: a HUD square with corner brackets whose teal
- * outline traces how far down you are. A click glides back to the top (Lenis),
- * or jumps there with reduced motion, and moves focus to the top of the
- * content so keyboard users carry on from there.
+ * past the middle of the page: a circle node (the shape the site uses for
+ * points in a sequence, like the scroll rail and the credential carousel) whose
+ * teal outline traces how far down you are, glowing softly on hover. A click
+ * glides back to the top (Lenis), or jumps there with reduced motion, and
+ * moves focus to the top of the content so keyboard users carry on from there.
  */
 export function BackToTop() {
   const lenis = useLenis();
@@ -37,22 +38,30 @@ export function BackToTop() {
       title="Back to Top"
       inert={!shown}
       data-shown={shown || undefined}
-      className="group fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-30 grid size-11 place-items-center bg-canvas/85 text-ink backdrop-blur-md transition-[opacity,translate,color] duration-300 ease-out hud-corners hover:text-accent not-data-shown:pointer-events-none not-data-shown:translate-y-2 not-data-shown:opacity-0 sm:right-6"
+      data-back-to-top
+      className="group fixed right-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-30 grid size-12 place-items-center text-ink transition-[opacity,translate,color] duration-300 ease-out hover:text-accent focus-visible:text-accent not-data-shown:pointer-events-none not-data-shown:translate-y-2 not-data-shown:opacity-0 sm:right-6"
     >
-      {/* Progress outline: a hairline square that fills with teal as you scroll down. */}
-      <svg aria-hidden className="pointer-events-none absolute inset-0 size-full" viewBox="0 0 44 44" fill="none">
-        <rect x={0.5} y={0.5} width={43} height={43} className="stroke-line" strokeWidth={1} />
-        <motion.rect
-          x={0.5}
-          y={0.5}
-          width={43}
-          height={43}
+      {/* The circle: a dark face, a hairline track, and a teal line that fills with your scroll progress. */}
+      <svg
+        aria-hidden
+        className="glow-node pointer-events-none absolute inset-0 size-full"
+        viewBox="0 0 100 100"
+        fill="none"
+      >
+        <circle cx="50" cy="50" r="47" vectorEffect="non-scaling-stroke" className="fill-canvas/90 stroke-line-strong" strokeWidth={1} />
+        {/* Starts at 12 o'clock and runs clockwise. */}
+        <motion.circle
+          cx="50"
+          cy="50"
+          r="47"
+          transform="rotate(-90 50 50)"
+          vectorEffect="non-scaling-stroke"
           className="stroke-accent"
           strokeWidth={1.5}
           style={{ pathLength: scrollYProgress }}
         />
       </svg>
-      <Icon icon={ChevronUp} className="transition-transform motion-safe:group-hover:-translate-y-0.5" />
+      <Icon icon={ChevronUp} className="relative transition-transform motion-safe:group-hover:-translate-y-0.5" />
     </button>
   );
 }

@@ -1,13 +1,9 @@
 import Link from "next/link";
-import { PageBackground } from "@/components/background/PageBackground";
-import { DepthGauge } from "@/components/nav/DepthGauge";
 import { Landing } from "@/components/hero/Landing";
-import { Collaborate } from "@/components/home/Collaborate";
-import { Tilt } from "@/components/motion/Tilt";
 import { Section } from "@/components/Section";
 import { TechIcon } from "@/components/TechIcon";
 import { projects } from "@/content/projects";
-import { getSection, homeIndex } from "@/content/site";
+import { getSection } from "@/content/site";
 import { techIcons } from "@/content/tech";
 import { isSkill } from "@/lib/skill-usage";
 
@@ -36,16 +32,13 @@ const projectsSection = getSection("projects");
 /**
  * Home, top to bottom (the same order as `homeIndex` in site.ts, which the
  * depth gauge reads), after the loading screen (rendered by the root layout):
- * the landing (with the hologram card and the page's h1), projects, and the
- * "Let's Build" invitation. The career timeline and GitHub activity live on
- * the About page.
+ * the landing (with the hologram card and the page's h1) and projects; the
+ * "Let's Build" invitation opens the footer, on every page. The career
+ * timeline and GitHub activity live on the About page.
  */
 export default function HomePage() {
   return (
     <>
-      {/* Subtle wave lines, fixed behind every home section. */}
-      <PageBackground />
-      <DepthGauge items={homeIndex} />
 
       {/* Full-screen landing, running up behind the transparent header. */}
       <Landing />
@@ -54,12 +47,11 @@ export default function HomePage() {
         <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {projects.map((project) => (
             <li key={project.id}>
-              <Tilt className="h-full">
-                <Link
+              <Link
                   href={`/projects#${project.id}`}
-                  className="hud-corners flex h-full flex-col border border-line-strong bg-canvas p-6 transition-colors hover:border-accent"
+                  className="group hud-notch hud-notch-edge flex h-full flex-col border border-line-strong bg-surface/80 p-6 pr-8 transition-colors hover:border-accent hover:[--edge:var(--color-accent)] focus-visible:-outline-offset-4"
                 >
-                  <span className="text-xl font-semibold">{project.name}</span>
+                  <span className="font-display text-2xl font-bold transition-colors group-hover:text-accent">{project.name}</span>
                   <span className="mt-2 flex-1 text-ink-muted">{project.summary}</span>
                   {/* Logos of the technologies it uses (names are in the project page). */}
                   <span aria-hidden className="mt-5 flex flex-wrap gap-2">
@@ -68,14 +60,11 @@ export default function HomePage() {
                     ))}
                   </span>
                 </Link>
-              </Tilt>
             </li>
           ))}
         </ul>
       </Section>
 
-      {/* The ask, right before the footer. */}
-      <Collaborate />
     </>
   );
 }

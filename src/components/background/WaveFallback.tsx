@@ -1,4 +1,4 @@
-import { SEGMENTS, WAVES, waveY } from "./waves";
+import { INTENSITY, SEGMENTS, WAVES, waveY, type Intensity } from "./waves";
 
 /**
  * The wave lines frozen in place, drawn as SVG. Shown before the animated
@@ -17,7 +17,8 @@ const paths = WAVES.map((wave) => {
   return { d, opacity: wave.opacity };
 });
 
-export function WaveFallback() {
+export function WaveFallback({ intensity = "full" }: { intensity?: Intensity }) {
+  const { lines, opacity } = INTENSITY[intensity];
   return (
     <svg
       aria-hidden
@@ -26,15 +27,15 @@ export function WaveFallback() {
       preserveAspectRatio="none"
       className="absolute inset-0 size-full"
     >
-      {paths.map((path, i) => (
+      {paths.slice(0, lines).map((path, i) => (
         <path
           key={i}
           d={path.d}
           fill="none"
-          className="stroke-accent"
+          className="stroke-line-strong"
           strokeWidth={1}
           vectorEffect="non-scaling-stroke"
-          opacity={path.opacity}
+          opacity={path.opacity * opacity}
         />
       ))}
     </svg>

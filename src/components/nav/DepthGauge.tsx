@@ -1,12 +1,13 @@
 "use client";
 
-import { motion, useReducedMotion, useSpring } from "motion/react";
+import { motion, useReducedMotion, useSpring, useTransform } from "motion/react";
 import { useEffect, useState } from "react";
+import { RingMark } from "../RingNode";
 
 /**
  * "Depth gauge": an on-page index for the home page. A hairline on the right
  * edge carries one tick per section (like the compass dial's ticks), and a
- * teal diamond, the compass needle's tip, springs to the section being read.
+ * teal circle (the site's node shape) springs to the section being read.
  * Ticks are plain hash links; Lenis smooth-scrolls them below the header.
  * Hidden below `lg`, where it would crowd the content.
  */
@@ -15,8 +16,8 @@ type Item = { id: string; label: string };
 
 /** Row height = touch-target size. */
 const ROW = 44;
-/** Half the diamond (8px), so its center sits on the row center. */
-const HALF = 4;
+/** Half the circle (14px), so its center sits on the row center. */
+const HALF = 7;
 /** Same feel as the compass needle. */
 const SPRING = { stiffness: 170, damping: 13 };
 
@@ -24,6 +25,7 @@ export function DepthGauge({ items }: { items: Item[] }) {
   const reduceMotion = useReducedMotion();
   const [active, setActive] = useState(0);
   const markerY = useSpring(ROW / 2 - HALF, SPRING);
+  const fillHeight = useTransform(markerY, (y) => Math.max(y + HALF - ROW / 2, 0));
 
   // The current section is the last one whose top has passed a line a third of
   // the way down the screen. Checked at most once per frame while scrolling.
@@ -101,12 +103,20 @@ export function DepthGauge({ items }: { items: Item[] }) {
             );
           })}
         </ul>
+        {/* Teal fill from the first row down to the circle, as on the other pages' scroll rail. */}
+        <motion.span
+          aria-hidden
+          className="pointer-events-none absolute top-[22px] left-1/2 w-px -translate-x-1/2 bg-accent"
+          style={{ height: fillHeight }}
+        />
         {/* The needle tip: springs to the current section. */}
         <motion.span
           aria-hidden
-          className="pointer-events-none absolute top-0 left-1/2 size-2 bg-accent shadow-glow"
-          style={{ y: markerY, x: "-50%", rotate: 45 }}
-        />
+          className="pointer-events-none absolute top-0 left-1/2 drop-shadow-glow"
+          style={{ y: markerY, x: "-50%" }}
+        >
+          <RingMark className="size-3.5" />
+        </motion.span>
       </div>
     </nav>
   );

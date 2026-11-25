@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import * as THREE from "three";
 
-/** Theme colors for the 3D background scene (client only). */
+/** Token colors for the 3D background scene (client only). */
 
 export type Palette = { cert: THREE.Color; accent: THREE.Color; project: THREE.Color; line: THREE.Color };
 
@@ -27,19 +27,8 @@ function readPalette(): Palette {
   };
 }
 
-/** Token colors, re-read when the theme changes (switcher or OS setting). */
+/** Token colors, read once on mount (the site is dark only, so they never change). */
 export function usePalette() {
-  const [palette, setPalette] = useState<Palette>(readPalette);
-  useEffect(() => {
-    const update = () => setPalette(readPalette());
-    const observer = new MutationObserver(update);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    media.addEventListener("change", update);
-    return () => {
-      observer.disconnect();
-      media.removeEventListener("change", update);
-    };
-  }, []);
+  const [palette] = useState<Palette>(readPalette);
   return palette;
 }

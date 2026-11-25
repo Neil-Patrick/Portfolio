@@ -2,46 +2,37 @@
 @import "lenis/dist/lenis.css";
 
 /* ==========================================================================
-   Theming
-   - No data-theme on <html>  -> follow the OS ("system").
-   - data-theme="light|dark"  -> forced by the ThemeSwitcher.
-   Every color token below uses light-dark(LIGHT, DARK), which resolves
-   from color-scheme. Components never need `dark:` classes.
+   Dark only ("Signal" redesign, Nov 2026). One theme: a near-neutral
+   charcoal canvas (never pure black) with near-white text and grey line work,
+   so the teal accent is the only color and stands out. Light mode was removed.
    ========================================================================== */
 
 :root {
-  color-scheme: light dark;
-}
-:root[data-theme="light"] {
-  color-scheme: light;
-}
-:root[data-theme="dark"] {
   color-scheme: dark;
 }
 
 /* ==========================================================================
-   Design tokens: "your work, shown as data". A calm data report.
-   Contrast (WCAG AA) checked for every text/background pair on canvas and
-   surface. Chart series colors were validated with the dataviz palette
-   checker (lightness band, chroma, colorblind separation, contrast).
+   Design tokens. Contrast (WCAG AA) checked for every text/background pair on
+   canvas and surface: ink 17.7:1, ink-muted 7.4:1, accent 10.5:1, control
+   boundaries (line-strong) 3.4:1. Teal means interactive or live, never decoration.
    ========================================================================== */
 
 @theme {
   /* Remove Tailwind's default palette so only these tokens can be used. */
   --color-*: initial;
 
-  --color-canvas: light-dark(#f7f8fa, #000000); /* page background (dark: pure black) */
-  --color-surface: light-dark(#eceff3, #0f0f0f); /* panels, cards, header */
-  --color-ink: light-dark(#13233a, #ededed); /* primary text */
-  --color-ink-muted: light-dark(#4a5a70, #a1a1a1); /* secondary text */
-  --color-line: light-dark(#d5dbe3, #262626); /* decorative dividers only */
-  --color-line-strong: light-dark(#74839a, #6b6b6b); /* control & panel boundaries (≥3:1) */
-  --color-accent: light-dark(#0b7268, #4fd1c1); /* links, active nav, focus */
-  --color-on-accent: light-dark(#ffffff, #000000); /* text on accent */
+  --color-canvas: #0b0c0e; /* page background: near-neutral charcoal */
+  --color-surface: #121417; /* the few real objects: cards, nodes, fields */
+  --color-ink: #f2f4f5; /* primary text */
+  --color-ink-muted: #9a9fa6; /* secondary text */
+  --color-line: #26282c; /* decorative hairlines only */
+  --color-line-strong: #62676e; /* control boundaries (3:1 or more) */
+  --color-accent: #4fd1c1; /* interactive or live: links, active, focus */
+  --color-on-accent: #04110f; /* text on accent */
   --color-focus: var(--color-accent); /* focus rings */
 
-  /* Light tile behind dark brand logos, only in dark mode (src/content/tech.ts). */
-  --color-logo-backing: light-dark(transparent, #ededed);
+  /* Light tile behind dark brand logos (src/content/tech.ts). */
+  --color-logo-backing: #ededed;
 
   /* Contribution heatmap: one hue (accent), light to dark, over the band surface. */
   --color-heat-0: var(--color-line);
@@ -51,12 +42,11 @@
   --color-heat-4: var(--color-accent);
 
   /* Chart marks only. Chart text always uses the ink tokens. */
-  --color-series-cert: light-dark(#00897b, #1a9e8f);
-  --color-series-project: light-dark(#a35c00, #c98425);
+  --color-series-cert: #1a9e8f;
+  --color-series-project: #c98425;
 
-  /* Spotify's logo only, per its brand guidelines: black on the light canvas,
-     Spotify Green (#1ed760, from the official logo pack) on the black dark canvas. */
-  --color-spotify-logo: light-dark(#000000, #1ed760);
+  /* Spotify's logo only, per its brand guidelines: Spotify Green (#1ed760, from the official logo pack). */
+  --color-spotify-logo: #1ed760;
 
   /* Type scale. */
   --text-display: clamp(2.5rem, 1.75rem + 3vw, 3.75rem);
@@ -98,7 +88,7 @@
 /* ==========================================================================
    HUD language (section pages, plus corner brackets on home cards).
    Inspired by a game-HUD layout: corner brackets, notched tabs, caps labels.
-   All colors come from the tokens above, so both themes work.
+   All colors come from the tokens above.
    ========================================================================== */
 
 :root {
@@ -139,10 +129,11 @@
 }
 
 /* Log-entry row: a framed line with a heavier left edge. Callers set display and padding. */
+/* An open log row (no frame): a 2px rail on its left edge and a hairline
+   under it, directly on the background ("Signal" open layout). */
 @utility hud-row {
-  border: 1px solid var(--color-line-strong);
-  border-left-width: 4px;
-  background-color: var(--color-canvas);
+  border-left: 2px solid var(--color-line-strong);
+  border-bottom: 1px solid var(--color-line);
 }
 
 /* A row that is a link: the edge turns teal and the row nudges right on hover
@@ -165,34 +156,6 @@
       translate: 0.25rem 0;
     }
   }
-}
-
-/* The teal folded corner on badge tiles (BadgeTile.tsx): a triangle in the top-right. */
-@utility corner-fold {
-  clip-path: polygon(0 0, 100% 0, 100% 100%);
-}
-
-/* Microchip pins (CredentialChip.tsx): short bars along all four edges, drawn as
-   backgrounds in the padding around the die. Set --pin to recolor them (teal on hover). */
-@utility chip-pins {
-  --pin-len: 0.4rem;
-  padding: var(--pin-len);
-  background-image:
-    repeating-linear-gradient(to right, var(--pin, var(--color-line-strong)) 0 2px, transparent 2px 10px),
-    repeating-linear-gradient(to right, var(--pin, var(--color-line-strong)) 0 2px, transparent 2px 10px),
-    repeating-linear-gradient(to bottom, var(--pin, var(--color-line-strong)) 0 2px, transparent 2px 10px),
-    repeating-linear-gradient(to bottom, var(--pin, var(--color-line-strong)) 0 2px, transparent 2px 10px);
-  background-size:
-    70% var(--pin-len),
-    70% var(--pin-len),
-    var(--pin-len) 70%,
-    var(--pin-len) 70%;
-  background-position:
-    50% 0,
-    50% 100%,
-    0 50%,
-    100% 50%;
-  background-repeat: no-repeat;
 }
 
 /* Top-right corner cut. Clips outlines too, so pair with an inset focus ring. */
@@ -428,8 +391,6 @@
   inset: 0;
   z-index: 60;
   overflow: hidden;
-  /* Always dark, whatever the theme: the color tokens resolve to their dark values in here. */
-  color-scheme: dark;
   background-color: var(--color-canvas);
   color: var(--color-ink);
   animation: intro-out 450ms ease-in 5000ms forwards;
@@ -740,13 +701,19 @@
   }
 }
 
-/* HUD cursor (public/cursors/): a teal dart, and a target reticle over anything
-   clickable. The SVGs carry fixed colors (cursor images can't read tokens): Signal
-   Teal (dark) with a near-black outline, so they read on both canvases. Only for
-   mouse-like pointers; text fields keep the I-beam; forced colors gets the system set. */
+/* Cursor (public/cursors/, drawn as SVG and rendered to 32px PNGs at 1x and
+   2x, since glow filters inside SVG cursors are unreliable in Safari): a slim
+   outlined teal dart with a very soft neon glow everywhere, a pointing hand
+   over anything clickable, an open hand over draggable things (closing while
+   dragged), and a matching I-beam in text fields. The hands are Lucide's
+   shapes (ISC) drawn in the same teal outline and glow.
+   Mouse-like pointers only; each rule repeats with image-set() for sharp
+   screens (browsers that can't read that line keep the 1x one). Forced-colors
+   mode keeps the system cursors. */
 @media (pointer: fine) {
   html {
-    cursor: url("/cursors/arrow.svg") 2 2, auto;
+    cursor: url("/cursors/arrow.png") 6 5, auto;
+    cursor: image-set(url("/cursors/arrow.png") 1x, url("/cursors/arrow@2x.png") 2x) 6 5, auto;
   }
   a[href],
   button,
@@ -755,12 +722,26 @@
   label[for],
   summary,
   select {
-    cursor: url("/cursors/reticle.svg") 16 16, pointer;
+    cursor: url("/cursors/hand-point.png") 12 5, pointer;
+    cursor: image-set(url("/cursors/hand-point.png") 1x, url("/cursors/hand-point@2x.png") 2x) 12 5, pointer;
+  }
+  /* Draggable things (the credential carousel): an open hand, closing while held. */
+  .cursor-hand-open,
+  .cursor-hand-open button,
+  .cursor-hand-open [aria-hidden] {
+    cursor: url("/cursors/hand-open.png") 16 14, grab;
+    cursor: image-set(url("/cursors/hand-open.png") 1x, url("/cursors/hand-open@2x.png") 2x) 16 14, grab;
+  }
+  .cursor-hand-open:active,
+  .cursor-hand-open:active * {
+    cursor: url("/cursors/hand-grab.png") 16 16, grabbing;
+    cursor: image-set(url("/cursors/hand-grab.png") 1x, url("/cursors/hand-grab@2x.png") 2x) 16 16, grabbing;
   }
   input:not([type="checkbox"], [type="radio"], [type="submit"], [type="button"], [type="hidden"]),
   textarea,
   [contenteditable="true"] {
-    cursor: text;
+    cursor: url("/cursors/text.png") 16 16, text;
+    cursor: image-set(url("/cursors/text.png") 1x, url("/cursors/text@2x.png") 2x) 16 16, text;
   }
   :disabled,
   [aria-disabled="true"] {
@@ -776,7 +757,9 @@
   [role="tab"],
   label[for],
   summary,
-  select {
+  select,
+  input,
+  textarea {
     cursor: revert;
   }
 }
@@ -848,20 +831,148 @@
   background: transparent;
 }
 
-/* Theme reveal (src/lib/theme-transition.ts): the new theme spreads out as a
-   circle from the theme dial. Replace the default crossfade with that clip. */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
+/* Signature effect: a soft teal neon glow on the primary action (and, later,
+   selected nodes). On a wrapper, since notched elements clip their own shadow. */
+.glow-accent {
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--color-accent) 40%, transparent));
+  transition: filter 250ms var(--ease-out-soft);
+}
+.glow-accent:hover,
+.glow-accent:focus-within {
+  filter: drop-shadow(0 0 12px color-mix(in oklab, var(--color-accent) 60%, transparent));
 }
 
-/* No visible page scrollbar (the user's choice): the page still scrolls with
-   wheel, trackpad, touch, and keyboard. On the home page the depth gauge shows
-   where you are. Inner scroll areas (heatmap, tables) keep their scrollbars. */
+/* Circle nodes (back to top) glow when their
+   button is hovered or focused. */
+.group:hover > .glow-node,
+.group:focus-visible > .glow-node {
+  filter: drop-shadow(0 0 8px color-mix(in oklab, var(--color-accent) 55%, transparent));
+}
+.glow-node {
+  transition: filter 250ms var(--ease-out-soft);
+}
+
+/* Credential carousel (src/components/CredentialPath.tsx): dragged or swiped,
+   never a visible scrollbar; the edges fade so the loop visibly runs on.
+   Emblems ride the wave (--wave-y), grow toward the center and fade toward
+   the edges (--depth-scale, --depth-fade); the component sets these per frame. */
+.credential-carousel {
+  mask-image: linear-gradient(to right, transparent, black 4rem, black calc(100% - 4rem), transparent);
+}
+.credential-strip {
+  scrollbar-width: none;
+}
+.credential-strip::-webkit-scrollbar {
+  display: none;
+}
+.credential-node {
+  translate: 0 var(--wave-y, 0);
+  scale: var(--depth-scale, 1);
+  opacity: var(--depth-fade, 1);
+  will-change: translate, scale, opacity;
+}
+/* The selected emblem's halo. */
+.emblem-glow {
+  background: radial-gradient(circle, color-mix(in oklab, var(--color-accent) 30%, transparent) 0%, transparent 70%);
+}
+@keyframes emblem-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+@keyframes emblem-breathe {
+  50% {
+    opacity: 0.45;
+    scale: 1.12;
+  }
+}
+@keyframes credential-pulse {
+  to {
+    stroke-dashoffset: -640;
+  }
+}
+@keyframes badge-in {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+}
+/* The line carries pulses (a short bright dash every 640px), like data on a wire. */
+.credential-pulse {
+  stroke-dasharray: 4 636;
+  opacity: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .credential-pulse {
+    opacity: 0.9;
+    animation: credential-pulse 5s linear infinite;
+  }
+  .emblem-spin {
+    animation: emblem-spin 9s linear infinite;
+  }
+  .emblem-glow {
+    animation: emblem-breathe 2.6s ease-in-out infinite;
+  }
+  .badge-in {
+    animation: badge-in 300ms var(--ease-out-soft);
+  }
+}
+
+/* Circle nodes (back to top) glow when their
+   button is hovered or focused. */
+.group:hover > .glow-node,
+.group:focus-visible > .glow-node {
+  filter: drop-shadow(0 0 8px color-mix(in oklab, var(--color-accent) 55%, transparent));
+}
+.glow-node {
+  transition: filter 250ms var(--ease-out-soft);
+}
+
+/* Credential carousel (src/components/CredentialPath.tsx): dragged or swiped,
+   never a visible scrollbar; the edges fade so the path visibly runs on. */
+.credential-strip {
+  scrollbar-width: none;
+  mask-image: linear-gradient(to right, transparent, black 3rem, black calc(100% - 3rem), transparent);
+}
+.credential-strip::-webkit-scrollbar {
+  display: none;
+}
+
+/* Circle nodes (back to top) glow when their
+   button is hovered or focused. */
+.group:hover > .glow-node,
+.group:focus-visible > .glow-node {
+  filter: drop-shadow(0 0 8px color-mix(in oklab, var(--color-accent) 55%, transparent));
+}
+.glow-node {
+  transition: filter 250ms var(--ease-out-soft);
+}
+
+/* The site background's static layers (src/components/background/PageBackground.tsx):
+   a faint 64px grid that fades out toward the edges, and a vignette that
+   darkens the corners so the middle of the page reads cleanest. */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, color-mix(in oklab, var(--color-line) 55%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--color-line) 55%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse at 50% 40%, black 20%, transparent 75%);
+}
+.bg-vignette {
+  background: radial-gradient(ellipse at 50% 45%, transparent 55%, color-mix(in oklab, var(--color-canvas) 85%, transparent) 100%);
+}
+
+/* No visible browser scrollbar on the page: the custom scroll rail (src/components/nav/ScrollRail.tsx)
+   is the scrollbar, on every page. The page still scrolls with wheel,
+   trackpad, touch, and keyboard. Inner scroll areas (heatmap, tables, the
+   credential path) keep a thin neutral scrollbar. */
 html {
   scrollbar-width: none;
 }
 html::-webkit-scrollbar {
   display: none;
+}
+body * {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-strong) transparent;
 }

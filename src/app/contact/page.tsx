@@ -10,7 +10,7 @@ const section = getSection("contact");
 
 export const metadata: Metadata = { title: section.label };
 
-/** Email is the main way to reach me, so it's the highlighted entry; the rest are log rows. */
+/** Email is the main way to reach me, so it's the lead row (teal rail, large type); the rest are log rows. */
 const [primary, ...others] = site.contactLinks;
 
 /** Web3Forms' public access key (see README). Without it the form is left out and the links remain. */
@@ -28,7 +28,7 @@ export default function ContactPage() {
       <a
         href={primary.href}
         {...linkTarget(primary.href)}
-        className="hud-notch hud-scan relative mb-6 flex min-h-11 flex-col gap-1 bg-accent px-4 py-4 text-on-accent focus-visible:-outline-offset-4 focus-visible:outline-on-accent sm:flex-row sm:items-baseline sm:justify-between sm:gap-6 sm:px-6"
+        className="group hud-row hud-row-link mb-6 flex min-h-11 flex-col gap-1 !border-l-accent px-4 py-5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6 sm:px-6"
       >
         <span className="inline-flex items-center gap-3 hud-label text-xl">
           <ContactIcon label={primary.label} />

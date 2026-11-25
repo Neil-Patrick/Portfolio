@@ -8,20 +8,22 @@ type SectionPageProps = {
 };
 
 /**
- * Shared shell for a section's own page, in the HUD style: one bracketed panel
- * holding the h1, lead sentence, and page body. On load the brackets "lock on"
- * and the title decodes into place. Navigation is the compass menu.
+ * Shared shell for a section's own page, in the open "Signal" layout: no
+ * frame around the page. A short teal rule marks the start, the title decodes
+ * into place, the lead sits under it, and the body follows directly on the
+ * background. Navigation is the compass menu.
  */
 export function SectionPage({ section, children }: SectionPageProps) {
   return (
-    <article className="container-page py-12 sm:py-16">
-      <div className="hud-corners hud-lock border border-line px-4 py-8 sm:p-8 lg:p-12">
-        <h1 className="mb-3 font-display text-display font-bold">
+    <article className="container-page py-12 sm:py-16 lg:py-20">
+      <header className="max-w-3xl">
+        <span aria-hidden className="mb-6 block h-0.5 w-12 bg-accent" />
+        <h1 className="mb-4 font-display text-display font-bold">
           <DecodeText text={section.label} />
         </h1>
         <p className="max-w-prose text-lg text-ink-muted">{section.detail}</p>
-        {children && <div className="mt-10 sm:mt-12">{children}</div>}
-      </div>
+      </header>
+      {children && <div className="mt-12 sm:mt-16">{children}</div>}
     </article>
   );
 }

@@ -5,10 +5,9 @@ import Link from "next/link";
 import { useState } from "react";
 import { site } from "@/content/site";
 import { CompassMenu } from "./nav/CompassMenu";
-import { ThemeSwitcher } from "./ThemeSwitcher";
 
 /**
- * Top bar: name (home link), theme control, and the compass that opens the
+ * Top bar: name (home link) and the compass that opens the
  * site navigation (same at every screen size). Transparent at the top of the
  * page, so the home hero runs edge to edge; once scrolled it becomes a blurred
  * surface.
@@ -29,7 +28,6 @@ export function SiteHeader() {
           <span className="truncate">{site.name}</span>
         </Link>
         <div className="flex shrink-0 items-center gap-3">
-          <ThemeSwitcher />
           <CompassMenu />
         </div>
       </div>

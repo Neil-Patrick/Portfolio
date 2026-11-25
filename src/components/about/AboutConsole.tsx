@@ -73,10 +73,10 @@ export function AboutConsole({ panels }: { panels: ConsolePanel[] }) {
               aria-controls={`panel-${panel.id}`}
               tabIndex={selected ? 0 : -1}
               onClick={() => open(panel.id)}
-              className={`hud-notch inline-flex min-h-11 items-center justify-center px-2 py-1.5 text-center hud-label text-xs leading-tight transition-colors focus-visible:-outline-offset-4 sm:px-4 sm:text-sm ${
+              className={`hud-notch hud-notch-edge inline-flex min-h-11 items-center justify-center border px-2 py-1.5 text-center hud-label text-xs leading-tight transition-colors focus-visible:-outline-offset-4 sm:px-4 sm:text-sm ${
                 selected
-                  ? "bg-accent text-on-accent focus-visible:outline-on-accent"
-                  : "bg-surface text-ink-muted hover:text-accent"
+                  ? "border-accent bg-accent text-on-accent focus-visible:outline-on-accent"
+                  : "border-line-strong text-ink-muted hover:border-accent hover:text-accent hover:[--edge:var(--color-accent)]"
               }`}
             >
               {panel.label}
@@ -84,8 +84,8 @@ export function AboutConsole({ panels }: { panels: ConsolePanel[] }) {
           );
         })}
       </div>
-      {/* The teal rail the tabs sit on, joining the active tab to its module. */}
-      <span aria-hidden className="block h-0.5 bg-accent" />
+      {/* A hairline under the tab strip (open layout: no box around the panels). */}
+      <span aria-hidden className="mt-3 block h-px bg-line" />
 
       {panels.map((panel) => (
         <div
@@ -95,7 +95,7 @@ export function AboutConsole({ panels }: { panels: ConsolePanel[] }) {
           aria-labelledby={`tab-${panel.id}`}
           hidden={panel.id !== active}
           data-panel={panel.id}
-          className="mt-6"
+          className="mt-10"
         >
           {panel.content}
         </div>

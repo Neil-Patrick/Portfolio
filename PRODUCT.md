@@ -26,8 +26,8 @@ Web first, data and AI next. Neil ships real full-stack web apps with his team n
 ## Operating Context
 
 - **Loader:** every full load of Home (a refresh included) opens with a ~5-second loading screen that preloads assets and continues on any click or key. It never shows with reduced motion, nor when navigating to Home within the site.
-- **Navigation:** a compass menu, which can be dragged with a finger on touch. Home is a short single scroll (landing, Projects, Contact); the Career Timeline and GitHub Activity sit on the About page, and each section also has its own page. A back-to-top button appears past the middle of any page.
-- **Themes and devices:** light and dark, following the OS or the theme switcher. Visitors arrive on both phones and desktops.
+- **Navigation:** a compass menu, which can be dragged with a finger on touch. Home is a short single scroll (landing, Projects), and every page ends with the "Let's Build" contact block in the footer; the Career Timeline and GitHub Activity sit on the About page, and each section also has its own page. On desktop a custom scroll rail on the right edge is the scrollbar on every page, and a back-to-top button appears past the middle of any page.
+- **Theme and devices:** dark only since the November 2026 "Signal" redesign (light mode was removed so one canvas could be tuned properly). Visitors arrive on both phones and desktops.
 - **Verification:** visitors check claims against external profiles: GitHub and LinkedIn links, and each badge's own Credly verification page (the Credly profile link was removed from Contact and the footer at Neil's request).
 
 ## Capabilities and Constraints
@@ -46,7 +46,7 @@ Web first, data and AI next. Neil ships real full-stack web apps with his team n
   - Untold Diaries: an anonymous message board with an AI cat.
   - All are team builds: GADvance and Untold Diaries with his thesis teammates, Statera with a class team.
   - Screenshots: none yet; each project shows a labeled placeholder until Neil adds them.
-- **Certifications** (`src/content/credentials.ts`): 15 Credly badges, with images in `public/badges/`, in five categories (AI and Data, Web Development, IT Foundations, Design and UX, Project Management) that the Credentials page filters by. The featured one is IT Specialist – Artificial Intelligence (Certiport, 2026).
+- **Certifications** (`src/content/credentials.ts`): 15 Credly badges, with images in `public/badges/`, in five fields (AI and Data, Web Development, IT Foundations, Design and UX, Project Management). The Credentials page shows them as a looping carousel of emblems in date order, the real badge in the details, and a browse-by-field list below. The featured one is IT Specialist – Artificial Intelligence (Certiport, 2026).
 - **GitHub:** the Pull Shark achievement and live contribution activity.
 - **Education** (shown on the About page): LSPU BS Computer Science (2023 to present), and Laguna Science National High School STEM, With Honors.
 - **Absences that must not be fabricated:**
@@ -67,7 +67,7 @@ Web first, data and AI next. Neil ships real full-stack web apps with his team n
 
 ## Accessibility & Inclusion
 
-- **Standard:** WCAG 2.2 AA contrast in both themes.
+- **Standard:** WCAG 2.2 AA contrast, including text over the brightest frame of the animated background.
 - **Interaction:** full keyboard access, visible focus states, touch targets of at least 44px, semantic HTML and meaningful alt text.
 - **Motion:** every animation respects `prefers-reduced-motion`, with a settled, fully visible final state.
 - **Layout:** no horizontal scrolling at any width from 320px up.

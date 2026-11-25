@@ -97,7 +97,7 @@ function Streaks({ activity }: { activity: GitHubActivity }) {
           <CountUp value={activity.allTime.total} />
         </p>
         <p className="mt-1 flex items-center justify-center gap-2 font-semibold">
-          <Icon icon={CalendarRange} className="text-accent" />
+          <Icon icon={CalendarRange} className="text-ink-muted" />
           Total Contributions
         </p>
         <p className="text-sm text-ink-muted">{shortDate(activity.allTime.since, true)} – present</p>
@@ -108,7 +108,7 @@ function Streaks({ activity }: { activity: GitHubActivity }) {
           <CountUp value={longest.length} />
         </p>
         <p className="mt-1 flex items-center justify-center gap-2 font-semibold">
-          <Icon icon={Trophy} className="text-accent" />
+          <Icon icon={Trophy} className="text-ink-muted" />
           Longest Streak
         </p>
         <p className="text-sm text-ink-muted">{range(longest)}</p>
@@ -141,7 +141,7 @@ function StreakRing({ current, longest }: { current: Streak; longest: Streak }) 
           />
         </svg>
         <span className="absolute inset-0 flex flex-col items-center justify-center text-4xl font-semibold sm:text-5xl">
-          <Icon icon={Flame} className="mb-1 text-accent" />
+          <Icon icon={Flame} className="mb-1 text-ink-muted" />
           <CountUp value={current.length} />
         </span>
       </div>
@@ -241,7 +241,7 @@ function Languages({ stats }: { stats: GitHubStats }) {
   return (
     <div>
       <h3 className="mb-1 flex items-center gap-2 text-lg">
-        <Icon icon={Code2} className="text-accent" />
+        <Icon icon={Code2} className="text-ink-muted" />
         Most Used Languages
       </h3>
       <p className="mb-4 text-sm text-ink-muted">

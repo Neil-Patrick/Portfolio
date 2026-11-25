@@ -68,7 +68,7 @@ export function SkillExplorer({ groups }: Props) {
                   {group.name}
                 </h2>
                 <span aria-hidden className="h-px min-w-6 flex-1 bg-line" />
-                <p className="hud-label text-sm text-accent tabular-nums">
+                <p className="hud-label text-sm text-ink-muted tabular-nums">
                   {group.skills.length} {group.skills.length === 1 ? "Tool" : "Tools"}
                 </p>
               </div>
@@ -142,10 +142,10 @@ function UsagePanel({ skill }: { skill: ExplorerSkill | null }) {
     <div
       aria-live="polite"
       data-testid="skill-usage"
-      className="hud-corners border border-line-strong bg-surface p-5"
+      className="border-l border-line py-1 pl-6"
     >
       <div aria-hidden className="mb-4 flex items-center gap-3">
-        <span className="hud-label text-sm text-accent">Usage</span>
+        <span className="hud-label text-sm text-ink-muted">Usage</span>
         <span className="h-px flex-1 bg-line" />
       </div>
       {/* Cross-fade between selections; instant with reduced motion. */}

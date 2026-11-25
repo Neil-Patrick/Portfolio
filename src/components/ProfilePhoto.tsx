@@ -2,12 +2,12 @@ import Image from "next/image";
 import { site } from "@/content/site";
 
 /**
- * Neil's profile photo inside HUD brackets. Until `site.photo` is set, a clearly
+ * Neil's profile photo in a notched frame (the site's one object shape). Until `site.photo` is set, a clearly
  * marked placeholder (a silhouette labeled "Photo Placeholder") stands in.
  */
 export function ProfilePhoto({ sizes, priority = false }: { sizes: string; priority?: boolean }) {
   return (
-    <div className="hud-corners relative aspect-square w-full overflow-hidden border border-line bg-canvas">
+    <div className="hud-notch relative aspect-square w-full overflow-hidden border border-line-strong bg-surface">
       {site.photo ? (
         <Image src={site.photo} alt={`Photo of ${site.name}`} fill sizes={sizes} priority={priority} className="object-cover" />
       ) : (

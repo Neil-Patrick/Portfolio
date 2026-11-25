@@ -8,7 +8,7 @@ const SIZES = "(min-width: 64rem) 40vw, 90vw";
 
 /**
  * A project's screenshots on the Projects page: the first one large in a
- * bracketed 16:9 frame, any others as thumbnails beneath that swap into the
+ * notched 16:9 frame, any others as thumbnails beneath that swap into the
  * frame. Until Neil adds images (`images` in projects.ts, files in
  * public/projects/<id>/), a clearly labeled placeholder stands in: a hairline
  * browser window, so it reads as "a screenshot goes here", never as content.
@@ -20,7 +20,7 @@ export function ProjectMedia({ project }: { project: Project }) {
 
   return (
     <div>
-      <div className="hud-corners relative aspect-video w-full overflow-hidden border border-line bg-canvas">
+      <div className="hud-notch relative aspect-video w-full overflow-hidden border border-line-strong bg-surface">
         {main ? (
           <Image src={main.src} alt={main.alt} fill sizes={SIZES} className="object-cover" />
         ) : (

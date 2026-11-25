@@ -49,7 +49,7 @@ export function Player({ feed }: { feed: SpotifyFeed }) {
 
   return (
     <section aria-label="Spotify" data-spotify={onAir ? "playing" : "idle"}>
-      <div className="hud-corners border border-line-strong bg-surface px-4 py-6 sm:p-8">
+      <div className="border-t border-line pt-10">
         <SpotifyHeader>
           <p>
             <OnAirStatus onAir={onAir} />

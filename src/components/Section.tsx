@@ -16,20 +16,23 @@ type SectionProps = {
 };
 
 /**
- * A home page section: anchor id, content, then an arrow to its page.
- * The h2 is visually hidden (the content speaks for itself) but still names the
- * section for screen readers and the on-page index.
- * One background for the whole page: sections are separated by space only.
- * Content and arrow reveal in sequence the first time they scroll into view.
+ * A home page section in the open "Signal" layout: a short teal rule, the
+ * title (visible now, so the page reads as chapters instead of floating
+ * cards), the content directly on the background, then an arrow to the
+ * section's own page. Content and arrow reveal in sequence the first time
+ * they scroll into view.
  */
 export function Section({ id, title, href, cta, children }: SectionProps) {
   const headingId = `${id}-heading`;
   return (
-    <section id={id} aria-labelledby={headingId} className="py-12 sm:py-16">
-      <h2 id={headingId} className="sr-only">
-        {title}
-      </h2>
-      <Reveal className="container-page grid gap-6">
+    <section id={id} aria-labelledby={headingId} className="py-16 sm:py-24">
+      <Reveal className="container-page grid gap-8">
+        <RevealItem>
+          <span aria-hidden className="mb-5 block h-0.5 w-12 bg-accent" />
+          <h2 id={headingId} className="font-display text-display font-bold">
+            {title}
+          </h2>
+        </RevealItem>
         <RevealItem>{children}</RevealItem>
         {href && cta && (
           <RevealItem>
@@ -42,8 +45,9 @@ export function Section({ id, title, href, cta, children }: SectionProps) {
 }
 
 /**
- * Round arrow button to a section's own page (home page). Icon only, so the
- * label is its accessible name and tooltip, e.g. "See All Projects".
+ * Notched arrow button to a section's own page (the site's one button shape).
+ * Icon only, so the label is its accessible name and tooltip, e.g. "See All
+ * Projects".
  */
 export function ArrowLink({ href, label }: { href: string; label: string }) {
   return (
@@ -52,7 +56,7 @@ export function ArrowLink({ href, label }: { href: string; label: string }) {
         href={href}
         aria-label={label}
         title={label}
-        className="group grid size-11 place-items-center rounded-full border border-line-strong text-accent transition-colors hover:border-accent hover:bg-accent hover:text-on-accent"
+        className="group hud-notch hud-notch-edge grid size-11 place-items-center border border-line-strong text-accent transition-colors hover:border-accent hover:bg-accent hover:text-on-accent hover:[--edge:var(--color-accent)] focus-visible:-outline-offset-4"
       >
         <Icon icon={ArrowRight} className="transition-transform motion-safe:group-hover:translate-x-0.5" />
       </Link>

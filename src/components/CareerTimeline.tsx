@@ -118,7 +118,7 @@ export function CareerTimeline({ points }: Props) {
   return (
     <figure
       aria-labelledby={captionId}
-      className="hud-corners border border-line-strong bg-surface p-4 sm:p-6"
+      className="m-0"
     >
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <figcaption id={captionId}>

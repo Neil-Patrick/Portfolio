@@ -1,17 +1,21 @@
 ---
 name: Neil Patrick Pajadan Portfolio
-description: A teal heads-up display the visitor operates to inspect Neil's work.
+description: An open, dark "Signal" layout where Neil's work sits directly on a living line field, with teal reserved for what responds.
 colors:
-  canvas: "light-dark(#f7f8fa, #000000)"
-  surface: "light-dark(#eceff3, #0f0f0f)"
-  ink: "light-dark(#13233a, #ededed)"
-  ink-muted: "light-dark(#4a5a70, #a1a1a1)"
-  line: "light-dark(#d5dbe3, #262626)"
-  line-strong: "light-dark(#74839a, #6b6b6b)"
-  accent: "light-dark(#0b7268, #4fd1c1)"
-  on-accent: "light-dark(#ffffff, #000000)"
-  series-cert: "light-dark(#00897b, #1a9e8f)"
-  series-project: "light-dark(#a35c00, #c98425)"
+  canvas: "#0b0c0e"
+  surface: "#121417"
+  ink: "#f2f4f5"
+  ink-muted: "#9a9fa6"
+  line: "#26282c"
+  line-strong: "#62676e"
+  accent: "#4fd1c1"
+  on-accent: "#04110f"
+  series-cert: "#1a9e8f"
+  series-project: "#c98425"
+  issuer-ibm: "#78a9ff"
+  issuer-cisco: "#f5b85c"
+  issuer-certiport: "#c792ea"
+  spotify-logo: "#1ed760"
 typography:
   landing:
     fontFamily: "Saira Condensed, IBM Plex Sans, ui-sans-serif, sans-serif"
@@ -43,8 +47,6 @@ rounded:
 spacing:
   header: "4rem"
   hud-notch: "0.75rem"
-  hud-corner: "0.875rem"
-  hud-corner-lg: "2rem"
   gutter: "clamp(1rem, 5vw, 6rem)"
   page-max: "110rem"
 components:
@@ -62,18 +64,19 @@ components:
     height: "44px"
   button-secondary-hover:
     textColor: "{colors.accent}"
-  hud-row:
-    backgroundColor: "{colors.canvas}"
-    textColor: "{colors.ink}"
-  hud-row-hover:
-    textColor: "{colors.accent}"
-  hud-row-featured:
-    backgroundColor: "{colors.accent}"
-    textColor: "{colors.on-accent}"
-  hud-tag:
-    backgroundColor: "{colors.surface}"
+  chip:
+    backgroundColor: "transparent"
     textColor: "{colors.ink}"
     typography: "{typography.label}"
+    height: "44px"
+  chip-selected:
+    backgroundColor: "{colors.accent}"
+    textColor: "{colors.on-accent}"
+  log-row:
+    backgroundColor: "transparent"
+    textColor: "{colors.ink}"
+  log-row-hover:
+    textColor: "{colors.accent}"
   arrow-link:
     backgroundColor: "transparent"
     textColor: "{colors.accent}"
@@ -81,234 +84,181 @@ components:
   arrow-link-hover:
     backgroundColor: "{colors.accent}"
     textColor: "{colors.on-accent}"
-  panel:
-    backgroundColor: "transparent"
+  card:
+    backgroundColor: "{colors.surface}"
     textColor: "{colors.ink}"
-  header-control:
-    backgroundColor: "transparent"
-    textColor: "{colors.ink}"
-    rounded: "{rounded.sm}"
-    size: "44px"
-  header-control-hover:
-    textColor: "{colors.accent}"
   back-to-top:
     backgroundColor: "{colors.canvas}"
     textColor: "{colors.ink}"
-    size: "44px"
+    size: "48px"
 ---
 
 # Design System: Neil Patrick Pajadan Portfolio
 
 ## Overview
 
-**Creative North Star: "The Operator's HUD"**
+**Creative North Star: "Signal on the Wire"**
 
-The site is a heads-up display that the visitor operates, not a page they read past. They steer with a compass, and panels lock on as they arrive. Rows read like log entries, and readouts report Neil's work as live system data. Every HUD device has a job: brackets frame what matters, notches mark what's active, and the scan sweep points at the one thing to do next. The cyberpunk feel comes from precision and response, not from neon saturation.
+The site is an open field, not a dashboard. Neil's work sits directly on a dark charcoal canvas crossed by faint grey signal lines, and small teal pulses travel along them like data on a wire. Nothing is boxed for the sake of it. Pages read as chapters: a short teal rule, a large title that decodes into place, then the content laid straight onto the background, organised by spacing, type and thin lines.
 
-The system is restrained at rest and alive on interaction. Surfaces are flat canvas and surface tones divided by 1–2px lines. Teal is the only signal color, and motion answers the visitor:
-- a row nudges toward the cursor;
-- a badge flips;
-- the hologram card tilts toward a finger.
+Teal is the signal. It marks what responds (links, buttons, the selected thing, focus) and what is live (On Air, Open to Work), and nothing else. Everything at rest is charcoal, grey and near-white, so the teal always stands out. Motion answers the visitor: the credential carousel waves as it is dragged, a pulse runs down the line, the selected emblem's ring turns. The one big orchestrated moment is still the first-visit loading screen.
 
-The one big orchestrated moment is the first-visit loading screen; after that, effects stay small.
-
-It works in both themes. Dark mode is a pure black void with a bright signal teal; light mode is a cool instrument-panel grey with a deep teal. Neither theme is an afterthought.
+The site is dark only. Light mode was removed in the November 2026 redesign so the background, glow and contrast could be tuned for one canvas.
 
 **Key Characteristics:**
-- One signal color (teal) on neutral canvas and surface tones.
-- Corner brackets, cut corners and heavy-left-edge rows instead of filled cards and soft shadows.
+- Open layout: content on the background, structured by spacing, type, rules and rails, not panels.
+- One signal color (teal) for interactive and live things only; neutral charcoal, grey and near-white for everything else.
+- One background on every page: a faint grid, grey signal lines and teal pulses, calmer on reading pages.
+- Two shapes: the notched corner for controls and cards, the circle for nodes in a sequence.
 - A condensed display face (Saira Condensed) for titles and short caps labels; IBM Plex Sans for everything else.
-- Motion is feedback (lock-on, wipe, scan, flip, tilt), always with a settled reduced-motion state.
-- No neon palettes, no glowing body text, no monospace costume.
+- Motion is feedback with a settled reduced-motion state; three signatures only (decode, signal pulses, node glow).
 
 ## Colors
 
-A cool neutral instrument palette with a single teal signal, defined as `light-dark()` pairs so each token resolves per theme.
+A near-neutral charcoal palette with a single teal signal. Every text pair is checked for WCAG AA (ink 17.7:1, ink-muted 7.4:1, accent 10.5:1 on the canvas).
 
 ### Primary
-- **Signal Teal** (accent): links, the active nav item, focus rings, HUD brackets and notches, primary buttons, and the selected state everywhere. It's deep in light mode and bright in dark mode so text contrast passes AA in both.
-- **On-Signal** (on-accent): text and icons placed on Signal Teal fills (white in light mode, black in dark mode).
+- **Signal Teal** (accent): links, primary buttons, the selected chip, tab and emblem, focus rings, live markers, the scroll rail's fill and the background pulses.
+- **On-Signal** (on-accent): text and icons on Signal Teal fills.
 
 ### Neutral
-- **Void Canvas** (canvas): the page background. Pure black in dark mode, a pale cool grey in light mode. Log rows sit directly on it.
-- **Instrument Surface** (surface): panels, cards and bands, one step off the canvas. The header is not one of them: scrolled, it's canvas-tinted glass, so it matches the page.
-- **Instrument Ink** (ink): primary text.
-- **Readout Grey** (ink-muted): secondary text, metadata and dates.
-- **Hairline** (line): decorative dividers only, never a control boundary.
-- **Frame Line** (line-strong): control and panel boundaries and row frames (at least 3:1 against canvas).
+- **Charcoal Canvas** (canvas): the page background, near-neutral so nothing reads as tinted. Never pure black.
+- **Raised Surface** (surface): the few real objects (project cards, the media frame, form fields, emblem faces).
+- **Bright Ink** (ink): primary text.
+- **Readout Grey** (ink-muted): secondary text, labels, counts, dates, and every non-interactive label that used to be teal.
+- **Hairline** (line): decorative dividers, the background grid.
+- **Frame Line** (line-strong): control boundaries, rails, the signal lines (at least 3:1 against the canvas).
 
 ### Data Series (charts only)
-- **Certificate Teal** (series-cert) and **Project Amber** (series-project): career timeline marks only, validated for colorblind separation. Chart text always uses the ink tokens, never series colors.
+- **Certificate Teal** (series-cert) and **Project Amber** (series-project): career timeline marks only. Chart text always uses the ink tokens.
 
 ### Named Rules
-**The One Signal Rule.** Teal is the only accent. Never add a second accent hue (no magenta, matrix green or neon cyan) for decoration. The amber series color exists only inside the career timeline chart.
+**The One Signal Rule.** Teal means interactive or live. Never use it for decoration, plain labels, counts or values; those are ink or Readout Grey.
 
-**The Token-Only Rule.** Tailwind's default palette is removed (`--color-*: initial`). Every color comes from these tokens, and new tints are `color-mix()` of them, never new hex values.
+**The Issuer Ring Rule.** Credential emblems ring in their issuer's color (IBM blue `#78a9ff`, Cisco amber `#f5b85c`, Certiport violet `#c792ea`). These three appear only on emblems and are never teal, so teal stays the signal.
+
+**The Token-Only Rule.** Tailwind's default palette is removed (`--color-*: initial`). Every color is a token; new tints are `color-mix()` of tokens. Fixed exceptions are listed (cursor images, issuer rings, Spotify's logo green).
 
 ## Typography
 
 **Display Font:** Saira Condensed, 600/700 (with IBM Plex Sans, then a sans-serif fallback)
 **Body Font:** IBM Plex Sans (with ui-sans-serif and system-ui)
 
-**Character:** Saira Condensed gives the HUD its tall, engineered voice in titles and labels. IBM Plex Sans keeps body text calm and technical, with tabular figures for dates and counts.
+**Character:** Saira Condensed gives titles and labels a tall, engineered voice. IBM Plex Sans keeps body text calm and technical, with tabular figures for dates and counts.
 
 ### Hierarchy
-- **Landing** (700, `clamp(2.25rem, 12cqi, 7.5rem)`, line-height 1): the home headline only ("CODE IN" / "PROGRESS", typed in caps by request; the one place large caps are used). It's sized to its column with container units so each line always fits, and it decodes into place.
-- **Display** (700, `clamp(2.5rem, 1.75rem + 3vw, 3.75rem)`, line-height 1.1): section page titles in the HUD panel, which decode in.
+- **Landing** (700, `clamp(2.25rem, 12cqi, 7.5rem)`, line-height 1): the home headline only ("CODE IN / PROGRESS.", caps by Neil's choice), sized to its column and decoding into place.
+- **Display** (700, `clamp(2.5rem, 1.75rem + 3vw, 3.75rem)`, line-height 1.1): page titles and home section titles, under a short teal rule.
 - **Headline** (600, line-height 1.2, -0.01em): h2 and h3 headings in Plex.
-- **Body** (400, 1rem, line-height 1.6): paragraphs and descriptions, kept to a readable measure (`max-w-prose` or narrower).
-- **Label** (Saira Condensed 600, uppercase, 0.12em tracking): short HUD labels such as tags, buttons, dates, issuers and field labels. The caller sets the size.
+- **Body** (400, 1rem, line-height 1.6): paragraphs at a readable measure.
+- **Label** (Saira Condensed 600, uppercase, 0.12em tracking): short labels: chips, buttons, field labels, dates, issuers, statuses.
 
 ### Named Rules
-**The Caps-for-Labels-Only Rule.** Uppercase is for short HUD labels of one to three words. Headings, links and sentences stay in Title Case or sentence case, never all caps.
+**The Caps-for-Labels-Only Rule.** Uppercase is for labels of one to three words. Sentences and links stay in sentence or Title Case.
 
-**The No-Costume-Mono Rule.** There is no monospace face. Numbers and dates use Plex with `tabular-nums`. Don't add a monospace font to look technical.
+**The No-Costume-Mono Rule.** There is no monospace face. Numbers use Plex with `tabular-nums`.
 
 ## Layout
 
-Pages use a single wide container: max width 110rem, fluid side gutters of `clamp(1rem, 5vw, 6rem)`. The sticky header is 4rem tall and also sets the anchor scroll offset. Breakpoints are Tailwind's defaults (sm 40rem, md 48rem, lg 64rem, xl 80rem, 2xl 96rem), mobile first.
+One wide container (max 110rem, fluid gutters `clamp(1rem, 5vw, 6rem)`), a 4rem sticky header that turns into charcoal glass on scroll, Tailwind's default breakpoints, mobile first.
 
-- **The landing** is a full-viewport two-column grid on large screens (the headline and CTAs beside the hologram card), stacked on phones.
-- **Section pages** open with a bracketed HUD panel holding the decoding title and lead, followed by log-style lists of rows.
-- **Lists** of projects, credentials and achievements are vertical rows or wrapping tiles, never dense masonry.
+- **Page opening:** a 3rem teal rule, the decoding title, the lead sentence, then content directly on the background. No page panel.
+- **Sections** are separated by space and hairlines, not boxes. Home sections get a visible title like the pages.
+- **Lists** are open log rows with a 2px rail on the left and a hairline below.
+- **The footer** on every page opens with "Let's Build Something" and the contact actions, then the links, all open on the background.
+- **The scroll rail** (desktop) replaces the browser's scrollbar on every page.
 
-No layout scrolls horizontally at 320px, and touch targets are at least 44px.
+No layout scrolls horizontally at 320px; touch targets are at least 44px.
 
 ## Elevation & Depth
 
-The system is flat. Depth comes from tonal layering (Void Canvas, then Instrument Surface), 1–2px frame lines and the 4px left edge of log rows, not from drop shadows. The only shadows are teal glows that mark the compass menu's aimed item. Real 3D appears in exactly one place: the hologram card's CSS perspective layers.
+Flat. Depth comes from the background's layers (grid, signal lines, vignette), the Raised Surface tone on the few real objects, and glow on what is selected or aimed at. There are no drop shadows on resting cards. Real 3D appears only in the hologram card.
 
 ### Shadow Vocabulary
-- **Aim Glow** (`box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-accent) 22%, transparent), 0 0 28px color-mix(in oklab, var(--color-accent) 40%, transparent)`): the item the compass needle points at.
-- **Aim Glow, filter form** (`drop-shadow: 0 0 10px color-mix(in oklab, var(--color-accent) 55%, transparent)`): the same glow for clipped or SVG shapes such as the compass hexagons.
+- **Signal Glow** (`drop-shadow: 0 0 6–12px color-mix(in oklab, var(--color-accent) 40–60%, transparent)`): the primary button, the hovered back-to-top button, the scroll rail marker.
+- **Emblem Halo** (radial teal gradient, breathing): behind the selected credential emblem.
+- **Aim Glow** (`box-shadow` ring plus soft teal): the compass menu's aimed item.
 
 ### Named Rules
-**The Glow-Means-Aimed Rule.** Glow appears only on the thing the visitor is currently aiming at. It never decorates resting cards, text or buttons.
+**The Glow-Means-Selected Rule.** Glow appears on the primary action, the selected or aimed item, and nothing else. Never on resting cards, body text or plain labels.
 
 ## Shapes
 
-The form language is angular. Corners are square, or cut at 45°, with almost no rounding.
-
-- **Corner brackets** (`hud-corners`): four teal L-shaped arms (0.875rem long, 2px thick, 2rem around the compass dial), drawn as backgrounds so they add no markup. They frame panels, cards and figures.
-- **Notch** (`hud-notch`): a 0.75rem cut on the top-right corner of tags, primary buttons and the featured row. It clips outlines, so pair it with an inset focus ring.
-- **Corner fold** (`corner-fold`): a small solid teal triangle in the top-right of badge tiles.
-- **Hexagons:** compass menu buttons.
-- **Circles:** only the 44px arrow link and small status dots.
-- **Radii** (4px small, 8px medium) exist for the few soft controls, such as chips and the header's icon buttons. HUD elements stay square.
+- **Notch** (`hud-notch`, 0.75rem top-right cut): buttons, chips, tabs, project cards, the media and photo frames, the preview panel. On bordered elements, `hud-notch-edge` draws the clipped corner's diagonal so the outline stays closed. Pair with an inset focus ring.
+- **Circle:** nodes in a sequence: credential emblems, GitHub achievements, education trace nodes, the scroll rail and home gauge markers, the back-to-top button.
+- **Rails and rules:** 2px rails on list rows, 3rem teal rules opening pages and sections, hairline dividers.
+- **Corner brackets** survive only on the hologram card and the compass dial.
+- **Radii** (4px, 8px) only for album art (Spotify's rule) and embedded players.
 
 ## Components
 
 ### Buttons
-Precise and responsive: square, labeled in caps, at least 44px tall.
-- **Primary** ("Work With Me", "Email Me"): a Signal Teal fill with On-Signal label text, the top-right notch, and (on the landing) a one-time scan sweep after load. Its focus ring is inset in On-Signal so the notch doesn't clip it. It sits in a subtle magnetic wrapper that pulls toward the cursor with full motion.
-- **Secondary** ("See the Work"): transparent with a Frame Line border. On hover the border and text turn Signal Teal.
-- **Arrow link** ("go to the section page"): a round 44px button with a Frame Line border and a teal arrow. On hover it fills Signal Teal, the arrow turns On-Signal and nudges right, and the magnetic wrapper applies.
+- **Primary:** a notched Signal Teal fill with On-Signal caps label and a soft Signal Glow (on a wrapper, since the notch clips shadows).
+- **Secondary:** a notched outline (Frame Line), caps label; border, edge and text turn teal on hover.
+- **Arrow link:** a notched 44px square with a teal arrow; fills teal on hover.
 
-### Log Rows (signature)
-Projects, education and contact entries are framed log entries: a 1px Frame Line border with a 4px left edge, on Void Canvas.
-- **Link rows:** on hover or focus the edge and text turn teal and the row nudges 0.25rem right (no nudge with reduced motion).
-- **The featured row** (the contact email): inverts to a Signal Teal fill with On-Signal text, adds the notch, and plays one scan sweep. There is one per page at most.
+### Log Rows
+Open rows on the background: a 2px Frame Line rail on the left and a hairline below. Link rows turn teal and nudge right on hover (no nudge with reduced motion). The Contact page's email row has a teal rail.
 
-### Console Tabs and Modules (About)
-- **Tabs:** notched caps tabs on a 2px Signal Teal rail; the active one is filled Signal Teal with On-Signal text, the rest sit on Instrument Surface in Readout Grey and turn teal on hover. One row of three equal tabs on phones.
-- **Module:** a bracketed panel of canvas-tinted glass. Header bar: the name in a caps label, a Hairline rule across, and a teal status readout from real data (a pulsing marker when the data is live).
-- **Education trace:** entries hang off a vertical Signal Teal line by solder-pad nodes (a teal ring with a dot on canvas); the line draws downward when the tab opens, static with reduced motion.
+### Chips and Tabs
+Notched outlines with caps labels and a count; selected is a Signal Teal fill. Used for credential fields, Technologies, and the About tabs (which sit over a hairline, with panels open below).
+
+### Credential Carousel (signature)
+A looping, draggable line of circular emblems, oldest to newest, then round again.
+- **Emblem:** a Raised Surface disc ringed in the issuer's color, a ticked inner ring, the issuer above, the short code in the display face, the year below.
+- **Motion:** the line and every emblem ride one wave that swells with drag or swipe speed and settles when still; emblems grow toward the center and fade toward the edges; teal pulses run along the line; the selected emblem's inner ring turns and a halo breathes behind it.
+- **Interaction:** drag (mouse, with momentum) or swipe; it settles on the nearest emblem and selects it. Click glides one to the center. Arrow keys and Home/End for keyboards. No scrollbar, no arrow buttons.
+- **Details:** below the carousel, the real Credly badge (untouched), field, position, issuer, dates and "Verify on Credly".
+- **Browse by Field:** below that, field chips over open rows (small emblem, name, issuer, month, Credly link), grouped by field under All; the choice lives in the URL hash.
 
 ### Spotify Player (About)
-Its own block below the About panel, above the footer, in a bracketed Instrument Surface panel with a Frame Line border.
-- **Header:** the official Spotify logo as the heading, a hairline, then **On Air** (pulsing teal lamp and four bouncing signal bars) or **Off Air** (a still Frame Line lamp).
-- **Song info (left):** static album art beside a caps status ("On Air Now" in Signal Teal, or "Played 20 min. ago"), the title in the display face linking to Spotify, the artist, and a fixed-height row with Open Spotify; under the art, a notched **Close Preview** button in its own row, always reserved (invisible while the preview is closed) so opening and closing moves nothing. It takes only the width it needs (up to 28rem).
-- **Preview panel (right, filling the rest of the row, 2rem gap):** always 152px tall. Closed: a notched panel-sized button with a framed ▶, "Preview on Spotify" and a muted line explaining it's a 30-second preview (or the full song when signed in). Open: Spotify's standard embed player in the same box, so nothing moves. Nothing from Spotify loads before the click. Below lg the panel stacks under the song info.
-- **No transport buttons:** the track index is the only way to change songs.
-- **Cue:** a track-index row loads that song; its text glitches once.
-- **Track index:** rows (▶ for the song playing, S1–S5 for the last five) with dotted leaders to a caps "how long ago"; a small ▶ slides in on hover and focus and the leader turns teal; the loaded row is a Signal Teal fill.
-- **Reduced motion:** no bouncing bars, pulse or glitch.
-- **Spotify attribution (their brand rules):** logo at least 70px wide with half the icon's height of clear space, black on the light canvas and Spotify Green `#1ed760` on dark (`--color-spotify-logo`); album art never animated, bordered or overlaid (4px corners, 8px from sm); every track links to Spotify, plus "Open Spotify".
+Open on a hairline: the official Spotify logo as the heading, On Air with bouncing signal bars or Off Air. Left, the loaded song (static album art, title linking to Spotify, artist, Open Spotify, a reserved Close Preview button). Right, a fixed 152px preview panel: a notched "Preview on Spotify" button that becomes Spotify's embed player in place, so nothing shifts. Below, the S1–S5 track index. Album art never animates (Spotify's rules).
 
-### Filter Chips
-Caps labels with a count, at least 44px tall, wrapping on phones (Credentials categories, Technologies). Resting: a Frame Line border that turns Signal Teal on hover. Selected: a Signal Teal fill with On-Signal text, and the count inverts. They're toggle buttons (`aria-pressed`), and the choice lives in the URL hash.
-
-### Technologies Chips
-Notched (top-right cut) like the HUD tags, square-cornered, at least 44px tall, with the project count as a square badge. Resting: Frame Line border on Instrument Surface (or a Hairline border when no project uses it); hover turns the border Signal Teal; selected is a Signal Teal fill with On-Signal text and an inset focus ring. Each group has a console-module header: caps name, a hairline, and a Signal Teal "N Tools" count. The usage panel opens with a "Usage" header bar.
+### Technologies
+Notched chips with logos and counts per group (group header: name, hairline, count). The usage column is open, with a rail on its left.
 
 ### Contact Form
-A console module ("Send a Message", status "Direct to Inbox") leading the Contact page. Caps labels above square inputs on Void Canvas with a Frame Line border that turns Signal Teal on hover and focus, at least 44px tall; Name and Email side by side from md, Message full width. An invalid field gets a 4px Ink left edge and a message below with a teal "!" (no new error color). Submit is a notched Signal Teal button ("Send Message", "Transmitting…" while sending); the result sits beside it in a polite live region: a teal confirmation, or an Ink-edged error with the direct email link.
+Open fields under an open section header ("Send a Message"); square Raised Surface inputs with a Frame Line border that turns teal on hover and focus; a notched primary submit.
 
 ### Project Media
-A 16:9 frame with corner brackets and a Hairline border on Void Canvas, in each Projects page card. With screenshots: the first fills the frame (object-cover); extras are 80px-wide thumbnails that swap in, the selected one framed in Signal Teal. Without: a Frame Line browser-window outline (title bar, three dots, a few content lines) and a caps "Screenshot Placeholder" label below it, so it never reads as real content.
-
-### HUD Tags
-Short caps labels on Instrument Surface with a 2px teal left edge and the notch. The compass menu uses them to name each destination.
-
-### Panels
-A HUD panel is a Hairline border with corner brackets, open to the canvas behind it (no fill). On section pages its brackets "lock on" once (sliding out from the center over 700ms) as the title decodes.
-
-### Credential Chips (signature)
-Every certification is the same microchip card; none is singled out. Grid of 2 (phones) to 5 (xl) per row, newest first in each category.
-- **Package:** a square die framed by Frame Line pins on all four sides (`chip-pins`, drawn as backgrounds).
-- **Die front:** Instrument Surface with corner brackets; the issuer in small caps, a pin-1 dot, the short code big in the display face, the month in teal, and a status LED.
-- **Aimed (hover or focus):** pins, LED and name turn Signal Teal, and the die flips in 3D to the real Credly badge. With reduced motion it swaps without the spin.
-- **Under the package:** the full name in the display face and the issuer in Readout Grey. The whole card is the link.
-
-### Badge Tiles
-Square tiles (80px small, 112px large), used for GitHub achievements.
-- **Front:** the issuer label, a big code in the display face (for example "AI" or "DATA"), and a teal corner fold.
-- **Back:** hover or focus on the parent link flips the tile in 3D to the real badge art. With reduced motion it swaps without the spin.
+A notched 16:9 Raised Surface frame. With screenshots, the first fills it and others are thumbnails; without, a labeled "Screenshot Placeholder".
 
 ### Navigation (Compass Menu)
-The primary navigation is a radial compass dial in corner brackets, with hexagon buttons for each section and a readout of the aimed destination.
-- **Aiming:** on desktop the needle follows the pointer. On touch it follows a dragging finger, and releasing after a real drag opens that page.
-- **The aimed item:** gets Aim Glow and a label that wipes in.
-- **Keyboard and taps** work as ordinary links.
+Kept from the first design and re-tinted: the compass dial with brackets, an aiming needle, Aim Glow on the aimed item.
 
-### Header Controls
-The theme chip and the compass trigger are borderless 44px squares in Instrument Ink that turn Signal Teal on hover. No outlines.
-- **Theme chip:** a glyph for the mode (sun, moon, or sun-and-moon for System) over three 6×2px ticks marking the stop in the Light → Dark → System cycle; the active tick is teal. A click glitches the glyph for 160ms (offset Signal Teal and Readout Grey copies), then the new theme spreads out from the chip in a circle.
+### Scroll Rail
+The site's scrollbar on every page (desktop). A Frame Line track that fills teal down to a glowing circle marker following the scroll; click the rail to jump or drag the marker. Home shows the section gauge instead (a tick per section, the marker springs to the current one).
 
 ### Back to Top
-A 44px square, bottom right on every page, canvas-tinted glass with corner brackets. It fades in past the middle of the page. A Hairline outline fills with Signal Teal as you scroll, so it doubles as a progress readout. Hidden, it's inert.
+A 48px circle: dark face, Frame Line track, a teal line filling clockwise with scroll progress, a chevron, glowing on hover. Appears past the middle of the page.
 
 ### Cursor
-Mouse pointers only (`@media (pointer: fine)`): a teal dart (`public/cursors/arrow.svg`, hotspot at its tip) across the page, and a target reticle (four corner brackets around a square dot, `reticle.svg`, hotspot at the center) over links, buttons, tabs and summaries. Fixed colors, since cursor images can't read tokens: dark-mode Signal Teal `#4fd1c1` with a `#0b1a1f` outline, readable on both canvases. Text fields keep the I-beam, disabled controls show not-allowed, and forced-colors mode gets the system cursors.
+A slim outlined teal dart with a very soft neon glow; a pointing hand over clickable things; an open hand over draggable things (the credential carousel, the scroll rail) that closes while dragging; a matching I-beam in text fields. The hands are Lucide's shapes in the same teal outline and glow. 32px PNGs at 1x and 2x. Mouse pointers only; forced-colors mode keeps the system cursors.
 
-### Footer (Terminal Sign-off)
-A HUD panel of canvas-tinted glass with corner brackets and a short notched Signal Teal tab on its top edge.
-- **Sign-off line:** "// End of Transmission" in a Readout Grey label, with the live availability status and a pulsing teal marker.
-- **Links:** Pages and Get in Touch under caps labels. Every icon is one ink (brand logos too), and links turn teal on hover.
-- **Bottom bar:** the copyright year and the location.
+### Footer
+Open on a hairline with a teal rule: "Let's Build Something", Email Me (primary with glow), Copy Email, LinkedIn, the arrow to Contact; then "// End of Transmission", Open to Work, page and contact links, copyright and location.
 
 ### Hologram Card (signature)
-The landing's profile card starts flat like a printed card, then separates into floating 3D layers (back plate, photo, brackets, name tag, status chip) when the loader clears.
-- **Movement:** it tilts toward the cursor or a dragging finger, sways when idle, and folds flat and pops back on tap.
-- **Surface:** a holographic sheen and faint scanlines sit on top.
-- **Reduced motion:** the card is flat and still.
-- **Content:** its name tag is the page's h1.
+Kept: the landing's layered 3D card with corner brackets, the photo and the name as the page's h1.
 
 ### Loading Screen
-Shown on every full load of Home (a refresh included), for about 5 seconds:
-- the CRT powers on;
-- the name glitches in;
-- system-check rows print in, with real counts and a live Assets row;
-- a progress bar fills;
-- "Access Granted" appears, then the CRT powers off.
-
-A click or key continues it immediately. It never shows with reduced motion.
+Kept: the CRT boot sequence on a full load of Home, re-tinted to the charcoal canvas. Never plays with reduced motion.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** use Signal Teal as the only accent, and mix tints from it with `color-mix()`.
-- **Do** frame important content with corner brackets, notches and frame lines instead of filled, shadowed cards.
-- **Do** give every animation a settled final state under `prefers-reduced-motion` (content is fully visible and nothing hides behind motion).
-- **Do** make motion answer the visitor (hover, focus, drag, press), and keep idle motion to the hologram card's sway and the loader.
-- **Do** design and check both themes, with AA contrast for every text and background pair.
-- **Do** keep labels in Title Case and reserve caps for short HUD labels.
+- **Do** put content directly on the background and structure it with spacing, rules and rails.
+- **Do** keep teal for interactive and live things; make plain labels, counts and values ink or Readout Grey.
+- **Do** use the notch for controls and cards, and the circle for nodes in a sequence.
+- **Do** give every animation a settled reduced-motion state, and pause ambient motion off screen.
+- **Do** keep text at AA contrast against the brightest frame of the background.
+- **Do** show real third-party marks untouched (Credly badges, Spotify logo and album art).
 
 ### Don't:
-- **Don't** add neon magenta, matrix green or a second accent hue.
-- **Don't** put glow or `text-shadow` on body text, headings or resting elements. Glow means "aimed".
-- **Don't** add a monospace font for a technical look. Use `tabular-nums` for figures.
-- **Don't** add constant glitching or CRT flicker outside the loading screen.
-- **Don't** use heavy blur or frosted-glass panels; the hologram card owns the holographic look.
-- **Don't** build a dark-only effect. Every treatment must work in light mode too.
-- **Don't** round HUD elements; radii are for the few soft controls only.
+- **Don't** wrap sections or pages in bordered panels, or nest boxes inside boxes.
+- **Don't** use pure black, or tint the whole page teal.
+- **Don't** add a second accent color for decoration (issuer rings are the documented exception).
+- **Don't** glow resting cards, body text or labels.
+- **Don't** bring back light mode piecemeal; it was removed on purpose.
+- **Don't** show the browser's page scrollbar; the scroll rail is the scrollbar.
+- **Don't** animate album art or alter issuers' badge art.
