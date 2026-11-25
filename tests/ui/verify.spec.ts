@@ -657,7 +657,7 @@ test("Education lives on the About page, not Credentials", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Education" })).toHaveCount(0);
 });
 
-test("Spotify module: now playing and the last 5 tracks from /api/now-playing, hidden when there's nothing", async ({ page, request }) => {
+test("Spotify radio: its own block below the About panel, tuning between now playing and the last 5, hidden when there's nothing", async ({ page, request }) => {
   // The real route always answers with a valid shape (empty without keys).
   const live = await (await request.get("/api/now-playing")).json();
   expect(live).toHaveProperty("now");
@@ -667,55 +667,60 @@ test("Spotify module: now playing and the last 5 tracks from /api/now-playing, h
   // Mocked, so the test doesn't depend on what Neil is listening to.
   const track = (n: number) => ({ title: `Song ${n}`, artist: `Artist ${n}`, url: `https://open.spotify.com/track/${n}` });
   const minutesAgo = (m: number) => new Date(Date.now() - m * 60_000).toISOString();
-  const recent = [
-    { ...track(1), playedAt: minutesAgo(5) },
-    { ...track(2), playedAt: minutesAgo(130) },
-    { ...track(3), playedAt: minutesAgo(60 * 30) },
-    { ...track(4), playedAt: minutesAgo(60 * 50) },
-    { ...track(5), playedAt: minutesAgo(60 * 80) },
-  ];
+  const recent = [5, 130, 60 * 30, 60 * 50, 60 * 80].map((m, i) => ({ ...track(i + 1), playedAt: minutesAgo(m) }));
   await page.route("**/api/now-playing", (route) => route.fulfill({ json: { now: track(0), recent } }));
   await page.goto("/about");
   const spotify = page.getByRole("region", { name: "Spotify" });
   await expect(spotify).toBeVisible();
-  // Below the console's tabs.
-  const tabsBottom = await page.getByRole("tablist").evaluate((el) => el.getBoundingClientRect().bottom);
-  expect(await spotify.evaluate((el) => el.getBoundingClientRect().top)).toBeGreaterThan(tabsBottom);
-  // Now playing deck: link, label, level meter, "Live" status.
-  const deck = spotify.locator("[data-now-playing]");
-  await expect(deck).toContainText("Now Playing");
-  await expect(deck).toHaveAttribute("href", "https://open.spotify.com/track/0");
-  await expect(deck.locator(".eq-bar")).toHaveCount(4);
-  await expect(spotify).toContainText("Live");
-  // Spotify attribution: the official logo names the module, and a link back reads "Open Spotify".
+
+  // Outside the About panel, between it and the footer.
+  await expect(page.locator("article").getByRole("region", { name: "Spotify" })).toHaveCount(0);
+  const top = (selector: string) => page.locator(selector).first().evaluate((el) => el.getBoundingClientRect().top);
+  const articleBottom = await page.locator("article").first().evaluate((el) => el.getBoundingClientRect().bottom);
+  const spotifyTop = await spotify.evaluate((el) => el.getBoundingClientRect().top);
+  expect(spotifyTop).toBeGreaterThanOrEqual(articleBottom);
+  expect(await top("footer")).toBeGreaterThan(spotifyTop);
+
+  // Attribution: the official logo names the block (70px or wider), and "Open Spotify" links back.
   await expect(spotify.getByRole("heading", { name: "Spotify" }).locator("svg[data-spotify-logo]")).toBeVisible();
   expect((await spotify.locator("svg[data-spotify-logo]").boundingBox())!.width).toBeGreaterThanOrEqual(70);
   await expect(spotify.getByRole("link", { name: /^Open Spotify/ })).toHaveAttribute("href", "https://open.spotify.com");
-  // Recently played: five rows, newest first, each with a link and a time.
-  const rows = spotify.getByRole("listitem");
-  await expect(rows).toHaveCount(5);
-  for (const [i, row] of (await rows.all()).entries()) {
-    await expect(row.getByRole("link")).toHaveAttribute("href", recent[i].url);
-    // Two copies of the time (under the artist on phones, a right-hand column on wider screens); one shows.
-    await expect(row.locator("time").first()).toHaveAttribute("datetime", recent[i].playedAt);
-    await expect(row.locator("time:visible")).toHaveCount(1);
-  }
-  // At a Glance no longer carries its own copy.
-  await expect(page.getByRole("complementary", { name: "At a Glance" }).locator("[data-now-playing]")).toHaveCount(0);
 
-  // Nothing playing: no deck, "Idle", the log stays.
+  // On air: LIVE plus presets 1-5, LIVE tuned in, the readout links to the song playing.
+  await expect(spotify.locator("[data-on-air]")).toHaveText(/On Air/);
+  const presets = spotify.getByRole("group", { name: "Stations" }).getByRole("button");
+  await expect(presets).toHaveText(["LIVE", "1", "2", "3", "4", "5"]);
+  await expect(presets.first()).toHaveAttribute("aria-pressed", "true");
+  const readout = spotify.locator("[data-readout]");
+  await expect(readout.getByRole("link")).toHaveAttribute("href", track(0).url);
+  await expect(readout).toContainText("On Air Now");
+
+  // Tuning: preset 3 swaps the readout to the third-last song and moves the needle.
+  const needle = spotify.locator("[data-needle]");
+  const needleBefore = await needle.evaluate((el) => (el as HTMLElement).style.left);
+  await spotify.getByRole("button", { name: "3: Tune to Song 3 by Artist 3" }).click();
+  await expect(presets.nth(3)).toHaveAttribute("aria-pressed", "true");
+  await expect(presets.first()).toHaveAttribute("aria-pressed", "false");
+  await expect(readout.getByRole("link")).toHaveAttribute("href", recent[2].url);
+  await expect(readout.locator("time")).toHaveAttribute("datetime", recent[2].playedAt);
+  expect(await needle.evaluate((el) => (el as HTMLElement).style.left)).not.toBe(needleBefore);
+  // Album art is never animated (Spotify's rules): the static flicker is on the text only.
+  await expect(spotify.locator("[data-spotify-art].tune-static, .tune-static [data-spotify-art]")).toHaveCount(0);
+
+  // Nothing playing: Off Air, presets 1-5, the latest song tuned in.
   await page.unroute("**/api/now-playing");
   await page.route("**/api/now-playing", (route) => route.fulfill({ json: { now: null, recent } }));
   await page.reload();
-  await expect(spotify).toContainText("Idle");
-  await expect(spotify.locator("[data-now-playing]")).toHaveCount(0);
-  await expect(rows).toHaveCount(5);
+  await expect(spotify.locator("[data-on-air]")).toHaveText(/Off Air/);
+  await expect(presets).toHaveText(["1", "2", "3", "4", "5"]);
+  await expect(presets.first()).toHaveAttribute("aria-pressed", "true");
+  await expect(readout.getByRole("link")).toHaveAttribute("href", recent[0].url);
 
-  // Not set up: no module at all.
+  // Not set up: no block at all.
   await page.unroute("**/api/now-playing");
   await page.route("**/api/now-playing", (route) => route.fulfill({ json: { now: null, recent: [] } }));
   await page.reload();
-  await page.waitForLoadState("networkidle");
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.getByRole("region", { name: "Spotify" })).toHaveCount(0);
 });
 

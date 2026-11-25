@@ -37,80 +37,83 @@ const facts = [
 
 export default function AboutPage() {
   return (
-    <SectionPage section={section}>
-      <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_22rem] xl:gap-20">
-        <div className="max-w-prose space-y-5 text-lg">
-          {site.about.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
+    <>
+      <SectionPage section={section}>
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_22rem] xl:gap-20">
+          <div className="max-w-prose space-y-5 text-lg">
+            {site.about.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
+
+          {/* HUD profile panel: caps field labels over teal values, printing in one by one. */}
+          <aside
+            aria-labelledby="at-a-glance"
+            className="hud-corners self-start border border-line-strong bg-surface p-6"
+          >
+            <div className="mb-6">
+              <ProfilePhoto sizes="(min-width: 1024px) 19rem, 90vw" />
+            </div>
+            <h2 id="at-a-glance" className="mb-5 hud-label text-lg text-ink">
+              At a Glance
+            </h2>
+            <Reveal as="dl" className="grid gap-5">
+              {facts.map((fact) => (
+                <RevealItem key={fact.label} from="left">
+                  <dt className="hud-label text-sm text-ink-muted">{fact.label}</dt>
+                  <dd className="mt-0.5 font-display text-xl leading-snug font-semibold text-accent">
+                    {fact.value}
+                  </dd>
+                </RevealItem>
+              ))}
+            </Reveal>
+          </aside>
         </div>
 
-        {/* HUD profile panel: caps field labels over teal values, printing in one by one. */}
-        <aside
-          aria-labelledby="at-a-glance"
-          className="hud-corners self-start border border-line-strong bg-surface p-6"
-        >
-          <div className="mb-6">
-            <ProfilePhoto sizes="(min-width: 1024px) 19rem, 90vw" />
-          </div>
-          <h2 id="at-a-glance" className="mb-5 hud-label text-lg text-ink">
-            At a Glance
-          </h2>
-          <Reveal as="dl" className="grid gap-5">
-            {facts.map((fact) => (
-              <RevealItem key={fact.label} from="left">
-                <dt className="hud-label text-sm text-ink-muted">{fact.label}</dt>
-                <dd className="mt-0.5 font-display text-xl leading-snug font-semibold text-accent">
-                  {fact.value}
-                </dd>
-              </RevealItem>
-            ))}
-          </Reveal>
-        </aside>
-      </div>
+        {/* The console: one HUD module at a time, picked by tab (or the URL hash). */}
+        <div className="mt-16 sm:mt-20">
+          <AboutConsole
+            panels={[
+              {
+                id: "education",
+                label: "Education",
+                content: (
+                  <ConsoleModule title="Education" status={`${education.length} Records`}>
+                    <EducationTrace />
+                  </ConsoleModule>
+                ),
+              },
+              {
+                id: "career-timeline",
+                label: "Career Timeline",
+                content: (
+                  <ConsoleModule title="Career Timeline" status={timelineStatus}>
+                    <CareerTimeline points={timeline} />
+                  </ConsoleModule>
+                ),
+              },
+              {
+                id: "github",
+                label: "GitHub Activity",
+                content: (
+                  <ConsoleModule title="GitHub Activity" status="Synced Hourly" live>
+                    <div className="grid gap-6">
+                      <GitHubActivity />
+                      <GitHubAchievements />
+                    </div>
+                  </ConsoleModule>
+                ),
+              },
+            ]}
+          />
+        </div>
+      </SectionPage>
 
-      {/* The console: one HUD module at a time, picked by tab (or the URL hash). */}
-      <div className="mt-16 sm:mt-20">
-        <AboutConsole
-          panels={[
-            {
-              id: "education",
-              label: "Education",
-              content: (
-                <ConsoleModule title="Education" status={`${education.length} Records`}>
-                  <EducationTrace />
-                </ConsoleModule>
-              ),
-            },
-            {
-              id: "career-timeline",
-              label: "Career Timeline",
-              content: (
-                <ConsoleModule title="Career Timeline" status={timelineStatus}>
-                  <CareerTimeline points={timeline} />
-                </ConsoleModule>
-              ),
-            },
-            {
-              id: "github",
-              label: "GitHub Activity",
-              content: (
-                <ConsoleModule title="GitHub Activity" status="Synced Hourly" live>
-                  <div className="grid gap-6">
-                    <GitHubActivity />
-                    <GitHubAchievements />
-                  </div>
-                </ConsoleModule>
-              ),
-            },
-          ]}
-        />
-      </div>
-
-      {/* Live from Spotify: now playing and the last five tracks (hidden if Spotify isn't set up). */}
-      <div className="mt-12 sm:mt-16">
+      {/* Spotify on its own, below the About panel and above the footer:
+          the radio tuner (hidden if Spotify isn't set up). */}
+      <div className="container-page pb-12 sm:pb-16">
         <SpotifyModule />
       </div>
-    </SectionPage>
+    </>
   );
 }

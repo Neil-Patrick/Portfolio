@@ -214,11 +214,14 @@ Projects, education and contact entries are framed log entries: a 1px Frame Line
 - **Module:** a bracketed panel of canvas-tinted glass. Header bar: the name in a caps label, a Hairline rule across, and a teal status readout from real data (a pulsing marker when the data is live).
 - **Education trace:** entries hang off a vertical Signal Teal line by solder-pad nodes (a teal ring with a dot on canvas); the line draws downward when the tab opens, static with reduced motion.
 
-### Spotify Module (About)
-A console module below the tabs. Status reads "Live" with the pulsing marker while a song plays, "Idle" otherwise.
-- **Now Playing deck** (only while playing): album art in corner brackets, a four-bar Signal Teal level meter (still under reduced motion), the song in the display face and the artist in Readout Grey.
-- **Recently Played:** the last five tracks as log rows with a thumbnail, title, artist and a caps "how long ago" label; on phones the time sits under the artist.
-- **Spotify attribution (their brand rules):** the official full logo replaces the module's text title, about 28px tall (over 70px wide), with half the icon's height of clear space; black on the light canvas, Spotify Green `#1ed760` on the black dark canvas (`--color-spotify-logo`, the logo's only use). Album art stays unaltered: no border, overlay or crop, 4px corners on thumbnails and 8px on the large deck art. An "Open Spotify" link closes the module.
+### Spotify Radio (About)
+Its own block below the About panel, above the footer: a pirate-radio tuner in a bracketed Instrument Surface panel with a Frame Line border.
+- **Header:** the official Spotify logo as the heading, a hairline, then **On Air** (pulsing teal lamp and four bouncing signal bars) or **Off Air** (a still Frame Line lamp).
+- **Dial:** an FM scale 88–108 (tall ticks every 10%, short between, line tokens), a mark per station, and a Signal Teal needle with a diamond head that glides to the tuned station (600ms ease-out-soft; it sweeps in from 88 on first show). Phones label 88, 98 and 108 only. Frequencies are decoration, spread evenly across the band.
+- **Readout:** static album art (no animation, border or overlay; 4px corners, 8px from sm), then the frequency in Signal Teal display type, the song as a link to Spotify, the artist, and "On Air Now" or "Played 2 hr. ago". Each tune replays a 280ms stepped static flicker on the text only.
+- **Presets:** notched square buttons (LIVE while playing, then 1–5), Signal Teal fill when tuned; "Open Spotify" closes the row.
+- **Reduced motion:** no sweep, flicker or bouncing bars.
+- **Spotify attribution (their brand rules):** logo at least 70px wide with half the icon's height of clear space, black on the light canvas and Spotify Green `#1ed760` on dark (`--color-spotify-logo`); album art unaltered; every track links to Spotify.
 
 ### Filter Chips
 Caps labels with a count, at least 44px tall, wrapping on phones (Credentials categories, Technologies). Resting: a Frame Line border that turns Signal Teal on hover. Selected: a Signal Teal fill with On-Signal text, and the count inverts. They're toggle buttons (`aria-pressed`), and the choice lives in the URL hash.
