@@ -657,7 +657,9 @@ test("Education lives on the About page, not Credentials", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Education" })).toHaveCount(0);
 });
 
-test("Spotify radio: its own block below the About panel, tuning between now playing and the last 5, hidden when there's nothing", async ({ page, request }) => {
+test("Spotify player: its own block below the About panel; track index rows load songs; hidden when there's nothing", async ({ page, request }) => {
+  // Several reloads (on air, idle, long title, empty): give it the slow-test budget.
+  test.slow();
   // The real route always answers with a valid shape (empty without keys).
   const live = await (await request.get("/api/now-playing")).json();
   expect(live).toHaveProperty("now");
@@ -665,56 +667,78 @@ test("Spotify radio: its own block below the About panel, tuning between now pla
   expect(live.recent.length).toBeLessThanOrEqual(5);
 
   // Mocked, so the test doesn't depend on what Neil is listening to.
-  const track = (n: number) => ({ title: `Song ${n}`, artist: `Artist ${n}`, url: `https://open.spotify.com/track/${n}` });
+  const track = (n: number) => ({ title: `Song ${n}`, artist: `Artist ${n}`, url: `https://open.spotify.com/track/abc${n}` });
   const minutesAgo = (m: number) => new Date(Date.now() - m * 60_000).toISOString();
   const recent = [5, 130, 60 * 30, 60 * 50, 60 * 80].map((m, i) => ({ ...track(i + 1), playedAt: minutesAgo(m) }));
   await page.route("**/api/now-playing", (route) => route.fulfill({ json: { now: track(0), recent } }));
+  await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/about");
   const spotify = page.getByRole("region", { name: "Spotify" });
   await expect(spotify).toBeVisible();
 
   // Outside the About panel, between it and the footer.
   await expect(page.locator("article").getByRole("region", { name: "Spotify" })).toHaveCount(0);
-  const top = (selector: string) => page.locator(selector).first().evaluate((el) => el.getBoundingClientRect().top);
   const articleBottom = await page.locator("article").first().evaluate((el) => el.getBoundingClientRect().bottom);
-  const spotifyTop = await spotify.evaluate((el) => el.getBoundingClientRect().top);
-  expect(spotifyTop).toBeGreaterThanOrEqual(articleBottom);
-  expect(await top("footer")).toBeGreaterThan(spotifyTop);
+  const box = (locator: ReturnType<typeof page.locator>) => locator.evaluate((el) => el.getBoundingClientRect().toJSON());
+  const spotifyBox = await box(spotify);
+  expect(spotifyBox.top).toBeGreaterThanOrEqual(articleBottom);
+  expect((await box(page.locator("footer"))).top).toBeGreaterThan(spotifyBox.top);
+  // Wide screens: song info on the left, the preview panel right next to it (no wide gap), no transport buttons.
+  const info = await box(spotify.locator("[data-info]"));
+  const slot = await box(spotify.locator("[data-preview-slot]"));
+  expect(slot.left).toBeGreaterThan(info.right);
+  expect(slot.left - info.right).toBeLessThanOrEqual(40);
+  await expect(spotify.getByRole("group", { name: "Deck controls" })).toHaveCount(0);
 
   // Attribution: the official logo names the block (70px or wider), and "Open Spotify" links back.
   await expect(spotify.getByRole("heading", { name: "Spotify" }).locator("svg[data-spotify-logo]")).toBeVisible();
   expect((await spotify.locator("svg[data-spotify-logo]").boundingBox())!.width).toBeGreaterThanOrEqual(70);
   await expect(spotify.getByRole("link", { name: /^Open Spotify/ })).toHaveAttribute("href", "https://open.spotify.com");
 
-  // On air: LIVE plus presets 1-5, LIVE tuned in, the readout links to the song playing.
+  // On air: lamp and signal bars; the song playing is loaded.
   await expect(spotify.locator("[data-on-air]")).toHaveText(/On Air/);
-  const presets = spotify.getByRole("group", { name: "Stations" }).getByRole("button");
-  await expect(presets).toHaveText(["LIVE", "1", "2", "3", "4", "5"]);
-  await expect(presets.first()).toHaveAttribute("aria-pressed", "true");
-  const readout = spotify.locator("[data-readout]");
-  await expect(readout.getByRole("link")).toHaveAttribute("href", track(0).url);
-  await expect(readout).toContainText("On Air Now");
+  await expect(spotify.locator("[data-on-air] .eq-bar")).toHaveCount(4);
+  const loaded = spotify.locator("[data-loaded]");
+  await expect(loaded).toHaveAttribute("href", track(0).url);
+  const rows = spotify.getByRole("listitem").getByRole("button");
+  await expect(rows).toHaveCount(6);
+  await expect(rows.first()).toHaveAttribute("aria-pressed", "true");
+  // Rows are labelled S1-S5 after the live one; the header has no tape counter.
+  await expect(rows.nth(1)).toContainText("S1");
+  await expect(rows.nth(5)).toContainText("S5");
+  await expect(spotify.locator("[data-on-air]").locator("xpath=..").getByText(/^\d{4}$/)).toHaveCount(0);
 
-  // Tuning: preset 3 swaps the readout to the third-last song and moves the needle.
-  const needle = spotify.locator("[data-needle]");
-  const needleBefore = await needle.evaluate((el) => (el as HTMLElement).style.left);
-  await spotify.getByRole("button", { name: "3: Tune to Song 3 by Artist 3" }).click();
-  await expect(presets.nth(3)).toHaveAttribute("aria-pressed", "true");
-  await expect(presets.first()).toHaveAttribute("aria-pressed", "false");
-  await expect(readout.getByRole("link")).toHaveAttribute("href", recent[2].url);
-  await expect(readout.locator("time")).toHaveAttribute("datetime", recent[2].playedAt);
-  expect(await needle.evaluate((el) => (el as HTMLElement).style.left)).not.toBe(needleBefore);
-  // Album art is never animated (Spotify's rules): the static flicker is on the text only.
-  await expect(spotify.locator("[data-spotify-art].tune-static, .tune-static [data-spotify-art]")).toHaveCount(0);
+  // A track index row cues its song.
+  await rows.nth(3).click();
+  await expect(rows.nth(3)).toHaveAttribute("aria-pressed", "true");
+  await expect(loaded).toHaveAttribute("href", recent[2].url);
+  // And back to the song playing now.
+  await rows.first().click();
+  await expect(loaded).toHaveAttribute("href", track(0).url);
 
-  // Nothing playing: Off Air, presets 1-5, the latest song tuned in.
+  // Album art never animates (Spotify's rules): no animation on it or around it from the deck's effects.
+  for (const img of await spotify.locator("[data-spotify-art]").all()) {
+    expect(await img.evaluate((el) => getComputedStyle(el).animationName)).toBe("none");
+  }
+
+  // Nothing playing: Off Air, no bars, the latest song loaded, five rows.
   await page.unroute("**/api/now-playing");
   await page.route("**/api/now-playing", (route) => route.fulfill({ json: { now: null, recent } }));
   await page.reload();
   await expect(spotify.locator("[data-on-air]")).toHaveText(/Off Air/);
-  await expect(presets).toHaveText(["1", "2", "3", "4", "5"]);
-  await expect(presets.first()).toHaveAttribute("aria-pressed", "true");
-  await expect(readout.getByRole("link")).toHaveAttribute("href", recent[0].url);
+  await expect(spotify.locator("[data-on-air] .eq-bar")).toHaveCount(0);
+  await expect(rows).toHaveCount(5);
+  await expect(loaded).toHaveAttribute("href", recent[0].url);
+
+  // A long title playing doesn't make a phone screen scroll sideways.
+  const long = { ...track(9), title: "Magkunwari ('Di Man Tayo) (TODA One I Love Official Soundtrack)" };
+  await page.unroute("**/api/now-playing");
+  await page.route("**/api/now-playing", (route) => route.fulfill({ json: { now: long, recent } }));
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.reload();
+  await expect(loaded).toContainText("Magkunwari");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+  await page.setViewportSize({ width: 1440, height: 900 });
 
   // Not set up: no block at all.
   await page.unroute("**/api/now-playing");
@@ -722,6 +746,64 @@ test("Spotify radio: its own block below the About panel, tuning between now pla
   await page.reload();
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.getByRole("region", { name: "Spotify" })).toHaveCount(0);
+});
+
+test("Spotify preview: Spotify's player loads only after Preview, in a fixed slot that moves nothing, and Close removes it", async ({ page }) => {
+  const track = (n: number) => ({ title: `Song ${n}`, artist: `Artist ${n}`, url: `https://open.spotify.com/track/abc${n}` });
+  const recent = [1, 2].map((n) => ({ ...track(n), playedAt: new Date(Date.now() - n * 600_000).toISOString() }));
+  await page.route("**/api/now-playing", (route) => route.fulfill({ json: { now: track(0), recent } }));
+  // Keep the test offline: the embed gets an empty page instead of Spotify's player.
+  let embedRequests = 0;
+  await page.route("https://open.spotify.com/embed/**", (route) => {
+    embedRequests++;
+    return route.fulfill({ contentType: "text/html", body: "<!doctype html><title>embed</title>" });
+  });
+  await page.goto("/about");
+  const spotify = page.getByRole("region", { name: "Spotify" });
+  await expect(spotify).toBeVisible();
+  const frame = spotify.locator("iframe");
+  await expect(frame).toHaveCount(0);
+  expect(embedRequests).toBe(0);
+
+  // Opening and closing the preview moves nothing: same track index position, same info height.
+  const layout = () =>
+    page.evaluate(() => ({
+      // Relative to the block, so scrolling doesn't count.
+      index:
+        document.querySelector("[data-spotify] ol")!.getBoundingClientRect().top -
+        document.querySelector("[data-spotify]")!.getBoundingClientRect().top,
+      info: document.querySelector("[data-info]")!.getBoundingClientRect().height,
+    }));
+  const before = await layout();
+
+  // The Preview button, in the slot.
+  await spotify.getByRole("button", { name: /^Preview on Spotify/ }).click();
+  await expect(frame).toHaveAttribute("height", "152");
+  expect(await layout()).toEqual(before);
+  await expect(frame).toHaveAttribute("src", /^https:\/\/open\.spotify\.com\/embed\/track\/abc0\b/);
+  await expect(frame).toHaveAttribute("title", "Spotify preview: Song 0 by Artist 0");
+  await spotify.getByRole("button", { name: "Close Preview" }).click();
+  await expect(frame).toHaveCount(0);
+  expect(await layout()).toEqual(before);
+
+  // Same on a phone, where everything stacks.
+  await page.setViewportSize({ width: 375, height: 800 });
+  const phoneBefore = await layout();
+  await spotify.getByRole("button", { name: /^Preview on Spotify/ }).click();
+  await expect(frame).toBeVisible();
+  expect(await layout()).toEqual(phoneBefore);
+  await spotify.getByRole("button", { name: "Close Preview" }).click();
+  await expect(frame).toHaveCount(0);
+  await page.setViewportSize({ width: 1280, height: 800 });
+
+  // After loading another song from the track index, the preview follows it.
+  const rows = spotify.getByRole("listitem").getByRole("button");
+  await rows.nth(1).click();
+  await spotify.getByRole("button", { name: /^Preview on Spotify/ }).click();
+  await expect(frame).toHaveAttribute("src", /\/embed\/track\/abc1\b/);
+  // Loading another song closes the player.
+  await rows.nth(2).click();
+  await expect(frame).toHaveCount(0);
 });
 
 test("About console: tabs switch by click and arrow keys, follow the hash, and hide the other panels", async ({ page }) => {

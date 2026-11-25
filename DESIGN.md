@@ -214,14 +214,16 @@ Projects, education and contact entries are framed log entries: a 1px Frame Line
 - **Module:** a bracketed panel of canvas-tinted glass. Header bar: the name in a caps label, a Hairline rule across, and a teal status readout from real data (a pulsing marker when the data is live).
 - **Education trace:** entries hang off a vertical Signal Teal line by solder-pad nodes (a teal ring with a dot on canvas); the line draws downward when the tab opens, static with reduced motion.
 
-### Spotify Radio (About)
-Its own block below the About panel, above the footer: a pirate-radio tuner in a bracketed Instrument Surface panel with a Frame Line border.
+### Spotify Player (About)
+Its own block below the About panel, above the footer, in a bracketed Instrument Surface panel with a Frame Line border.
 - **Header:** the official Spotify logo as the heading, a hairline, then **On Air** (pulsing teal lamp and four bouncing signal bars) or **Off Air** (a still Frame Line lamp).
-- **Dial:** an FM scale 88–108 (tall ticks every 10%, short between, line tokens), a mark per station, and a Signal Teal needle with a diamond head that glides to the tuned station (600ms ease-out-soft; it sweeps in from 88 on first show). Phones label 88, 98 and 108 only. Frequencies are decoration, spread evenly across the band.
-- **Readout:** static album art (no animation, border or overlay; 4px corners, 8px from sm), then the frequency in Signal Teal display type, the song as a link to Spotify, the artist, and "On Air Now" or "Played 2 hr. ago". Each tune replays a 280ms stepped static flicker on the text only.
-- **Presets:** notched square buttons (LIVE while playing, then 1–5), Signal Teal fill when tuned; "Open Spotify" closes the row.
-- **Reduced motion:** no sweep, flicker or bouncing bars.
-- **Spotify attribution (their brand rules):** logo at least 70px wide with half the icon's height of clear space, black on the light canvas and Spotify Green `#1ed760` on dark (`--color-spotify-logo`); album art unaltered; every track links to Spotify.
+- **Song info (left):** static album art beside a caps status ("On Air Now" in Signal Teal, or "Played 20 min. ago"), the title in the display face linking to Spotify, the artist, and a fixed-height row with Open Spotify; under the art, a notched **Close Preview** button in its own row, always reserved (invisible while the preview is closed) so opening and closing moves nothing. It takes only the width it needs (up to 28rem).
+- **Preview panel (right, filling the rest of the row, 2rem gap):** always 152px tall. Closed: a notched panel-sized button with a framed ▶, "Preview on Spotify" and a muted line explaining it's a 30-second preview (or the full song when signed in). Open: Spotify's standard embed player in the same box, so nothing moves. Nothing from Spotify loads before the click. Below lg the panel stacks under the song info.
+- **No transport buttons:** the track index is the only way to change songs.
+- **Cue:** a track-index row loads that song; its text glitches once.
+- **Track index:** rows (▶ for the song playing, S1–S5 for the last five) with dotted leaders to a caps "how long ago"; a small ▶ slides in on hover and focus and the leader turns teal; the loaded row is a Signal Teal fill.
+- **Reduced motion:** no bouncing bars, pulse or glitch.
+- **Spotify attribution (their brand rules):** logo at least 70px wide with half the icon's height of clear space, black on the light canvas and Spotify Green `#1ed760` on dark (`--color-spotify-logo`); album art never animated, bordered or overlaid (4px corners, 8px from sm); every track links to Spotify, plus "Open Spotify".
 
 ### Filter Chips
 Caps labels with a count, at least 44px tall, wrapping on phones (Credentials categories, Technologies). Resting: a Frame Line border that turns Signal Teal on hover. Selected: a Signal Teal fill with On-Signal text, and the count inverts. They're toggle buttons (`aria-pressed`), and the choice lives in the URL hash.
