@@ -702,11 +702,12 @@
 }
 
 /* Cursor (public/cursors/, drawn as SVG and rendered to 32px PNGs at 1x and
-   2x, since glow filters inside SVG cursors are unreliable in Safari): a slim
-   outlined teal dart with a very soft neon glow everywhere, a pointing hand
-   over anything clickable, an open hand over draggable things (closing while
-   dragged), and a matching I-beam in text fields. The hands are Lucide's
-   shapes (ISC) drawn in the same teal outline and glow.
+   2x, since glow filters inside SVG cursors are unreliable in Safari): angular
+   shapes filled dark with a teal outline and a very soft neon glow, the arrow
+   and hands trailed by a faint offset echo. The arrow everywhere, a pointing
+   hand over anything clickable, an open hand over draggable things (a fist
+   while dragged), an I-beam in text fields, a slashed box on disabled
+   controls, and the arrow with an hourglass while something works.
    Mouse-like pointers only; each rule repeats with image-set() for sharp
    screens (browsers that can't read that line keep the 1x one). Forced-colors
    mode keeps the system cursors. */
@@ -745,7 +746,14 @@
   }
   :disabled,
   [aria-disabled="true"] {
-    cursor: not-allowed;
+    cursor: url("/cursors/unavailable.png") 16 16, not-allowed;
+    cursor: image-set(url("/cursors/unavailable.png") 1x, url("/cursors/unavailable@2x.png") 2x) 16 16, not-allowed;
+  }
+  /* Something is working in the background (the contact form while it sends): the arrow with an hourglass. */
+  [aria-busy="true"],
+  [aria-busy="true"] * {
+    cursor: url("/cursors/progress.png") 6 5, progress;
+    cursor: image-set(url("/cursors/progress.png") 1x, url("/cursors/progress@2x.png") 2x) 6 5, progress;
   }
 }
 

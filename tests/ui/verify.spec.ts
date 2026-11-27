@@ -1282,7 +1282,7 @@ test("mouse pointers get the glowing cursors: the dart on the page, the pointing
   // Draggable: the credential carousel gets the open hand, and the closed hand while held.
   await page.goto("/credentials");
   expect(await page.locator("[data-credential-path]").evaluate((el) => getComputedStyle(el).cursor)).toContain("cursors/hand-open");
-  for (const file of ["arrow", "hand-point", "hand-open", "hand-grab", "text"]) {
+  for (const file of ["arrow", "hand-point", "hand-open", "hand-grab", "text", "unavailable", "progress"]) {
     for (const suffix of ["", "@2x"]) {
       expect((await page.request.get(`/cursors/${file}${suffix}.png`)).ok(), file + suffix).toBe(true);
     }

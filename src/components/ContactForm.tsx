@@ -94,6 +94,7 @@ export function ContactForm({ accessKey, fallbackEmail }: { accessKey: string; f
         noValidate
         onSubmit={onSubmit}
         aria-label="Send a message"
+        aria-busy={sending}
         className="grid gap-5 md:grid-cols-2"
       >
         <input type="hidden" name="access_key" value={accessKey} />

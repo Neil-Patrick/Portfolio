@@ -233,7 +233,7 @@ The site's scrollbar on every page (desktop). A Frame Line track that fills teal
 A 48px circle: dark face, Frame Line track, a teal line filling clockwise with scroll progress, a chevron, glowing on hover. Appears past the middle of the page.
 
 ### Cursor
-A slim outlined teal dart with a very soft neon glow; a pointing hand over clickable things; an open hand over draggable things (the credential carousel, the scroll rail) that closes while dragging; a matching I-beam in text fields. The hands are Lucide's shapes in the same teal outline and glow. 32px PNGs at 1x and 2x. Mouse pointers only; forced-colors mode keeps the system cursors.
+One angular set: dark-filled shapes with a teal outline and a very soft neon glow; the arrow and hands trail a faint offset echo. The arrow everywhere; a pointing hand over clickable things; an open hand over draggable things (the credential carousel, the scroll rail) that becomes a fist while dragging; an I-beam in text fields; a slashed box on disabled controls; the arrow with an hourglass while something works (the contact form sending). 32px PNGs at 1x and 2x. Mouse pointers only; forced-colors mode keeps the system cursors.
 
 ### Footer
 Open on a hairline with a teal rule: "Let's Build Something", Email Me (primary with glow), Copy Email, LinkedIn, the arrow to Contact; then "// End of Transmission", Open to Work, page and contact links, copyright and location.
