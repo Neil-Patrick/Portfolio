@@ -419,12 +419,19 @@ test("GitHub section (About page) shows live stats or the documented fallback", 
   await page.goto("/about#github");
   const section = page.getByRole("tabpanel", { name: "GitHub Activity" });
   await expect(section.getByRole("heading", { name: /^GitHub activity$/i })).toBeVisible();
+  // The profile link button is gone (the stats are the point; GitHub is linked from the footer).
+  await expect(section.getByRole("link", { name: /View my GitHub profile/i })).toHaveCount(0);
   const heatmap = section.getByTestId("heatmap");
   if ((await heatmap.count()) > 0) {
-    // Token configured: full calendar (52-53 weeks) and streaks.
+    // Token configured: full calendar (52-53 weeks), and the streak reactor between two readouts.
     expect(await heatmap.locator("[data-day]").count()).toBeGreaterThanOrEqual(364);
+    await expect(section.locator("[data-streak-reactor]")).toBeVisible();
     await expect(section.getByText(/^Current streak$/i)).toBeVisible();
     await expect(section.getByText(/^Longest streak$/i)).toBeVisible();
+    await expect(section.getByText(/^Total contributions$/i)).toBeVisible();
+
+    // Languages: arcs, named in a legend (never color alone).
+    await expect(section.getByRole("list", { name: "Languages" }).getByRole("listitem").first()).toBeVisible();
 
     // Year buttons swap the calendar; exactly one is pressed.
     const years = section.getByRole("group", { name: "Calendar year" }).getByRole("button");
@@ -627,7 +634,13 @@ test("Education lives on the About page, not Credentials", async ({ page }) => {
   await page.goto("/about");
   // Education is the console's first tab, open by default.
   const section = page.getByRole("tabpanel", { name: "Education" });
-  for (const entry of education) await expect(section.getByText(entry.program)).toBeVisible();
+  for (const entry of education) await expect(section.getByText(entry.program, { exact: true })).toBeVisible();
+  // School and location sit on their own lines under the program; no honors note; the degree runs 2023 to 2027.
+  await expect(section.getByText(education[0].location, { exact: true })).toBeVisible();
+  await expect(section.getByText(/Laguna State Polytechnic University – San Pablo City Campus/)).toBeVisible();
+  await expect(section.getByText("2023 to 2027")).toBeVisible();
+  await expect(section.getByText(/with honors/i)).toHaveCount(0);
+  await expect(page.getByText(/with honors/i)).toHaveCount(0);
   await page.goto("/credentials");
   await expect(page.getByRole("heading", { name: "Education" })).toHaveCount(0);
 });

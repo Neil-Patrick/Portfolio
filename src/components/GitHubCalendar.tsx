@@ -25,7 +25,7 @@ export function GitHubCalendar({ calendars }: { calendars: ContributionCalendar[
   return (
     <figure aria-labelledby="heatmap-caption" className="min-w-0">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <figcaption id="heatmap-caption" className="font-semibold">
+        <figcaption id="heatmap-caption" className="hud-label text-lg text-ink">
           <span className="tabular-nums">{calendar.total.toLocaleString("en-US")}</span>{" "}
           {calendar.key === "past" ? "Contributions in the Last Year" : `Contributions in ${calendar.label}`}
         </figcaption>
@@ -37,7 +37,7 @@ export function GitHubCalendar({ calendars }: { calendars: ContributionCalendar[
                 type="button"
                 aria-pressed={c.key === key}
                 onClick={() => setKey(c.key)}
-                className="min-h-11 min-w-11 rounded-md px-3 text-sm text-ink-muted transition-colors hover:text-ink aria-pressed:bg-accent aria-pressed:font-semibold aria-pressed:text-on-accent"
+                className="hud-notch hud-notch-edge min-h-11 min-w-11 border border-line-strong px-3 hud-label text-sm text-ink-muted transition-colors hover:border-accent hover:text-accent hover:[--edge:var(--color-accent)] focus-visible:-outline-offset-4 aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-on-accent"
               >
                 {c.label}
               </button>

@@ -130,7 +130,7 @@ A near-neutral charcoal palette with a single teal signal. Every text pair is ch
 - **Frame Line** (line-strong): control boundaries, rails, the signal lines (at least 3:1 against the canvas).
 
 ### Data Series (charts only)
-- **Certificate Teal** (series-cert) and **Project Amber** (series-project): career timeline marks only. Chart text always uses the ink tokens.
+- **Certificate Teal** (series-cert) and **Project Amber** (series-project): career timeline nodes only (certifications solid teal, projects an amber ring with a core). Chart text always uses the ink tokens.
 
 ### Named Rules
 **The One Signal Rule.** Teal means interactive or live. Never use it for decoration, plain labels, counts or values; those are ink or Readout Grey.
@@ -210,6 +210,12 @@ A looping, draggable line of circular emblems, oldest to newest, then round agai
 - **Interaction:** drag (mouse, with momentum) or swipe; it settles on the nearest emblem and selects it. Click glides one to the center. Arrow keys and Home/End for keyboards. No scrollbar, no arrow buttons.
 - **Details:** below the carousel, the real Credly badge (untouched), field, position, issuer, dates and "Verify on Credly".
 - **Browse by Field:** below that, field chips over open rows (small emblem, name, issuer, month, Credly link), grouped by field under All; the choice lives in the URL hash.
+
+### GitHub Signal Readout (About)
+GitHub's numbers in the site's own language, not GitHub's. A **streak reactor**: a flame flickers in a core ringed by one arc segment per day of the longest streak; the segments charge up to the current streak once in view, embers rise, and at a record the flame runs hotter. Total Contributions and Longest Streak flank it as readouts (big number, short teal rule, caps label). The year stays GitHub's familiar contribution heatmap (cells fill in diagonally; hover or tap reads a day; a monthly table is the text version), with notched year chips. **Languages** are arcs around a core with a named legend. **This month** is a transmission log: repositories branch off one wire, each trace as long as its commits, a pulse on the busiest, new repositories as hollow nodes. **Achievements** are circle badges strung on a wire. No profile button. All motion stops under reduced motion.
+
+### Career Circuit Bus (About)
+One horizontal wire is time. Each certification branches up and each project branches down to a circle node; close items fan out over three heights and step sideways on a 45° bend. Traces draw out once in view, a pulse runs along the bus and blips each node as it passes, and the running total sits at the end of the wire. One selection (nearest node, tap, arrow keys) drives the readout below; a table lists everything. Phones get a vertical bus, newest first, with each name beside its node.
 
 ### Spotify Player (About)
 Open on a hairline: the official Spotify logo as the heading, On Air with bouncing signal bars or Off Air. Left, the loaded song (static album art, title linking to Spotify, artist, Open Spotify, a reserved Close Preview button). Right, a fixed 152px preview panel: a notched "Preview on Spotify" button that becomes Spotify's embed player in place, so nothing shifts. Below, the S1–S5 track index. Album art never animates (Spotify's rules).

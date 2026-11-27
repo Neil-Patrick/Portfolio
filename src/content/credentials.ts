@@ -6,24 +6,34 @@
 export type Education = {
   school: string;
   program: string;
-  note?: string;
   location: string;
   period: string;
 };
 
 export const education: Education[] = [
   {
-    school: "Laguna State Polytechnic University, San Pablo City Campus",
-    program: "BS Computer Science, Intelligent Systems",
+    school: "Laguna State Polytechnic University – San Pablo City Campus",
+    program: "Bachelor of Science in Computer Science, Major in Intelligent Systems",
     location: "San Pablo City, Laguna",
-    period: "2023 to present, expected graduation 2027",
+    period: "2023 to 2027",
   },
   {
     school: "Laguna Science National High School",
-    program: "Senior High School, STEM",
-    note: "With Honors",
+    program: "Senior High School, Science, Technology, Engineering, and Mathematics (STEM)",
     location: "Bay, Laguna",
     period: "2021 to 2023",
+  },
+  {
+    school: "The Refiner's Christian School",
+    program: "Junior High School",
+    location: "Calauan, Laguna",
+    period: "2017 to 2021",
+  },
+  {
+    school: "The Refiner's Christian School",
+    program: "Elementary School",
+    location: "Calauan, Laguna",
+    period: "2008 to 2017",
   },
 ];
 

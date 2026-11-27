@@ -789,8 +789,91 @@
   }
 }
 
+/* GitHub signal readout (src/components/GitHubActivityView.tsx, GitHubCalendar.tsx).
+   Everything is drawn in its final state; motion only adds the rise, the
+   flicker and the pulses, so reduced motion simply shows the readout. */
+
+/* Streak reactor: the lit ring segments charge up one by one once in view;
+   the flame flickers from its base, embers rise, the core halo breathes.
+   At a record streak (data-hot) the flame runs faster. */
+.reactor-halo {
+  background: radial-gradient(circle, color-mix(in oklab, var(--color-accent) 32%, transparent), transparent 70%);
+}
+.reactor-flame {
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--color-accent) 55%, transparent));
+}
+.reactor-flame path {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+.reactor-ember {
+  opacity: 0;
+}
+@keyframes flame-flicker {
+  0%,
+  100% {
+    transform: scale(1, 1) skewX(0deg);
+  }
+  20% {
+    transform: scale(0.95, 1.06) skewX(-3deg);
+  }
+  45% {
+    transform: scale(1.04, 0.95) skewX(2deg);
+  }
+  70% {
+    transform: scale(0.97, 1.04) skewX(-1.5deg);
+  }
+}
+@keyframes flame-core {
+  50% {
+    transform: scale(0.85, 1.1);
+    opacity: 0.75;
+  }
+}
+@keyframes ember-rise {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(1);
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx, 0), -52px) scale(0.3);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  :not([data-shown]) > .reactor-segment[data-lit] {
+    stroke-opacity: 0.15;
+  }
+  .reactor-segment[data-lit] {
+    transition: stroke-opacity 200ms ease-out;
+    transition-delay: calc(var(--i, 0) * 28ms + 200ms);
+  }
+  .reactor-flame path:first-child {
+    animation: flame-flicker 1.7s ease-in-out infinite;
+  }
+  .reactor-flame-core {
+    animation: flame-core 0.9s ease-in-out infinite;
+  }
+  [data-hot] .reactor-flame path:first-child {
+    animation-duration: 0.95s;
+  }
+  .reactor-ember {
+    animation: ember-rise 2.4s ease-out infinite;
+    animation-delay: var(--delay, 0s);
+  }
+  [data-hot] .reactor-ember {
+    animation-duration: 1.6s;
+  }
+  .reactor-halo {
+    animation: emblem-breathe 2.6s ease-in-out infinite;
+  }
+}
+
 /* Contribution heatmap cells fill in diagonally once the grid is in view
-   (src/components/GitHubActivityView.tsx sets --d per cell and data-shown on the grid). */
+   (src/components/GitHubCalendar.tsx sets --d per cell and data-shown on the grid). */
 @media (prefers-reduced-motion: no-preference) {
   .heat-cell {
     opacity: 0;
@@ -806,18 +889,83 @@
   }
 }
 
-/* Current-streak ring (GitHubActivityView.tsx): --offset is 100 minus the fill percent.
-   It fills from empty once in view; with reduced motion it's simply drawn full. */
-.streak-ring {
-  stroke-dasharray: 100;
-  stroke-dashoffset: var(--offset);
+@keyframes bus-pulse {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Languages: each arc sweeps out to its share once in view. */
+.language-arc {
+  stroke-dasharray: var(--arc) 100;
 }
 @media (prefers-reduced-motion: no-preference) {
-  .streak-ring {
-    transition: stroke-dashoffset 1.4s var(--ease-out-soft) 0.2s;
+  .language-arc {
+    transition: stroke-dasharray 1.2s var(--ease-out-soft);
+    transition-delay: calc(var(--i, 0) * 90ms);
   }
-  :not([data-shown]) > .streak-ring {
-    stroke-dashoffset: 100;
+  :not([data-shown]) > g > .language-arc {
+    stroke-dasharray: 0 100;
+  }
+}
+
+/* This month: a pulse runs along the busiest branch. */
+@keyframes branch-pulse {
+  from {
+    left: 0;
+  }
+  to {
+    left: calc(100% - 7px);
+  }
+}
+.branch-pulse {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .branch-pulse {
+    opacity: 1;
+    animation: branch-pulse 1.8s linear infinite;
+  }
+}
+
+/* Career circuit bus (src/components/CareerTimeline.tsx): the traces draw out
+   from the bus once in view, a pulse runs along the bus, and each node blips
+   as the pulse passes its junction (--t is its position, 0 to 1). */
+.bus-pulse {
+  stroke-dasharray: 1.5 98.5;
+  opacity: 0;
+}
+@keyframes bus-blip {
+  0%,
+  5% {
+    box-shadow:
+      0 0 0 3px color-mix(in oklab, var(--color-accent) 30%, transparent),
+      0 0 14px color-mix(in oklab, var(--color-accent) 60%, transparent);
+  }
+  14%,
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .bus-trace {
+    stroke-dasharray: 1;
+    transition: stroke-dashoffset 600ms var(--ease-out-soft);
+    transition-delay: calc(var(--t, 0) * 900ms + 200ms);
+  }
+  :not([data-shown]) > .bus-trace {
+    stroke-dashoffset: 1;
+  }
+  [data-shown] > .bus-pulse {
+    opacity: 1;
+    animation: bus-pulse 6s linear infinite;
+  }
+  [data-shown] .bus-node {
+    animation: bus-blip 6s linear infinite;
+    animation-delay: calc(var(--t, 0) * 6s);
   }
 }
 

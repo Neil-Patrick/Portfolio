@@ -26,7 +26,8 @@ const degree = education[0];
 /** Quick facts, all taken from the content files. */
 const facts = [
   { label: "Based In", value: degree.location },
-  { label: "Studying", value: `${degree.program}, ${degree.school}` },
+  // A short form of the degree and school (the full names are in Education below).
+  { label: "Studying", value: "BS Computer Science, Intelligent Systems, LSPU – San Pablo City Campus" },
   { label: "Graduating", value: "2027 (expected)" },
   { label: "Heading Toward", value: "Data and AI" },
   {
