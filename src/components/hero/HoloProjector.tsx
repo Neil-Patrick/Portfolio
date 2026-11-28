@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion, useSpring, useTransform } from "motion/react";
+import { motion, useReducedMotion, useSpring } from "motion/react";
 import Image from "next/image";
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { site } from "@/content/site";
@@ -11,7 +11,7 @@ type Phase = "off" | "on" | "glitch";
 
 /** Parallax follows the pointer with a little lag. */
 const DRIFT = { stiffness: 120, damping: 20 };
-/** Most the figure drifts with the pointer, in px (the tags drift the other way, less). */
+/** Most the figure drifts with the pointer, in px. */
 const MAX_DRIFT = { x: 10, y: 6 };
 /** How long the tap glitch runs before the figure re-projects, in ms (matches holo-glitch in globals.css). */
 const GLITCH_MS = 320;
@@ -28,14 +28,13 @@ const TICKS = Array.from({ length: 48 }, (_, i) => {
 
 /**
  * The landing's hologram: the illustrated avatar (never the real photo) stands
- * in a beam of light above a ring emitter, with the name (the page's h1), role
- * and status floating beside it as HUD tags on leader lines. It projects in
- * bottom-up once the loading screen clears, then idles: a rare flicker, a scan
- * band rising through it, ring dashes orbiting, a slow float. A pointer (or a
- * dragging finger) drifts it in parallax; a tap glitches it and re-projects.
- * The project-in and idle loops are CSS (globals.css, "Hologram projector"),
- * driven by data-phase; under reduced motion it is simply shown, still.
- * On phones the tags sit below the emitter, without leader lines.
+ * in a beam of light above a ring emitter. It projects in bottom-up once the
+ * loading screen clears, then idles: a rare flicker, a scan band rising through
+ * it, ring dashes orbiting, a slow float. A pointer (or a dragging finger)
+ * drifts it in parallax; a tap glitches it and re-projects. The project-in and
+ * idle loops are CSS (globals.css, "Hologram projector"), driven by data-phase;
+ * under reduced motion it is simply shown, still. The name (h1) and the Open to
+ * Work chip live in the landing's text column.
  */
 export function HoloProjector() {
   const reduceMotion = useReducedMotion();
@@ -45,8 +44,6 @@ export function HoloProjector() {
 
   const driftX = useSpring(0, DRIFT);
   const driftY = useSpring(0, DRIFT);
-  const tagX = useTransform(driftX, (x) => x * -0.5);
-  const tagY = useTransform(driftY, (y) => y * -0.5);
 
   // Projects in once the loading screen has cleared. With reduced motion it stays "off", which the CSS
   // only hides under prefers-reduced-motion: no-preference, so it is simply shown (and markup matches the server).
@@ -105,7 +102,7 @@ export function HoloProjector() {
   };
 
   return (
-    <div className="relative mx-auto w-full max-w-md select-none" data-hologram data-phase={phase}>
+    <div className="mx-auto w-full max-w-md select-none" data-hologram data-phase={phase}>
       <div
         className="relative aspect-4/5 touch-pan-y"
         onPointerMove={onPointerMove}
@@ -148,7 +145,7 @@ export function HoloProjector() {
         </svg>
 
         {/* The figure: the keyed-out illustration, with scanlines and a scan band clipped to its shape. */}
-        <motion.div className="absolute top-[6%] right-[20%] bottom-[9%] left-[12%]" style={{ x: driftX, y: driftY }} data-layer="figure">
+        <motion.div className="absolute inset-x-[16%] top-[6%] bottom-[9%]" style={{ x: driftX, y: driftY }} data-layer="figure">
           <div className="holo-float size-full">
             <div className="holo-figure relative size-full" style={cssVars({ "--holo-mask": `url(${site.avatar.holo})` })}>
               <Image
@@ -165,31 +162,7 @@ export function HoloProjector() {
             </div>
           </div>
         </motion.div>
-
       </div>
-
-      {/* Floating tags: name and role right of the head, status left of the beam, on leader lines.
-          On phones they sit below the emitter instead, centred, without the lines. */}
-      <motion.div
-        className="mt-4 grid justify-items-center gap-3 text-center sm:pointer-events-none sm:absolute sm:inset-0 sm:mt-0 sm:block sm:text-left"
-        style={{ x: tagX, y: tagY }}
-        data-layer="tags"
-      >
-        <div className="relative sm:absolute sm:top-[22%] sm:right-[-8%] sm:max-w-[36%]">
-          <span aria-hidden className="holo-leader hidden sm:block" data-side="left" />
-          <div className="holo-tag-body sm:border-l-2 sm:border-accent sm:bg-canvas/75 sm:px-3 sm:py-2 sm:backdrop-blur-sm">
-            <h1 className="font-display text-3xl leading-tight font-bold sm:text-2xl xl:text-3xl">{site.name}</h1>
-            <p className="mt-1 text-sm leading-snug text-ink-muted">{site.role}</p>
-          </div>
-        </div>
-        <div className="relative sm:absolute sm:bottom-[36%] sm:left-[-6%]">
-          <span aria-hidden className="holo-leader hidden sm:block" data-side="right" />
-          <p className="holo-tag-body flex items-center gap-2 hud-label text-xs text-accent sm:border-r-2 sm:border-accent sm:bg-canvas/75 sm:px-3 sm:py-1.5 sm:backdrop-blur-sm">
-            <span aria-hidden className="live-pulse size-2 shrink-0 rounded-full bg-accent" />
-            {site.availability}
-          </p>
-        </div>
-      </motion.div>
     </div>
   );
 }

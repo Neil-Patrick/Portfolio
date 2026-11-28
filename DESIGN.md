@@ -187,7 +187,7 @@ Flat. Depth comes from the background's layers (grid, signal lines, vignette), t
 - **Notch** (`hud-notch`, 0.75rem top-right cut): buttons, chips, tabs, project cards, the media and photo frames, the preview panel. On bordered elements, `hud-notch-edge` draws the clipped corner's diagonal so the outline stays closed. Pair with an inset focus ring.
 - **Circle:** nodes in a sequence: credential emblems, GitHub achievements, education trace nodes, the scroll rail and home gauge markers, the back-to-top button.
 - **Rails and rules:** 2px rails on list rows, 3rem teal rules opening pages and sections, hairline dividers.
-- **Corner brackets** survive only on the compass dial.
+- **Corner brackets** survive only on the About portrait's hologram card and the compass dial.
 - **Radii** (4px, 8px) only for album art (Spotify's rule) and embedded players.
 
 ## Components
@@ -244,17 +244,35 @@ One angular set: dark-filled shapes with a teal outline and a very soft neon glo
 ### Footer
 Open on a hairline with a teal rule: "Let's Build Something", Email Me (primary with glow), Copy Email, LinkedIn, the arrow to Contact; then "// End of Transmission", Open to Work, page and contact links, copyright and location.
 
+### Landing name and Open to Work chip
+The name is the page's h1 on its own at the top of the landing's text column (a modest display size, so the decoding headline stays the lead); it is ready to move into the section planned above the landing. Open to Work is a projected HUD chip on its own line under the two actions (`AvailabilityChip.tsx`, globals.css "Open to Work chip"):
+- **Look:** a translucent teal plate with scanlines, a dashed ring round a pulsing dot, the notched edge.
+- **Link:** it goes to the "Let's Build" call to action.
+- **Hover, keyboard focus or a press:**
+  - it brightens and a band sweeps across;
+  - the ring spins faster and the label jitters;
+  - the detail ("Internships, jobs & freelance") slides out sideways, or opens as a second line on phones.
+- **The detail** is always part of the link's text.
+
 ### Hologram Projector (signature)
-The landing's centrepiece (`HoloProjector.tsx`, globals.css "Hologram projector"). The illustrated avatar (`site.avatar.holo`, black keyed out; never the real photo, which stays on About) stands in a teal beam rising from a ring emitter: perspective rings, orbiting dashes, tick marks, a glowing core. Scanlines and a rising scan band are clipped to the figure by its own alpha. The name (the page's h1) with the role sits right of the head, and the Open to Work status sits left of the beam. Both are floating tags on leader lines that end in circle nodes; on phones (under `sm`) they stack below the emitter without lines.
+The landing's centrepiece (`HoloProjector.tsx`, globals.css "Hologram projector"). The illustrated avatar (`site.avatar.holo`, black keyed out; never the real photo, which stays on About) stands in a teal beam rising from a ring emitter: perspective rings, orbiting dashes, tick marks, a glowing core. Scanlines and a rising scan band are clipped to the figure by its own alpha. No labels sit on the projection.
 Motion, driven by `data-phase` (`off` / `on` / `glitch`):
-- **Project-in:** once the loader clears, the rings open, the beam fades up, the figure builds bottom-up with a flicker, then the tags draw their lines and text.
+- **Project-in:** once the loader clears, the rings open, the beam fades up, and the figure builds bottom-up with a flicker.
 - **Idle:** a rare flicker, the scan band rising, the dashes orbiting, a slow float.
-- **Pointer:** the pointer or a dragging finger drifts the figure (and the tags the other way) in parallax; a tap glitches it (RGB split, jitter) and re-projects.
+- **Pointer:** the pointer or a dragging finger drifts the figure in parallax; a tap glitches it (RGB split, jitter) and re-projects.
 - **Reduced motion:** all of it is shown still. It's built in CSS and Motion springs, with no WebGL.
 
+### Hologram Card (About portrait)
+`HoloCard.tsx`, the earlier landing card's look, now holding only the About portrait, apart from the At a Glance list and the tabs:
+- **Layers:** a bracketed plate with scanlines and a sheen that slides as it turns, the portrait floating in front, corner brackets further out.
+- **Motion:** the layers separate into depth once in view; it tilts toward the cursor or a dragging finger, and sways gently when idle.
+- **Drag guard:** a drag never counts as a click on the portrait.
+- **Reduced motion:** a flat, still card.
+
 ### Photo Reveal (About)
-`PhotoReveal.tsx`: the About photo frame shows the illustrated portrait (`site.avatar.illustrated`, on the same charcoal grid as the photo, face aligned) first. Once in view, a teal scan line sweeps down and uncovers the real photo behind it, landing with a faint flicker.
-- **Toggle:** "Show Illustration" / "Show Photo" flips between them, sweeping again: down to the photo, up to the illustration.
+`PhotoReveal.tsx`, inside the hologram card. The portrait shows the illustration (`site.avatar.illustrated`, on the same charcoal grid as the photo, face aligned) first. Once in view, a teal scan line sweeps down and uncovers the real photo, landing with a faint flicker.
+- **The portrait is the control:** click, tap, Enter or Space flips it, sweeping again (down to the photo, up to the illustration).
+- **Hover or keyboard focus:** a scan shimmer, a glowing frame and a "Click to switch" hint ("Tap to switch" on touch, where it shows faintly at rest).
 - **Reduced motion:** the real photo shows at once and flips are instant.
 
 ### Loading Screen

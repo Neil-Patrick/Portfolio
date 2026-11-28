@@ -47,24 +47,27 @@ export default function AboutPage() {
             ))}
           </div>
 
-          {/* Profile column, open (no panel): a hairline rail on its left, caps field labels over values, printing in one by one. */}
-          <aside aria-labelledby="at-a-glance" className="self-start border-l border-line pl-6">
-            <div className="mb-6">
+          {/* Profile column: the portrait in its own hologram card, then At a Glance, open (no panel)
+              on a hairline rail, caps field labels over values, printing in one by one. */}
+          <aside aria-labelledby="at-a-glance" className="self-start">
+            <div className="mx-auto mb-10 max-w-sm lg:max-w-none">
               <PhotoReveal sizes="(min-width: 1024px) 19rem, 90vw" />
             </div>
-            <h2 id="at-a-glance" className="mb-5 hud-label text-lg text-ink">
-              At a Glance
-            </h2>
-            <Reveal as="dl" className="grid gap-5">
-              {facts.map((fact) => (
-                <RevealItem key={fact.label} from="left">
-                  <dt className="hud-label text-sm text-ink-muted">{fact.label}</dt>
-                  <dd className="mt-0.5 font-display text-xl leading-snug font-semibold text-ink">
-                    {fact.value}
-                  </dd>
-                </RevealItem>
-              ))}
-            </Reveal>
+            <div className="border-l border-line pl-6">
+              <h2 id="at-a-glance" className="mb-5 hud-label text-lg text-ink">
+                At a Glance
+              </h2>
+              <Reveal as="dl" className="grid gap-5">
+                {facts.map((fact) => (
+                  <RevealItem key={fact.label} from="left">
+                    <dt className="hud-label text-sm text-ink-muted">{fact.label}</dt>
+                    <dd className="mt-0.5 font-display text-xl leading-snug font-semibold text-ink">
+                      {fact.value}
+                    </dd>
+                  </RevealItem>
+                ))}
+              </Reveal>
+            </div>
           </aside>
         </div>
 

@@ -961,14 +961,17 @@ const transformOf = (locator: ReturnType<Page["locator"]>) =>
 const animationsIn = (locator: ReturnType<Page["locator"]>) =>
   locator.evaluate((el) => el.getAnimations({ subtree: true }).map((a) => (a as CSSAnimation).animationName ?? "transition"));
 
-test("hologram projector: holds the page's h1, the illustrated avatar (never the real photo) and the status, and stays still with reduced motion", async ({ page }) => {
+test("landing: the name is the h1 on its own in the text column; the projector holds only the illustrated avatar (never the real photo) and stays still with reduced motion", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
+  const h1 = page.getByRole("heading", { level: 1 });
+  await expect(h1).toHaveCount(1);
+  await expect(h1).toHaveText(site.name);
+  await expect(page.locator("[data-landing-column]").getByRole("heading", { level: 1 })).toBeVisible();
   const holo = page.locator("[data-hologram]");
-  await expect(holo.getByRole("heading", { level: 1 })).toHaveText(site.name);
   await expect(holo.getByRole("img", { name: site.avatar.alt })).toBeVisible();
-  await expect(holo).toContainText(site.role);
-  await expect(holo).toContainText(site.availability);
+  await expect(holo, "no name or status tags on the projection").not.toContainText(site.name);
+  await expect(holo).not.toContainText(site.availability);
   await expect(page.getByRole("img", { name: `Photo of ${site.name}` }), "the real face stays off the home page").toHaveCount(0);
 
   const figure = holo.locator('[data-layer="figure"]');
@@ -1023,13 +1026,38 @@ test("hologram projector: projects in after the loader, drifts with the cursor a
   expect(errors, "console errors").toEqual([]);
 });
 
-test("hologram projector: on a phone the name, role and status stack below the emitter without overlapping it", async ({ page }) => {
+test("Open to Work chip: under the buttons, links to the call to action, carries its detail in its name, and opens the detail on hover and focus", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const chip = page.locator("[data-landing-column]").getByRole("link", { name: `${site.availability} ${site.availabilityDetail}` });
+  await expect(chip).toBeVisible();
+  await expect(chip).toHaveAttribute("href", "#contact");
+  const workWithMe = (await page.getByRole("link", { name: site.landing.primaryCta }).boundingBox())!;
+  expect((await chip.boundingBox())!.y, "below the buttons").toBeGreaterThan(workWithMe.y + workWithMe.height - 1);
+  expect((await chip.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  const detail = chip.locator(".holo-chip-detail");
+  const detailWidth = () => detail.evaluate((el) => el.getBoundingClientRect().width);
+  expect(await detailWidth(), "detail folded at rest").toBeLessThan(2);
+  await chip.hover();
+  await expect.poll(detailWidth, { message: "opens on hover" }).toBeGreaterThan(100);
+  await page.mouse.move(0, 0);
+  await expect.poll(detailWidth).toBeLessThan(2);
+  await chip.focus();
+  await page.keyboard.press("Shift+Tab");
+  await page.keyboard.press("Tab");
+  await expect.poll(detailWidth, { message: "opens on keyboard focus" }).toBeGreaterThan(100);
+  expect(await animationsIn(chip), "nothing animates with reduced motion").toEqual([]);
+});
+
+test("Open to Work chip: on a phone the detail opens below the label, never past the screen", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await page.goto("/");
-  const holo = page.locator("[data-hologram]");
-  const stage = (await holo.locator("> div").first().boundingBox())!;
-  const name = (await holo.getByRole("heading", { level: 1 }).boundingBox())!;
-  expect(name.y, "name sits below the emitter").toBeGreaterThanOrEqual(stage.y + stage.height - 1);
+  const chip = page.locator("[data-availability]");
+  await chip.hover();
+  const box = (await chip.boundingBox())!;
+  expect(box.x + box.width, "chip stays on screen").toBeLessThanOrEqual(320);
+  const detail = (await chip.locator(".holo-chip-detail").boundingBox())!;
+  expect(detail.x + detail.width, "detail stays on screen").toBeLessThanOrEqual(320);
   expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false);
 });
 
@@ -1073,7 +1101,7 @@ const photoShown = (page: Page) =>
     return bottom.endsWith("%") ? 1 - parseFloat(bottom) / 100 : 1 - parseFloat(bottom) / el.getBoundingClientRect().height;
   });
 
-test("about photo: the illustration resolves into the real photo once in view, and the button flips between them", async ({ page }) => {
+test("about portrait: the illustration resolves into the real photo once in view, and clicking the portrait flips between them", async ({ page }) => {
   test.skip(site.photo === null, "no real photo set");
   const errors = collectErrors(page);
   await page.emulateMedia({ reducedMotion: "no-preference" });
@@ -1082,34 +1110,73 @@ test("about photo: the illustration resolves into the real photo once in view, a
   const reveal = page.locator("[data-photo-reveal]");
   await expect(reveal.getByRole("img", { name: site.avatar.alt })).toBeAttached();
   await expect(reveal.getByRole("img", { name: `Photo of ${site.name}` })).toBeAttached();
+  await expect(page.getByRole("button", { name: /^Show Illustration$/ }), "no separate text button").toHaveCount(0);
   // Below the fold on a phone: still the illustration.
   await expect(reveal).toHaveAttribute("data-state", "initial");
   expect(await photoShown(page), "photo hidden before it is seen").toBeLessThan(0.05);
 
-  await reveal.scrollIntoViewIfNeeded();
+  const portrait = reveal.getByRole("button");
+  // Scrolled and focused directly: the card never stops swaying, so Playwright's wait-until-still would never end.
+  await portrait.evaluate((el) => el.scrollIntoView({ block: "center" }));
   await expect(reveal).toHaveAttribute("data-state", "photo");
   await expect.poll(() => photoShown(page), { message: "the scan uncovers the photo" }).toBeGreaterThan(0.99);
 
-  const button = reveal.getByRole("button");
-  await expect(button).toHaveText("Show Illustration");
-  expect((await button.boundingBox())!.height).toBeGreaterThanOrEqual(44);
-  await button.click();
+  // The portrait itself is the control (clicked by position: the card never stops swaying).
+  await expect(portrait).toHaveAccessibleName("Show illustration");
+  const box = (await portrait.boundingBox())!;
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
   await expect(reveal).toHaveAttribute("data-state", "illustration");
-  await expect(button).toHaveText("Show Photo");
+  await expect(portrait).toHaveAccessibleName("Show photo");
   await expect.poll(() => photoShown(page), { message: "covered back up" }).toBeLessThan(0.01);
-  await button.press("Enter");
+  await portrait.evaluate((el) => (el as HTMLElement).focus());
+  await page.keyboard.press("Enter");
   await expect(reveal).toHaveAttribute("data-state", "photo");
+  await page.keyboard.press("Space");
+  await expect(reveal).toHaveAttribute("data-state", "illustration");
   expect(errors, "console errors").toEqual([]);
 });
 
-test("about photo: with reduced motion the real photo shows at once and flips are instant", async ({ page }) => {
+test("about portrait: in the hologram card, it tilts toward the cursor, shows the hint on hover, and a drag to tilt doesn't flip it", async ({ page }) => {
+  test.skip(site.photo === null, "no real photo set");
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/about");
+  const card = page.locator("[data-holo-card]");
+  const plate = card.locator("> div");
+  const reveal = page.locator("[data-photo-reveal]");
+  await expect(reveal).toHaveAttribute("data-state", "photo");
+  const portrait = reveal.getByRole("button");
+  const hint = portrait.locator(".portrait-hint");
+  await expect.poll(() => hint.evaluate((el) => Number(getComputedStyle(el).opacity))).toBeLessThan(0.1);
+
+  const box = (await portrait.boundingBox())!;
+  await page.mouse.move(box.x + box.width * 0.9, box.y + box.height * 0.5, { steps: 5 });
+  await page.waitForTimeout(600);
+  const right = await transformOf(plate);
+  await page.mouse.move(box.x + box.width * 0.1, box.y + box.height * 0.5, { steps: 5 });
+  await page.waitForTimeout(600);
+  expect(await transformOf(plate), "tilts toward the cursor").not.toBe(right);
+  await expect.poll(() => hint.evaluate((el) => Number(getComputedStyle(el).opacity)), { message: "hint on hover" }).toBeGreaterThan(0.9);
+
+  // A mouse drag across the portrait tilts the card but must not count as a click.
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width * 0.9, box.y + box.height * 0.5, { steps: 8 });
+  await page.mouse.up();
+  await page.waitForTimeout(300);
+  await expect(reveal).toHaveAttribute("data-state", "photo");
+});
+
+test("about portrait: with reduced motion the card is flat and still, the real photo shows at once and flips are instant", async ({ page }) => {
   test.skip(site.photo === null, "no real photo set");
   await page.goto("/about");
   const reveal = page.locator("[data-photo-reveal]");
+  const plate = page.locator("[data-holo-card] > div");
   expect(await photoShown(page), "real photo shown at once").toBeGreaterThan(0.99);
+  const before = await transformOf(plate);
   await reveal.getByRole("button").click();
   expect(await photoShown(page), "illustration at once").toBeLessThan(0.01);
-  expect(await reveal.evaluate((el) => el.getAnimations({ subtree: true }).length), "no animations").toBe(0);
+  expect(await transformOf(plate), "no tilt with reduced motion").toBe(before);
+  expect(await page.locator("[data-holo-card]").evaluate((el) => el.getAnimations({ subtree: true }).length), "no animations").toBe(0);
 });
 
 test("every certification shows its real Credly badge in the details: saved locally, loaded, and named", async ({ page }) => {

@@ -4,12 +4,13 @@ import { cssVars } from "@/lib/css-vars";
 import { Icon } from "../icons";
 import { DecodeText } from "../motion/DecodeText";
 import { Magnetic } from "../motion/Tilt";
+import { AvailabilityChip } from "./AvailabilityChip";
 import { HoloProjector } from "./HoloProjector";
 
 /**
- * Home landing: a huge headline that decodes in and the two main actions, with
- * the hologram projector beside them (the illustrated avatar in a beam of light,
- * the name as the page's h1, role, status). On every full load the cyberpunk
+ * Home landing: the name (the page's h1), a huge headline that decodes in, the
+ * two main actions and the Open to Work chip, with the hologram projector
+ * beside them (the illustrated avatar in a beam of light). On every full load the cyberpunk
  * loading screen plays first (src/components/intro/), and the headline and the
  * projection start as it clears. With reduced motion everything is shown at rest.
  */
@@ -25,6 +26,10 @@ export function Landing() {
       <div className="container-page grid items-center gap-12 pt-12 pb-24 lg:grid-cols-2 lg:gap-16">
         {/* The column is a size container, so the headline scales to fit it. */}
         <div className="@container" data-landing-column>
+          {/* The name, on its own: the page's h1. Ready to move into the section Neil plans above the landing. */}
+          <h1 className="load-fade mb-6 font-display text-2xl font-bold tracking-wide text-ink sm:text-3xl" style={cssVars({ "--fade-delay": "200ms" })}>
+            {site.name}
+          </h1>
           <p className="font-display text-landing font-bold">
             {headline.map((line) => (
               <span key={line} className="block whitespace-nowrap" data-landing-line>
@@ -50,6 +55,11 @@ export function Landing() {
             >
               {secondaryCta}
             </a>
+          </div>
+
+          {/* Open to Work, by the buttons: its own line, so the detail sliding out never reflows the row. */}
+          <div className="load-fade mt-5" style={cssVars({ "--fade-delay": "900ms" })}>
+            <AvailabilityChip />
           </div>
         </div>
 

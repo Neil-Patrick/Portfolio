@@ -39,8 +39,10 @@ export const site = {
     "Now I'm moving toward data and AI: analysis, automation, and building with AI models. In 2026 I earned the IT Specialist – Artificial Intelligence certification, and my next projects are in that direction.",
     "Before university, I took the STEM track at Laguna Science National High School.",
   ],
-  /** Shown on the landing's hologram and in the loading screen's system check. Neil: open to internships, jobs, and freelance work. */
+  /** Shown on the landing's Open to Work chip and in the loading screen's system check. Neil: open to internships, jobs, and freelance work. */
   availability: "Open to Work",
+  /** The chip's detail line (slides out on hover or focus; always in its link text). */
+  availabilityDetail: "Internships, jobs & freelance",
   /**
    * Real profile photo, a path under public/ (for example "/me.jpg"). Shown only on
    * the About page (after the illustration resolves into it). While null, the
