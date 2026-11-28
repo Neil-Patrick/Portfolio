@@ -6,16 +6,16 @@ import { motion, useMotionValueEvent, useScroll, useSpring } from "motion/react"
 import { useState } from "react";
 import { Icon } from "../icons";
 
-/** Shows once the visitor is past this share of the page's scroll (early, so the line is seen growing). */
-const SHOW_AFTER = 0.08;
+/** Shows once the visitor is past this share of the page's scroll. */
+const SHOW_AFTER = 0.5;
 /** The diamond's points (top, right, bottom, left) on the 100 x 100 box. */
 const DIAMOND = "50,3 97,50 50,97 3,50";
 /** How the progress line follows the scroll. */
 const EASE = { stiffness: 90, damping: 22 };
 
 /**
- * Back-to-top control, bottom right on every page. It appears once you've
- * scrolled a little way: a diamond (like the compass needle's tip) whose teal
+ * Back-to-top control, bottom right on every page. It appears once you're
+ * past the middle of the page: a diamond (like the compass needle's tip) whose teal
  * edge line grows clockwise from the top point as you go down the page, easing
  * smoothly; it glows softly on hover. A click
  * glides back to the top (Lenis), or jumps there with reduced motion, and
@@ -61,12 +61,13 @@ export function BackToTop() {
           strokeWidth={1}
           strokeLinejoin="miter"
         />
-        {/* The progress line: starts at the top point and grows clockwise round the edge as you go down. */}
+        {/* The progress line: starts at the top point and grows clockwise round the edge as you go down.
+            No non-scaling-stroke here: it makes the browser ignore pathLength, so the dash would
+            repeat as tiny dots and read as a full outline. 4 units of the 100 box is about 2px at 48px. */}
         <motion.path
           d={`M${DIAMOND.replaceAll(" ", " L")} Z`}
-          vectorEffect="non-scaling-stroke"
           className="stroke-accent"
-          strokeWidth={2}
+          strokeWidth={4}
           strokeLinejoin="miter"
           style={{ pathLength: progress }}
           data-progress-line

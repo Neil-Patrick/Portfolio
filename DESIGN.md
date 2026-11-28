@@ -236,7 +236,7 @@ Kept from the first design and re-tinted: the compass dial with brackets, an aim
 The site's scrollbar on every page (desktop). A Frame Line track that fills teal down to a glowing circle marker following the scroll; click the rail to jump or drag the marker. Home shows the section gauge instead (a tick per section, the marker springs to the current one).
 
 ### Back to Top
-A 48px diamond, like the compass needle's tip: dark face, Frame Line edge, an upright chevron, glowing on hover. A teal line grows clockwise round its edge from the top point as you go down the page, easing smoothly (no fill). Appears once you've scrolled a little, so the line is seen growing from the start.
+A 48px diamond, like the compass needle's tip: dark face, Frame Line edge, an upright chevron, glowing on hover. A teal line grows clockwise round its edge from the top point as you go down the page, easing smoothly (no fill). Appears past the middle of the page.
 
 ### Project images (Scan image)
 `ScanImage.tsx`, on the home project cards and the Projects page's main frame:

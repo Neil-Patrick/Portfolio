@@ -1341,7 +1341,7 @@ test("the GitHub section lists the saved achievements as circle nodes linking to
 
 /* ---------- Behaviour: back to top, footer ---------- */
 
-test("back-to-top button: a diamond that appears once you scroll, its edge line grows as you go down, and returns to the top", async ({ page }) => {
+test("back-to-top button: a diamond that appears past the middle of the page, its edge line grows as you go down, and returns to the top", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/about");
   const button = page.getByRole("button", { name: "Back to Top" });
@@ -1355,11 +1355,15 @@ test("back-to-top button: a diamond that appears once you scroll, its edge line 
   const drawn = () =>
     button.locator("[data-progress-line]").evaluate((el) => parseFloat(el.getAttribute("stroke-dasharray") ?? "0"));
   await page.evaluate(() => window.scrollTo(0, (document.documentElement.scrollHeight - innerHeight) * 0.3));
+  await page.waitForTimeout(500);
+  await expect(button, "still hidden before the middle").toHaveCSS("opacity", "0");
+  await page.evaluate(() => window.scrollTo(0, (document.documentElement.scrollHeight - innerHeight) * 0.65));
   await expect(button).toHaveCSS("opacity", "1");
-  await expect.poll(drawn).toBeGreaterThan(0.2);
-  const third = await drawn();
-  expect(third, "partly drawn").toBeLessThan(0.5);
+  await expect.poll(drawn).toBeGreaterThan(0.55);
+  expect(await drawn(), "partly drawn").toBeLessThan(0.8);
   await expect(button.locator("[data-fill]"), "a line only, no fill").toHaveCount(0);
+  // non-scaling-stroke makes the browser ignore pathLength, so the dash repeats as tiny dots and looks full.
+  await expect(button.locator("[data-progress-line]"), "drawn as a true share of the outline").not.toHaveAttribute("vector-effect", /.*/);
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
   await expect.poll(drawn, { message: "grows round the edge" }).toBeGreaterThan(0.95);
   await expect(button).toHaveCSS("opacity", "1");
