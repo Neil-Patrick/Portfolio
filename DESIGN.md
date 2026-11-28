@@ -185,7 +185,7 @@ Flat. Depth comes from the background's layers (grid, signal lines, vignette), t
 ## Shapes
 
 - **Notch** (`hud-notch`, 0.75rem top-right cut): buttons, chips, tabs, project cards, the media and photo frames, the preview panel. On bordered elements, `hud-notch-edge` draws the clipped corner's diagonal so the outline stays closed. Pair with an inset focus ring.
-- **Circle:** nodes in a sequence: credential emblems, GitHub achievements, education trace nodes, the scroll rail and home gauge markers, the back-to-top button.
+- **Circle:** nodes in a sequence: credential emblems, GitHub achievements, education trace nodes, the scroll rail and home gauge markers.
 - **Rails and rules:** 2px rails on list rows, 3rem teal rules opening pages and sections, hairline dividers.
 - **Corner brackets** survive only on the About portrait's hologram card and the compass dial.
 - **Radii** (4px, 8px) only for album art (Spotify's rule) and embedded players.
@@ -236,7 +236,15 @@ Kept from the first design and re-tinted: the compass dial with brackets, an aim
 The site's scrollbar on every page (desktop). A Frame Line track that fills teal down to a glowing circle marker following the scroll; click the rail to jump or drag the marker. Home shows the section gauge instead (a tick per section, the marker springs to the current one).
 
 ### Back to Top
-A 48px circle: dark face, Frame Line track, a teal line filling clockwise with scroll progress, a chevron, glowing on hover. Appears past the middle of the page.
+A 48px diamond, like the compass needle's tip: dark face, Frame Line edge, a teal line filling clockwise from the top point with scroll progress, an upright chevron, glowing on hover. Appears past the middle of the page.
+
+### Project images (Scan image)
+`ScanImage.tsx`, on the home project cards and the Projects page's main frame:
+- **Appear:** the first time an image is in view and loaded, it wipes in top-down behind a teal scan line. The home cards stagger it, rising in one after another with `Reveal`.
+- **Hover or keyboard focus** on the card or frame: the image zooms a touch, a band sweeps across, faint scanlines show, the border turns teal and the card glows. Home cards also slide in a "View Project" tag.
+- **Reduced motion:** images are simply shown.
+
+Home cards lead with the project's first screenshot (16:9) above the name, summary and logos.
 
 ### Cursor
 One angular set: dark-filled shapes with a teal outline and a very soft neon glow; the arrow and hands trail a faint offset echo. The arrow everywhere; a pointing hand over clickable things; an open hand over draggable things (the credential carousel, the scroll rail) that becomes a fist while dragging; an I-beam in text fields; a slashed box on disabled controls; the arrow with an hourglass while something works (the contact form sending). 32px PNGs at 1x and 2x. Mouse pointers only; forced-colors mode keeps the system cursors.

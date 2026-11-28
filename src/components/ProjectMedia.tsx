@@ -3,13 +3,15 @@
 import Image from "next/image";
 import { useState } from "react";
 import type { Project } from "@/content/projects";
+import { ScanImage } from "./ScanImage";
 
 const SIZES = "(min-width: 64rem) 40vw, 90vw";
 
 /**
  * A project's screenshots on the Projects page: the first one large in a
- * notched 16:9 frame, any others as thumbnails beneath that swap into the
- * frame. Until Neil adds images (`images` in projects.ts, files in
+ * notched 16:9 frame (it scan-wipes in when scrolled into view; hovering zooms
+ * it, sweeps a band across and turns the frame teal, via ScanImage), any others
+ * as thumbnails beneath that swap into the frame. Until Neil adds images (`images` in projects.ts, files in
  * public/projects/<id>/), a clearly labeled placeholder stands in: a hairline
  * browser window, so it reads as "a screenshot goes here", never as content.
  */
@@ -20,9 +22,15 @@ export function ProjectMedia({ project }: { project: Project }) {
 
   return (
     <div>
-      <div className="hud-notch relative aspect-video w-full overflow-hidden border border-line-strong bg-surface">
+      <div
+        className={`hud-notch relative aspect-video w-full overflow-hidden border border-line-strong bg-surface ${
+          main ? "group transition-colors hover:border-accent" : ""
+        }`}
+        data-project-media
+      >
         {main ? (
-          <Image src={main.src} alt={main.alt} fill sizes={SIZES} className="object-cover" />
+          // Keyed by image, so switching screenshots replays the scan wipe.
+          <ScanImage key={main.src} src={main.src} alt={main.alt} sizes={SIZES} />
         ) : (
           <div
             role="img"
@@ -62,11 +70,17 @@ export function ProjectMedia({ project }: { project: Project }) {
                 aria-pressed={i === shown}
                 aria-label={`Show screenshot ${i + 1}: ${image.alt}`}
                 onClick={() => setShown(i)}
-                className={`relative block aspect-video w-20 overflow-hidden border transition-colors ${
+                className={`group relative block aspect-video w-20 overflow-hidden border transition-colors ${
                   i === shown ? "border-accent" : "border-line-strong hover:border-accent"
                 }`}
               >
-                <Image src={image.src} alt="" fill sizes="5rem" className="object-cover" />
+                <Image
+                  src={image.src}
+                  alt=""
+                  fill
+                  sizes="5rem"
+                  className="object-cover transition-transform duration-500 motion-safe:group-hover:scale-110"
+                />
               </button>
             </li>
           ))}

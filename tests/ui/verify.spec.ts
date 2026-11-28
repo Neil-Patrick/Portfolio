@@ -1058,6 +1058,45 @@ test("Open to Work chip: under the buttons, links to the call to action, carries
   expect(await animationsIn(chip), "nothing animates with reduced motion").toEqual([]);
 });
 
+test("home project cards: each shows its thumbnail inside the link, scan-wipes in when scrolled into view, and zooms with a View Project tag on hover", async ({ page }) => {
+  const { projects } = await import("../../src/content/projects");
+  const errors = collectErrors(page);
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  const section = page.locator("#projects");
+  for (const project of projects.filter((p) => p.images?.length)) {
+    const card = section.getByRole("link", { name: new RegExp(project.name) });
+    await expect(card.getByRole("img", { name: project.images![0].alt })).toBeAttached();
+  }
+  await expect(section.locator(".scan-image[data-shown]"), "not before it is seen").toHaveCount(0);
+  await section.evaluate((el) => el.scrollIntoView());
+  await expect(section.locator(".scan-image[data-shown]")).toHaveCount(projects.filter((p) => p.images?.length).length);
+
+  const card = section.locator("a.project-card").first();
+  const img = card.locator(".scan-image img");
+  await page.waitForTimeout(1500);
+  const rest = await transformOf(img);
+  const tag = card.locator(".card-tag");
+  await expect.poll(() => tag.evaluate((el) => Number(getComputedStyle(el).opacity))).toBeLessThan(0.1);
+  await card.hover();
+  await expect.poll(() => transformOf(img), { message: "zooms on hover" }).not.toBe(rest);
+  await expect.poll(() => tag.evaluate((el) => Number(getComputedStyle(el).opacity)), { message: "View Project tag" }).toBeGreaterThan(0.9);
+  expect(errors, "console errors").toEqual([]);
+});
+
+test("home project cards and the Projects page images: shown at once with reduced motion, no animations, and no horizontal scroll on a phone", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  for (const path of ["/", "/projects"]) {
+    await page.goto(path);
+    const image = page.locator(".scan-image").first();
+    await image.evaluate((el) => el.scrollIntoView());
+    await expect(image.locator(".scan-image-picture")).toHaveCSS("opacity", "1");
+    expect(await image.evaluate((el) => el.getAnimations({ subtree: true }).length), `${path}: no animations`).toBe(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false);
+  }
+});
+
 test("Open to Work chip: on a phone the detail opens below the label, never past the screen", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await page.goto("/");
@@ -1302,10 +1341,12 @@ test("the GitHub section lists the saved achievements as circle nodes linking to
 
 /* ---------- Behaviour: back to top, footer ---------- */
 
-test("back-to-top button appears past the middle of the page and returns to the top", async ({ page }) => {
+test("back-to-top button: a diamond that appears past the middle of the page and returns to the top", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/about");
   const button = page.getByRole("button", { name: "Back to Top" });
+  await expect(button.locator("svg polygon"), "the diamond shape").toHaveAttribute("points", "50,3 97,50 50,97 3,50");
+  expect((await button.boundingBox())!.width).toBeGreaterThanOrEqual(44);
   // Hidden at the top: invisible, and out of the tab order.
   await expect(button).toHaveCSS("opacity", "0");
   await expect(button).toHaveJSProperty("inert", true);

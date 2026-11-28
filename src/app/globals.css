@@ -1013,6 +1013,93 @@
   }
 }
 
+/* Scan image (src/components/ScanImage.tsx): project images on Home and the
+   Projects page. In view: a top-down wipe behind a teal scan line (staggered by
+   --scan-delay). Hover or focus on the nearest .group: a slight zoom, a band
+   sweeping across, faint scanlines. Motion-only; at rest it is just the image. */
+.scan-image-lines {
+  opacity: 0;
+}
+.scan-image-band {
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    color-mix(in oklab, var(--color-accent) 22%, transparent) 50%,
+    transparent 70%
+  );
+  transform: translateX(-110%);
+}
+@keyframes scan-wipe {
+  from {
+    clip-path: inset(0 0 100% 0);
+    opacity: 1;
+  }
+  to {
+    clip-path: inset(0);
+    opacity: 1;
+  }
+}
+@keyframes scan-band {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(110%);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  /* Hidden by opacity, not clip-path: a fully clipped image never starts lazy-loading. */
+  .scan-image:not([data-shown]) .scan-image-picture {
+    opacity: 0;
+  }
+  .scan-image[data-shown] .scan-image-picture {
+    animation: scan-wipe 900ms cubic-bezier(0.45, 0, 0.55, 1) var(--scan-delay, 0ms) both;
+  }
+  .scan-image[data-shown] .scan-image-line {
+    animation: reveal-sweep 900ms cubic-bezier(0.45, 0, 0.55, 1) var(--scan-delay, 0ms) both;
+  }
+  .scan-image img {
+    transition: transform 500ms var(--ease-out-soft);
+  }
+  .group:is(:hover, :focus-visible) .scan-image img {
+    transform: scale(1.05);
+  }
+  .scan-image-lines {
+    transition: opacity 300ms ease-out;
+  }
+  .group:is(:hover, :focus-visible) .scan-image-lines {
+    opacity: 1;
+  }
+  .group:is(:hover, :focus-visible) .scan-image-band {
+    animation: scan-band 800ms var(--ease-out-soft);
+  }
+}
+
+/* Home project cards: the "View Project" tag slides in, and the card glows, on hover or focus. */
+.card-tag {
+  opacity: 0;
+  translate: 0.5rem 0;
+}
+.group:is(:hover, :focus-visible) .card-tag {
+  opacity: 1;
+  translate: 0 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card-tag {
+    transition:
+      opacity 250ms ease-out,
+      translate 350ms var(--ease-out-soft);
+  }
+  .project-card {
+    transition:
+      border-color 200ms ease-out,
+      box-shadow 300ms ease-out;
+  }
+  .project-card:is(:hover, :focus-visible) {
+    box-shadow: 0 0 28px color-mix(in oklab, var(--color-accent) 16%, transparent);
+  }
+}
+
 /* Photo reveal (src/components/PhotoReveal.tsx): a scan line sweeps down the
    About photo, uncovering the real photo above the illustration (or back). */
 .reveal-photo {

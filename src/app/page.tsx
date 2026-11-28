@@ -1,6 +1,10 @@
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Landing } from "@/components/hero/Landing";
 import { NameHero } from "@/components/hero/NameHero";
+import { Icon } from "@/components/icons";
+import { Reveal, RevealItem } from "@/components/motion/Reveal";
+import { ScanImage } from "@/components/ScanImage";
 import { Section } from "@/components/Section";
 import { TechIcon } from "@/components/TechIcon";
 import { projects } from "@/content/projects";
@@ -48,25 +52,49 @@ export default function HomePage() {
       <Landing />
 
       <Section id="projects" title={projectsSection.label} href={projectsSection.href} cta={projectsSection.cta}>
-        <ul className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project) => (
-            <li key={project.id}>
-              <Link
+        {/* Cards rise in one after another; each thumbnail's scan wipe follows the same stagger. */}
+        <Reveal as="ul" className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {projects.map((project, index) => {
+            const thumbnail = project.images?.[0];
+            return (
+              <RevealItem as="li" key={project.id}>
+                <Link
                   href={`/projects#${project.id}`}
-                  className="group hud-notch hud-notch-edge flex h-full flex-col border border-line-strong bg-surface/80 p-6 pr-8 transition-colors hover:border-accent hover:[--edge:var(--color-accent)] focus-visible:-outline-offset-4"
+                  className="project-card group hud-notch hud-notch-edge flex h-full flex-col border border-line-strong bg-surface/80 transition-colors hover:border-accent hover:[--edge:var(--color-accent)] focus-visible:-outline-offset-4"
                 >
-                  <span className="font-display text-2xl font-bold transition-colors group-hover:text-accent">{project.name}</span>
-                  <span className="mt-2 flex-1 text-ink-muted">{project.summary}</span>
-                  {/* Logos of the technologies it uses (names are in the project page). */}
-                  <span aria-hidden className="mt-5 flex flex-wrap gap-2">
-                    {previewLogos(project.stack).map((tool) => (
-                      <TechIcon key={tool} name={tool} />
-                    ))}
+                  {thumbnail && (
+                    <span className="relative block aspect-video border-b border-line">
+                      <ScanImage
+                        src={thumbnail.src}
+                        alt={thumbnail.alt}
+                        sizes="(min-width: 64rem) 30vw, (min-width: 48rem) 45vw, 90vw"
+                        delay={index * 120}
+                      />
+                      {/* Slides in on hover or focus; the link itself already names the project. */}
+                      <span
+                        aria-hidden
+                        className="card-tag absolute right-3 bottom-3 inline-flex items-center gap-1.5 bg-canvas/85 px-2.5 py-1 hud-label text-xs text-accent backdrop-blur-sm"
+                      >
+                        View Project
+                        <Icon icon={ArrowRight} />
+                      </span>
+                    </span>
+                  )}
+                  <span className="flex flex-1 flex-col p-6 pr-8">
+                    <span className="font-display text-2xl font-bold transition-colors group-hover:text-accent">{project.name}</span>
+                    <span className="mt-2 flex-1 text-ink-muted">{project.summary}</span>
+                    {/* Logos of the technologies it uses (names are in the project page). */}
+                    <span aria-hidden className="mt-5 flex flex-wrap gap-2">
+                      {previewLogos(project.stack).map((tool) => (
+                        <TechIcon key={tool} name={tool} />
+                      ))}
+                    </span>
                   </span>
                 </Link>
-            </li>
-          ))}
-        </ul>
+              </RevealItem>
+            );
+          })}
+        </Reveal>
       </Section>
 
     </>
