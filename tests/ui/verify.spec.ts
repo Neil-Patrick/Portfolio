@@ -1341,17 +1341,27 @@ test("the GitHub section lists the saved achievements as circle nodes linking to
 
 /* ---------- Behaviour: back to top, footer ---------- */
 
-test("back-to-top button: a diamond that appears past the middle of the page and returns to the top", async ({ page }) => {
+test("back-to-top button: a diamond that appears once you scroll, its edge line grows as you go down, and returns to the top", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/about");
   const button = page.getByRole("button", { name: "Back to Top" });
-  await expect(button.locator("svg polygon"), "the diamond shape").toHaveAttribute("points", "50,3 97,50 50,97 3,50");
+  await expect(button.locator("svg > polygon"), "the diamond shape").toHaveAttribute("points", "50,3 97,50 50,97 3,50");
   expect((await button.boundingBox())!.width).toBeGreaterThanOrEqual(44);
   // Hidden at the top: invisible, and out of the tab order.
   await expect(button).toHaveCSS("opacity", "0");
   await expect(button).toHaveJSProperty("inert", true);
 
+  // The edge line grows with the scroll: its drawn share of the outline (Motion's dash, against pathLength 1).
+  const drawn = () =>
+    button.locator("[data-progress-line]").evaluate((el) => parseFloat(el.getAttribute("stroke-dasharray") ?? "0"));
+  await page.evaluate(() => window.scrollTo(0, (document.documentElement.scrollHeight - innerHeight) * 0.3));
+  await expect(button).toHaveCSS("opacity", "1");
+  await expect.poll(drawn).toBeGreaterThan(0.2);
+  const third = await drawn();
+  expect(third, "partly drawn").toBeLessThan(0.5);
+  await expect(button.locator("[data-fill]"), "a line only, no fill").toHaveCount(0);
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await expect.poll(drawn, { message: "grows round the edge" }).toBeGreaterThan(0.95);
   await expect(button).toHaveCSS("opacity", "1");
   await expect(button).toHaveJSProperty("inert", false);
   await button.click();
