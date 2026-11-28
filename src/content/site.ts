@@ -45,7 +45,7 @@ export const site = {
    * Profile photo, a path under public/ (for example "/me.jpg"). While null, the
    * landing card and the About page show a clearly marked placeholder.
    */
-  photo: null as string | null,
+  photo: "/me.jpg" as string | null,
   /** Home landing. Draft copy, true to the intro: edit freely. */
   landing: {
     /** One line each; they decode in. Keep each line short enough to fit a phone. */

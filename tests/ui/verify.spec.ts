@@ -964,12 +964,12 @@ const depthOf = (locator: ReturnType<Page["locator"]>) =>
     return m.startsWith("matrix3d(") ? Number(m.slice(9, -1).split(",")[14]) : 0;
   });
 
-test("hologram card: holds the page's h1 and a labeled photo placeholder, and stays flat and still with reduced motion", async ({ page }) => {
+test("hologram card: holds the page's h1 and the photo (or its labeled placeholder), and stays flat and still with reduced motion", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   const card = page.locator("[data-hologram]");
   await expect(card.getByRole("heading", { level: 1 })).toHaveText(site.name);
-  await expect(card.getByRole("img", { name: "Photo placeholder" })).toBeVisible();
+  await expect(card.getByRole("img", { name: site.photo ? `Photo of ${site.name}` : "Photo placeholder" })).toBeVisible();
   await expect(card).toContainText(site.availability);
   const body = card.locator("> div");
   const before = await transformOf(body);
