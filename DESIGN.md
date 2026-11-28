@@ -286,7 +286,7 @@ Motion, driven by `data-phase` (`off` / `on` / `glitch`):
 ### Loading Screen
 Kept: the CRT boot sequence on a full load of Home, re-tinted to the charcoal canvas. Never plays with reduced motion. About 6 seconds in two acts after the CRT power-on:
 1. **Data:** the progress bar, the system check with real counts, and "Access Granted". Then the status line and data block jolt twice and wipe off upward.
-2. **The NP logo alone,** centred and enlarged to fit the screen (`IntroLogo.tsx`, `--spacing-intro-logo: min(52svh, 66vw)`). It blinks out at the end, before the CRT power-off reveals the page.
+2. **The NP logo alone,** centred and enlarged to fit the screen (`IntroLogo.tsx`, `--spacing-intro-logo: min(52svh, 66vw)`). At the end it flickers and stays lit, so the CRT power-off squashes it into a bright line and a dot, like a TV switching off, and the page appears.
 
 How the logo plays:
 - **Trace:** each letter's outline traces in teal, one after another (left stem, diagonal, right stem, P).

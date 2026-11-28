@@ -376,12 +376,13 @@
 /* ---------- Loading screen (src/components/intro/, src/lib/intro.ts) ----------
    Shown only while <html data-intro> is "play" or "skip": every full load of
    Home (a refresh included), with motion allowed (decided before first paint). Timeline, about
-   6.1s (time the page uses to preload), in two acts after a CRT power-on and flicker:
+   6.25s (time the page uses to preload), in two acts after a CRT power-on and flicker:
    1. data (0.4-2.9s): the progress bar and the system check printing, "Access Granted",
       then the data jolts and wipes off the screen;
-   2. the logo (3.1-5.5s): the NP logo alone, centred and enlarged, tracing in, igniting,
-      glitching, its sparkle spinning in, then blinking out;
-   then a CRT power-off and the fade out. A click or key ("skip") fades it at once. */
+   2. the logo (3.1-5.45s): the NP logo alone, centred and enlarged, tracing in, igniting,
+      glitching, its sparkle spinning in, then a last flicker;
+   then the CRT power-off squashes the lit logo into a bright line and a dot (5.45-5.9s),
+   and the overlay clears. A click or key ("skip") fades it at once. */
 .intro {
   display: none;
 }
@@ -396,7 +397,7 @@
   overflow: hidden;
   background-color: var(--color-canvas);
   color: var(--color-ink);
-  animation: intro-out 400ms ease-in 5750ms forwards;
+  animation: intro-out 350ms ease-in 5900ms forwards;
 }
 :root[data-intro="skip"] .intro {
   animation: intro-skip 300ms ease-out forwards;
@@ -445,15 +446,16 @@
   animation:
     intro-crt-on 450ms var(--ease-out-soft) both,
     intro-flicker 900ms steps(1, end) 420ms both,
-    intro-crt-off 350ms ease-in 5550ms forwards;
+    intro-crt-off 450ms ease-in 5450ms forwards;
 }
 /* Act 1 ends: the status line and the data block jolt twice and wipe off upward. */
 .intro-data {
   animation: intro-data-out 400ms steps(8, end) 2850ms forwards;
 }
-/* Act 2 ends: the logo blinks out before the screen powers off. */
+/* Act 2 ends: the logo flickers, and stays lit so the CRT power-off squashes it into a
+   bright line and a dot (the TV switching off), rather than blinking out to an empty screen first. */
 .intro-logo-stage {
-  animation: intro-blink-out 450ms steps(1, end) 5100ms forwards;
+  animation: intro-logo-flicker 350ms steps(1, end) 5100ms both;
 }
 /* The NP logo (src/components/intro/IntroLogo.tsx): each letter's outline traces in
    teal (--trace-delay staggers them), the letter then ignites solid with a flicker
@@ -612,25 +614,19 @@
     clip-path: inset(0 0 100% 0);
   }
 }
-@keyframes intro-blink-out {
-  0% {
-    opacity: 1;
-  }
-  16% {
-    opacity: 0;
-  }
-  33% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-  66% {
-    opacity: 1;
-  }
-  83%,
+@keyframes intro-logo-flicker {
+  0%,
   100% {
-    opacity: 0;
+    opacity: 1;
+  }
+  20% {
+    opacity: 0.2;
+  }
+  40% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.35;
   }
 }
 @keyframes intro-trace {

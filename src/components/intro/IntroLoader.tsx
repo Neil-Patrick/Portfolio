@@ -31,8 +31,8 @@ const leader = <span className="min-w-4 flex-1 border-b border-dotted border-lin
  * first the data (the progress bar, a system check with real numbers, "Access
  * Granted"), which then glitches and wipes off the screen; then the NP logo
  * alone, centred and enlarged, tracing in letter by letter, igniting and
- * glitching, its sparkle spinning in, before it blinks out and a CRT power-off
- * reveals the landing. IntroController handles skipping and preloading and the
+ * glitching, its sparkle spinning in, until a CRT power-off squashes it into a
+ * bright line and a dot, like a TV switching off, and reveals the landing. IntroController handles skipping and preloading and the
  * handoff. It lasts about 6 seconds, or until a click or key.
  * Decorative for assistive tech: everything here is also on the page.
  */

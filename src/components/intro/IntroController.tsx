@@ -8,7 +8,7 @@ import { INTRO_DONE_EVENT } from "@/lib/intro";
 
 /** A click (or tap) anywhere, or any key, continues. Scrolling doesn't, so a stray swipe can't cut it short. */
 const CONTINUE_EVENTS = ["click", "keydown"] as const;
-/** The overlay's own end (globals.css, about 6.1s); a safety net past it, measured from page load. */
+/** The overlay's own end (globals.css, about 6.25s); a safety net past it, measured from page load. */
 const SAFETY_MS = 6900;
 
 /** Warms up what's heavy while the loader plays, so the page feels instant after it. */

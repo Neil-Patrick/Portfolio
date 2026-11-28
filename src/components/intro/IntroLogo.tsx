@@ -30,8 +30,8 @@ const solid = (
  * with a flicker and its outline dims to a glow; two sliced copies glitch over
  * it as it settles; faint scanlines run over
  * the shape; last, the sparkle spins in with a flash ring and keeps pulsing.
- * Centred and enlarged on its own in the loader's second act, then it blinks
- * out before the screen powers off. Decorative, like the rest of the overlay.
+ * Centred and enlarged on its own in the loader's second act; a last flicker,
+ * then the CRT power-off squashes it into a bright line and a dot. Decorative, like the rest of the overlay.
  */
 export function IntroLogo() {
   return (
