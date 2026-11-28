@@ -1,6 +1,7 @@
 "use client";
 
 import { useMotionValueEvent, useScroll } from "motion/react";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { site } from "@/content/site";
@@ -24,7 +25,9 @@ export function SiteHeader() {
       }`}
     >
       <div className="container-page flex h-header items-center justify-between gap-4">
-        <Link href="/" className="inline-flex min-h-11 min-w-0 items-center font-semibold">
+        <Link href="/" className="inline-flex min-h-11 min-w-0 items-center gap-2.5 font-semibold">
+          {/* The NP mark; decorative, the name beside it is the link text. */}
+          <Image src="/brand/np-mark-white.svg" alt="" width={29} height={22} priority className="shrink-0" />
           <span className="truncate">{site.name}</span>
         </Link>
         <div className="flex shrink-0 items-center gap-3">
