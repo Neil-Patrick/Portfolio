@@ -8,7 +8,7 @@ import { site } from "@/content/site";
 import { CompassMenu } from "./nav/CompassMenu";
 
 /**
- * Top bar: name (home link) and the compass that opens the
+ * Top bar: the NP logo (home link) and the compass that opens the
  * site navigation (same at every screen size). Transparent at the top of the
  * page, so the home hero runs edge to edge; once scrolled it becomes a blurred
  * surface.
@@ -25,10 +25,9 @@ export function SiteHeader() {
       }`}
     >
       <div className="container-page flex h-header items-center justify-between gap-4">
-        <Link href="/" className="inline-flex min-h-11 min-w-0 items-center gap-2.5 font-semibold">
-          {/* The NP mark; decorative, the name beside it is the link text. */}
-          <Image src="/brand/np-mark-white.svg" alt="" width={29} height={22} priority className="shrink-0" />
-          <span className="truncate">{site.name}</span>
+        <Link href="/" aria-label={`${site.name}, home`} className="inline-flex min-h-11 min-w-11 items-center">
+          {/* The NP mark alone; the link's label carries the name for screen readers. */}
+          <Image src="/brand/np-mark-white.svg" alt="" width={34} height={26} priority />
         </Link>
         <div className="flex shrink-0 items-center gap-3">
           <CompassMenu />
