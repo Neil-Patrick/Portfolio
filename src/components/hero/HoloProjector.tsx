@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useReducedMotion, useSpring } from "motion/react";
+import { motion, useInView, useReducedMotion, useSpring } from "motion/react";
 import Image from "next/image";
 import { useEffect, useRef, useState, type PointerEvent } from "react";
 import { site } from "@/content/site";
@@ -29,12 +29,12 @@ const TICKS = Array.from({ length: 48 }, (_, i) => {
 /**
  * The landing's hologram: the illustrated avatar (never the real photo) stands
  * in a beam of light above a ring emitter. It projects in bottom-up once the
- * loading screen clears, then idles: a rare flicker, a scan band rising through
+ * loading screen clears and it is scrolled into view, then idles: a rare flicker, a scan band rising through
  * it, ring dashes orbiting, a slow float. A pointer (or a dragging finger)
  * drifts it in parallax; a tap glitches it and re-projects. The project-in and
  * idle loops are CSS (globals.css, "Hologram projector"), driven by data-phase;
- * under reduced motion it is simply shown, still. The name (h1) and the Open to
- * Work chip live in the landing's text column.
+ * under reduced motion it is simply shown, still. The Open to Work chip lives
+ * in the landing's text column; the name (h1) has its own section above.
  */
 export function HoloProjector() {
   const reduceMotion = useReducedMotion();
@@ -45,19 +45,22 @@ export function HoloProjector() {
   const driftX = useSpring(0, DRIFT);
   const driftY = useSpring(0, DRIFT);
 
-  // Projects in once the loading screen has cleared. With reduced motion it stays "off", which the CSS
-  // only hides under prefers-reduced-motion: no-preference, so it is simply shown (and markup matches the server).
+  // Projects in once it is scrolled into view (and the loading screen has cleared). With reduced motion it
+  // stays "off", which the CSS only hides under prefers-reduced-motion: no-preference, so it is simply shown
+  // (and markup matches the server).
+  const root = useRef<HTMLDivElement>(null);
+  const inView = useInView(root, { once: true, amount: 0.35 });
   useEffect(() => {
-    if (reduceMotion) return;
+    if (reduceMotion || !inView) return;
     let timer = 0;
     const stopWaiting = whenIntroDone(() => {
-      timer = window.setTimeout(() => setPhase("on"), 250);
+      timer = window.setTimeout(() => setPhase("on"), 150);
     });
     return () => {
       stopWaiting();
       window.clearTimeout(timer);
     };
-  }, [reduceMotion]);
+  }, [reduceMotion, inView]);
 
   useEffect(() => () => timers.current.forEach((id) => window.clearTimeout(id)), []);
 
@@ -102,7 +105,7 @@ export function HoloProjector() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-md select-none" data-hologram data-phase={phase}>
+    <div ref={root} className="mx-auto w-full max-w-md select-none" data-hologram data-phase={phase}>
       <div
         className="relative aspect-4/5 touch-pan-y"
         onPointerMove={onPointerMove}

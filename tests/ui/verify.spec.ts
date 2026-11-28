@@ -400,7 +400,7 @@ test("home shows the wave background (animated or static) behind readable text",
   // Tests run with reduced motion, so only the static lines show (no 3D download).
   await expect(layer.locator('[data-bg-fallback="waves"] path')).toHaveCount(6);
   await expect(layer.locator("canvas")).toHaveCount(0);
-  await expect(page.locator("#home").getByRole("heading", { level: 1 })).toHaveText("Neil Patrick Pajadan");
+  await expect(page.locator("#home").getByRole("heading", { level: 1 })).toHaveAccessibleName("Neil Patrick Pajadan");
   const axe = await new AxeBuilder({ page }).include("#home").withTags(["wcag2aa"]).analyze();
   expect(axe.violations.map((v) => v.id)).toEqual([]);
 });
@@ -931,7 +931,7 @@ test("loading screen: plays on the first home visit with the real counts, preloa
   expect(errors, "console errors").toEqual([]);
 });
 
-test("loading screen: stays about 5 seconds, clears on its own, then the landing headline decodes into place", async ({ context }) => {
+test("loading screen: stays about 5 seconds, clears on its own, then the name decodes into place", async ({ context }) => {
   const page = await freshPage(context, "no-preference");
   await page.goto("/", { waitUntil: "commit" });
   await expect(page.locator("html")).toHaveAttribute("data-intro", "play");
@@ -939,8 +939,7 @@ test("loading screen: stays about 5 seconds, clears on its own, then the landing
   expect(await introState(page), "still on screen after 3 seconds").toBe("play");
   await expect(page.locator("html")).toHaveAttribute("data-intro", "done", { timeout: 6000 });
   await expect(page.locator("[data-intro-overlay]")).toBeHidden();
-  const firstLine = page.locator("[data-landing-line] span[aria-hidden]").first();
-  await expect(firstLine).toHaveText(site.landing.headline[0], { timeout: 3000 });
+  await expect(page.locator("#home-name span[aria-hidden]")).toHaveText(site.name, { timeout: 3000 });
 });
 
 test("loading screen: never shows with reduced motion", async ({ context }) => {
@@ -961,13 +960,19 @@ const transformOf = (locator: ReturnType<Page["locator"]>) =>
 const animationsIn = (locator: ReturnType<Page["locator"]>) =>
   locator.evaluate((el) => el.getAnimations({ subtree: true }).map((a) => (a as CSSAnimation).animationName ?? "transition"));
 
-test("landing: the name is the h1 on its own in the text column; the projector holds only the illustrated avatar (never the real photo) and stays still with reduced motion", async ({ page }) => {
+test("home: the name is the h1, alone on the first screen; the landing below holds the projector with only the illustrated avatar (never the real photo), still with reduced motion", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   const h1 = page.getByRole("heading", { level: 1 });
   await expect(h1).toHaveCount(1);
-  await expect(h1).toHaveText(site.name);
-  await expect(page.locator("[data-landing-column]").getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(h1).toHaveAccessibleName(site.name);
+  const home = page.locator("#home");
+  await expect(home.getByRole("heading", { level: 1 })).toBeInViewport();
+  await expect(home.getByRole("link"), "the name section holds only the name and the scroll cue").toHaveCount(1);
+  await expect(page.locator("#intro").getByRole("heading", { level: 1 })).toHaveCount(0);
+  await expect(page.locator("[data-landing-column]"), "the landing starts below the first screen").not.toBeInViewport();
+
+  await page.locator("#intro").evaluate((el) => el.scrollIntoView());
   const holo = page.locator("[data-hologram]");
   await expect(holo.getByRole("img", { name: site.avatar.alt })).toBeVisible();
   await expect(holo, "no name or status tags on the projection").not.toContainText(site.name);
@@ -983,14 +988,18 @@ test("landing: the name is the h1 on its own in the text column; the projector h
   expect(await animationsIn(holo), "nothing animates with reduced motion").toEqual([]);
 });
 
-test("hologram projector: projects in after the loader, drifts with the cursor and a dragging finger, and a tap glitches it and re-projects", async ({ page }) => {
+test("hologram projector: projects in once scrolled into view, drifts with the cursor and a dragging finger, and a tap glitches it and re-projects", async ({ page }) => {
   const errors = collectErrors(page);
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   await page.waitForLoadState("networkidle");
   const holo = page.locator("[data-hologram]");
+  await page.waitForTimeout(800);
+  await expect(holo, "waits below the fold").toHaveAttribute("data-phase", "off");
+  await page.locator("#home a[href='#intro']").click();
   await expect(holo).toHaveAttribute("data-phase", "on");
+  await page.waitForTimeout(1200);
   await expect(holo.getByRole("img", { name: site.avatar.alt })).toBeVisible();
 
   const figure = holo.locator('[data-layer="figure"]');

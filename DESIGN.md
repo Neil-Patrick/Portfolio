@@ -244,8 +244,8 @@ One angular set: dark-filled shapes with a teal outline and a very soft neon glo
 ### Footer
 Open on a hairline with a teal rule: "Let's Build Something", Email Me (primary with glow), Copy Email, LinkedIn, the arrow to Contact; then "// End of Transmission", Open to Work, page and contact links, copyright and location.
 
-### Landing name and Open to Work chip
-The name is the page's h1 on its own at the top of the landing's text column (a modest display size, so the decoding headline stays the lead); it is ready to move into the section planned above the landing. Open to Work is a projected HUD chip on its own line under the two actions (`AvailabilityChip.tsx`, globals.css "Open to Work chip"):
+### Name screen and Open to Work chip
+Home opens on a screen of its own holding only the name (`NameHero.tsx`): the page's h1, large (`--text-name`, sized to the page width) and centred, decoding in as the loader clears, with a scroll cue to the landing. Neil plans more for this section. The landing is the second screen; its headline decode and the projector's project-in wait until it is scrolled into view. Open to Work is a projected HUD chip on its own line under the two actions (`AvailabilityChip.tsx`, globals.css "Open to Work chip"):
 - **Look:** a translucent teal plate with scanlines, a dashed ring round a pulsing dot, the notched edge.
 - **Link:** it goes to the "Let's Build" call to action.
 - **Hover, keyboard focus or a press:**

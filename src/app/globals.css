@@ -54,6 +54,9 @@
   /* Home landing headline: sized to its column (cqi), so each line always fits. */
   --text-landing: clamp(2.25rem, 12cqi, 7.5rem);
   --text-landing--line-height: 1;
+  /* The name on its own, the home page's first screen: sized to the page width (cqi), so it always fits. */
+  --text-name: clamp(2.75rem, 11cqi, 9rem);
+  --text-name--line-height: 0.95;
   /* The loading screen's glitching name. */
   --text-intro: clamp(2.5rem, 1rem + 7vw, 6.5rem);
   --text-intro--line-height: 1;

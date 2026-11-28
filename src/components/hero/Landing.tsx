@@ -1,4 +1,4 @@
-import { ArrowDown, ChevronDown } from "lucide-react";
+import { ArrowDown } from "lucide-react";
 import { site } from "@/content/site";
 import { cssVars } from "@/lib/css-vars";
 import { Icon } from "../icons";
@@ -6,34 +6,27 @@ import { DecodeText } from "../motion/DecodeText";
 import { Magnetic } from "../motion/Tilt";
 import { AvailabilityChip } from "./AvailabilityChip";
 import { HoloProjector } from "./HoloProjector";
+import { ScrollCue } from "./ScrollCue";
 
 /**
- * Home landing: the name (the page's h1), a huge headline that decodes in, the
- * two main actions and the Open to Work chip, with the hologram projector
- * beside them (the illustrated avatar in a beam of light). On every full load the cyberpunk
- * loading screen plays first (src/components/intro/), and the headline and the
- * projection start as it clears. With reduced motion everything is shown at rest.
+ * Home's second screen, under the name (NameHero): a huge headline that decodes
+ * in, the two main actions and the Open to Work chip, with the hologram
+ * projector beside them (the illustrated avatar in a beam of light). The
+ * headline's decode and the projection wait until the section is scrolled into
+ * view. With reduced motion everything is shown at rest.
  */
 export function Landing() {
   const { headline, primaryCta, secondaryCta } = site.landing;
 
   return (
-    <section
-      id="home"
-      aria-label="Welcome"
-      className="relative -mt-header flex min-h-svh flex-col justify-center overflow-hidden pt-header"
-    >
+    <section id="intro" aria-label="Introduction" className="relative flex min-h-svh flex-col justify-center overflow-hidden">
       <div className="container-page grid items-center gap-12 pt-12 pb-24 lg:grid-cols-2 lg:gap-16">
         {/* The column is a size container, so the headline scales to fit it. */}
         <div className="@container" data-landing-column>
-          {/* The name, on its own: the page's h1. Ready to move into the section Neil plans above the landing. */}
-          <h1 className="load-fade mb-6 font-display text-2xl font-bold tracking-wide text-ink sm:text-3xl" style={cssVars({ "--fade-delay": "200ms" })}>
-            {site.name}
-          </h1>
           <p className="font-display text-landing font-bold">
             {headline.map((line) => (
               <span key={line} className="block whitespace-nowrap" data-landing-line>
-                <DecodeText text={line} />
+                <DecodeText text={line} inView />
               </span>
             ))}
           </p>
@@ -66,16 +59,7 @@ export function Landing() {
         <HoloProjector />
       </div>
 
-      <a
-        href="#projects"
-        className="load-fade absolute inset-x-0 bottom-4 mx-auto flex min-h-11 w-fit flex-col items-center justify-center px-3 hud-label text-xs text-ink-muted transition-colors hover:text-accent"
-        style={cssVars({ "--fade-delay": "1800ms" })}
-      >
-        <span>
-          Scroll<span className="sr-only"> to the Projects</span>
-        </span>
-        <Icon icon={ChevronDown} className="cue-bob" />
-      </a>
+      <ScrollCue href="#projects" to="the Projects" delay="1800ms" />
     </section>
   );
 }

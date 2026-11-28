@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Landing } from "@/components/hero/Landing";
+import { NameHero } from "@/components/hero/NameHero";
 import { Section } from "@/components/Section";
 import { TechIcon } from "@/components/TechIcon";
 import { projects } from "@/content/projects";
@@ -32,15 +33,18 @@ const projectsSection = getSection("projects");
 /**
  * Home, top to bottom (the same order as `homeIndex` in site.ts, which the
  * depth gauge reads), after the loading screen (rendered by the root layout):
- * the landing (with the hologram card and the page's h1) and projects; the
+ * the name on its own (the page's h1), the landing (headline, actions, Open to
+ * Work, the hologram projector) and projects; the
  * "Let's Build" invitation opens the footer, on every page. The career
  * timeline and GitHub activity live on the About page.
  */
 export default function HomePage() {
   return (
     <>
+      {/* First screen: the name on its own (the page's h1), running up behind the transparent header. */}
+      <NameHero />
 
-      {/* Full-screen landing, running up behind the transparent header. */}
+      {/* Second screen: headline, actions, Open to Work, and the hologram projector. */}
       <Landing />
 
       <Section id="projects" title={projectsSection.label} href={projectsSection.href} cta={projectsSection.cta}>

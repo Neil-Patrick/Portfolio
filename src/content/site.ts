@@ -80,6 +80,7 @@ export const site = {
  */
 export const homeIndex = [
   { id: "home", label: "Home" },
+  { id: "intro", label: "Intro" },
   { id: "projects", label: "Projects" },
   { id: "contact", label: "Contact" },
 ];
