@@ -62,6 +62,12 @@ export const projects: Project[] = [
       { label: "App Source", href: "https://github.com/Neil-Patrick/Statera_App" },
       { label: "Website Source", href: "https://github.com/Neil-Patrick/Statera_FrontEnd" },
     ],
+    images: [
+      {
+        src: "/projects/statera/1.webp",
+        alt: "Statera: two phone screens showing behavioral profile results, Minimal Digital Engager and High-Functioning Academic, each with a 72% pattern match",
+      },
+    ],
   },
   {
     id: "untold-diaries",
