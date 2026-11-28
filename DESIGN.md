@@ -172,7 +172,7 @@ No layout scrolls horizontally at 320px; touch targets are at least 44px.
 
 ## Elevation & Depth
 
-Flat. Depth comes from the background's layers (grid, signal lines, vignette), the Raised Surface tone on the few real objects, and glow on what is selected or aimed at. There are no drop shadows on resting cards. Real 3D appears only in the hologram card.
+Flat. Depth comes from the background's layers (grid, signal lines, vignette), the Raised Surface tone on the few real objects, and glow on what is selected or aimed at. There are no drop shadows on resting cards. The hologram projector is the one place light is drawn as an effect (beam, glow, scanlines).
 
 ### Shadow Vocabulary
 - **Signal Glow** (`drop-shadow: 0 0 6–12px color-mix(in oklab, var(--color-accent) 40–60%, transparent)`): the primary button, the hovered back-to-top button, the scroll rail marker.
@@ -187,7 +187,7 @@ Flat. Depth comes from the background's layers (grid, signal lines, vignette), t
 - **Notch** (`hud-notch`, 0.75rem top-right cut): buttons, chips, tabs, project cards, the media and photo frames, the preview panel. On bordered elements, `hud-notch-edge` draws the clipped corner's diagonal so the outline stays closed. Pair with an inset focus ring.
 - **Circle:** nodes in a sequence: credential emblems, GitHub achievements, education trace nodes, the scroll rail and home gauge markers, the back-to-top button.
 - **Rails and rules:** 2px rails on list rows, 3rem teal rules opening pages and sections, hairline dividers.
-- **Corner brackets** survive only on the hologram card and the compass dial.
+- **Corner brackets** survive only on the compass dial.
 - **Radii** (4px, 8px) only for album art (Spotify's rule) and embedded players.
 
 ## Components
@@ -244,8 +244,18 @@ One angular set: dark-filled shapes with a teal outline and a very soft neon glo
 ### Footer
 Open on a hairline with a teal rule: "Let's Build Something", Email Me (primary with glow), Copy Email, LinkedIn, the arrow to Contact; then "// End of Transmission", Open to Work, page and contact links, copyright and location.
 
-### Hologram Card (signature)
-Kept: the landing's layered 3D card with corner brackets, the photo and the name as the page's h1.
+### Hologram Projector (signature)
+The landing's centrepiece (`HoloProjector.tsx`, globals.css "Hologram projector"). The illustrated avatar (`site.avatar.holo`, black keyed out; never the real photo, which stays on About) stands in a teal beam rising from a ring emitter: perspective rings, orbiting dashes, tick marks, a glowing core. Scanlines and a rising scan band are clipped to the figure by its own alpha. The name (the page's h1) with the role sits right of the head, and the Open to Work status sits left of the beam. Both are floating tags on leader lines that end in circle nodes; on phones (under `sm`) they stack below the emitter without lines.
+Motion, driven by `data-phase` (`off` / `on` / `glitch`):
+- **Project-in:** once the loader clears, the rings open, the beam fades up, the figure builds bottom-up with a flicker, then the tags draw their lines and text.
+- **Idle:** a rare flicker, the scan band rising, the dashes orbiting, a slow float.
+- **Pointer:** the pointer or a dragging finger drifts the figure (and the tags the other way) in parallax; a tap glitches it (RGB split, jitter) and re-projects.
+- **Reduced motion:** all of it is shown still. It's built in CSS and Motion springs, with no WebGL.
+
+### Photo Reveal (About)
+`PhotoReveal.tsx`: the About photo frame shows the illustrated portrait (`site.avatar.illustrated`, on the same charcoal grid as the photo, face aligned) first. Once in view, a teal scan line sweeps down and uncovers the real photo behind it, landing with a faint flicker.
+- **Toggle:** "Show Illustration" / "Show Photo" flips between them, sweeping again: down to the photo, up to the illustration.
+- **Reduced motion:** the real photo shows at once and flips are instant.
 
 ### Loading Screen
 Kept: the CRT boot sequence on a full load of Home, re-tinted to the charcoal canvas. Never plays with reduced motion.

@@ -4,14 +4,14 @@ import { cssVars } from "@/lib/css-vars";
 import { Icon } from "../icons";
 import { DecodeText } from "../motion/DecodeText";
 import { Magnetic } from "../motion/Tilt";
-import { HologramCard } from "./HologramCard";
+import { HoloProjector } from "./HoloProjector";
 
 /**
  * Home landing: a huge headline that decodes in and the two main actions, with
- * the hologram card beside them (photo, name as the page's h1, role, status).
- * On every full load the cyberpunk loading screen plays first
- * (src/components/intro/), and the headline and the card's 3D pop start as it
- * clears. With reduced motion everything is shown at rest.
+ * the hologram projector beside them (the illustrated avatar in a beam of light,
+ * the name as the page's h1, role, status). On every full load the cyberpunk
+ * loading screen plays first (src/components/intro/), and the headline and the
+ * projection start as it clears. With reduced motion everything is shown at rest.
  */
 export function Landing() {
   const { headline, primaryCta, secondaryCta } = site.landing;
@@ -53,7 +53,7 @@ export function Landing() {
           </div>
         </div>
 
-        <HologramCard />
+        <HoloProjector />
       </div>
 
       <a

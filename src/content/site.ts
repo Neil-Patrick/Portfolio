@@ -39,13 +39,25 @@ export const site = {
     "Now I'm moving toward data and AI: analysis, automation, and building with AI models. In 2026 I earned the IT Specialist – Artificial Intelligence certification, and my next projects are in that direction.",
     "Before university, I took the STEM track at Laguna Science National High School.",
   ],
-  /** Shown on the landing's hologram card and in the loading screen's system check. Neil: open to internships, jobs, and freelance work. */
+  /** Shown on the landing's hologram and in the loading screen's system check. Neil: open to internships, jobs, and freelance work. */
   availability: "Open to Work",
   /**
-   * Profile photo, a path under public/ (for example "/me.jpg"). While null, the
-   * landing card and the About page show a clearly marked placeholder.
+   * Real profile photo, a path under public/ (for example "/me.jpg"). Shown only on
+   * the About page (after the illustration resolves into it). While null, the
+   * About page shows a clearly marked placeholder.
    */
   photo: "/me.jpg" as string | null,
+  /**
+   * Illustrated portrait. `holo`: black keyed out, projected on the home landing
+   * (the real face stays off the home page). `illustrated`: the same portrait in
+   * the About photo's square frame, shown first before the real photo.
+   */
+  avatar: {
+    holo: "/avatar/holo.webp",
+    holoSize: { width: 800, height: 1061 },
+    illustrated: "/avatar/illustrated.jpg",
+    alt: "Illustrated portrait of Neil Patrick Pajadan",
+  },
   /** Home landing. Draft copy, true to the intro: edit freely. */
   landing: {
     /** One line each; they decode in. Keep each line short enough to fit a phone. */

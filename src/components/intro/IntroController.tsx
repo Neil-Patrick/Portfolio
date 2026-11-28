@@ -18,11 +18,10 @@ function preload(router: ReturnType<typeof useRouter>) {
     import("../background/WaveLines"),
     document.fonts?.ready ?? Promise.resolve(),
   ];
-  if (site.photo) {
-    const photo = new Image();
-    photo.src = site.photo;
-    tasks.push(photo.decode().catch(() => undefined));
-  }
+  // The landing's hologram avatar, so it can project in the moment the loader clears.
+  const avatar = new Image();
+  avatar.src = site.avatar.holo;
+  tasks.push(avatar.decode().catch(() => undefined));
   // The other pages, so the first click elsewhere is quick.
   sections.filter((section) => section.href !== "/").forEach((section) => router.prefetch(section.href));
   return Promise.allSettled(tasks);

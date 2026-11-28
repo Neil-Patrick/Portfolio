@@ -952,71 +952,85 @@ test("loading screen: never shows with reduced motion", async ({ context }) => {
   }
 });
 
-/* ---------- Behaviour: hologram card, compass touch, photo, badges ---------- */
+/* ---------- Behaviour: hologram projector, compass touch, photo, badges ---------- */
 
-/** Rotation of an element's computed transform, rounded, so tilts can be compared. */
+/** An element's computed transform, so drift and glitch can be compared. */
 const transformOf = (locator: ReturnType<Page["locator"]>) =>
   locator.evaluate((el) => getComputedStyle(el).transform);
-/** How far a layer floats in front of the card (the translateZ in its computed matrix). */
-const depthOf = (locator: ReturnType<Page["locator"]>) =>
-  locator.evaluate((el) => {
-    const m = getComputedStyle(el).transform;
-    return m.startsWith("matrix3d(") ? Number(m.slice(9, -1).split(",")[14]) : 0;
-  });
+/** Names of the CSS animations running anywhere inside an element. */
+const animationsIn = (locator: ReturnType<Page["locator"]>) =>
+  locator.evaluate((el) => el.getAnimations({ subtree: true }).map((a) => (a as CSSAnimation).animationName ?? "transition"));
 
-test("hologram card: holds the page's h1 and the photo (or its labeled placeholder), and stays flat and still with reduced motion", async ({ page }) => {
+test("hologram projector: holds the page's h1, the illustrated avatar (never the real photo) and the status, and stays still with reduced motion", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  const card = page.locator("[data-hologram]");
-  await expect(card.getByRole("heading", { level: 1 })).toHaveText(site.name);
-  await expect(card.getByRole("img", { name: site.photo ? `Photo of ${site.name}` : "Photo placeholder" })).toBeVisible();
-  await expect(card).toContainText(site.availability);
-  const body = card.locator("> div");
-  const before = await transformOf(body);
-  const box = (await body.boundingBox())!;
+  const holo = page.locator("[data-hologram]");
+  await expect(holo.getByRole("heading", { level: 1 })).toHaveText(site.name);
+  await expect(holo.getByRole("img", { name: site.avatar.alt })).toBeVisible();
+  await expect(holo).toContainText(site.role);
+  await expect(holo).toContainText(site.availability);
+  await expect(page.getByRole("img", { name: `Photo of ${site.name}` }), "the real face stays off the home page").toHaveCount(0);
+
+  const figure = holo.locator('[data-layer="figure"]');
+  const before = await transformOf(figure);
+  const box = (await figure.boundingBox())!;
   await page.mouse.move(box.x + box.width * 0.95, box.y + box.height * 0.1, { steps: 4 });
   await page.waitForTimeout(400);
-  expect(await transformOf(body), "no tilt with reduced motion").toBe(before);
-  expect(await depthOf(card.locator('[data-layer="status"]')), "no depth with reduced motion").toBe(0);
+  expect(await transformOf(figure), "no drift with reduced motion").toBe(before);
+  expect(await animationsIn(holo), "nothing animates with reduced motion").toEqual([]);
 });
 
-test("hologram card: pops into 3D, tilts toward the cursor and a dragging finger, and a tap folds it flat and back", async ({ page }) => {
+test("hologram projector: projects in after the loader, drifts with the cursor and a dragging finger, and a tap glitches it and re-projects", async ({ page }) => {
   const errors = collectErrors(page);
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
   await page.waitForLoadState("networkidle");
-  const card = page.locator("[data-hologram]");
-  const body = card.locator("> div");
-  const status = card.locator('[data-layer="status"]');
-  await expect.poll(() => depthOf(status), { message: "layers separate into depth" }).toBeGreaterThan(60);
+  const holo = page.locator("[data-hologram]");
+  await expect(holo).toHaveAttribute("data-phase", "on");
+  await expect(holo.getByRole("img", { name: site.avatar.alt })).toBeVisible();
 
-  const box = (await body.boundingBox())!;
+  const figure = holo.locator('[data-layer="figure"]');
+  const box = (await figure.boundingBox())!;
   await page.mouse.move(box.x + box.width * 0.95, box.y + box.height * 0.5, { steps: 5 });
   await page.waitForTimeout(600);
-  const right = await transformOf(body);
+  const right = await transformOf(figure);
+  expect(right, "drifts toward the cursor").not.toBe("none");
   await page.mouse.move(box.x + box.width * 0.05, box.y + box.height * 0.5, { steps: 5 });
   await page.waitForTimeout(600);
-  expect(await transformOf(body), "tilts toward the cursor").not.toBe(right);
+  const left = await transformOf(figure);
+  expect(left, "follows the cursor").not.toBe(right);
 
-  // A finger dragged across it (touch pointer events) tilts it too.
+  // A finger dragged across it (touch pointer events) drifts it too.
   await page.mouse.move(0, 0);
+  await page.waitForTimeout(600);
+  const stage = holo.locator("> div").first();
   const y = box.y + box.height * 0.5;
-  await body.dispatchEvent("pointerdown", { pointerType: "touch", pointerId: 7, isPrimary: true, clientX: box.x + box.width * 0.5, clientY: y });
+  await stage.dispatchEvent("pointerdown", { pointerType: "touch", pointerId: 7, isPrimary: true, clientX: box.x + box.width * 0.5, clientY: y });
   for (const fx of [0.6, 0.75, 0.9, 0.98]) {
-    await body.dispatchEvent("pointermove", { pointerType: "touch", pointerId: 7, isPrimary: true, clientX: box.x + box.width * fx, clientY: y });
+    await stage.dispatchEvent("pointermove", { pointerType: "touch", pointerId: 7, isPrimary: true, clientX: box.x + box.width * fx, clientY: y });
   }
   await page.waitForTimeout(500);
-  const dragged = await transformOf(body);
-  await body.dispatchEvent("pointerup", { pointerType: "touch", pointerId: 7, isPrimary: true, clientX: box.x + box.width * 0.98, clientY: y });
-  expect(dragged, "a dragging finger tilts it").not.toBe(right);
+  const dragged = await transformOf(figure);
+  await stage.dispatchEvent("pointerup", { pointerType: "touch", pointerId: 7, isPrimary: true, clientX: box.x + box.width * 0.98, clientY: y });
+  expect(dragged, "a dragging finger drifts it").not.toBe(left);
 
-  // A tap folds it flat, then it pops back out. (Clicked by position: the card never
-  // stops swaying, so Playwright's wait-until-still would never end.)
+  // A tap glitches it, then it re-projects. (Clicked by position: it never stops floating,
+  // so Playwright's wait-until-still would never end.)
   await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.3);
-  await expect.poll(() => depthOf(status), { message: "folds flat" }).toBeLessThan(30);
-  await expect.poll(() => depthOf(status), { message: "pops back out" }).toBeGreaterThan(60);
+  await expect(holo).toHaveAttribute("data-phase", "glitch");
+  await expect(holo).toHaveAttribute("data-phase", "on");
   expect(errors, "console errors").toEqual([]);
+});
+
+test("hologram projector: on a phone the name, role and status stack below the emitter without overlapping it", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  await page.goto("/");
+  const holo = page.locator("[data-hologram]");
+  const stage = (await holo.locator("> div").first().boundingBox())!;
+  const name = (await holo.getByRole("heading", { level: 1 }).boundingBox())!;
+  expect(name.y, "name sits below the emitter").toBeGreaterThanOrEqual(stage.y + stage.height - 1);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)).toBe(false);
 });
 
 test("compass menu: on touch, the needle follows a dragging finger and letting go opens that page", async ({ page }) => {
@@ -1049,6 +1063,53 @@ test("about page shows a labeled photo placeholder until a photo is set", async 
   await page.goto("/about");
   await expect(page.getByRole("img", { name: "Photo placeholder" })).toBeVisible();
   await expect(page.getByText("Photo Placeholder", { exact: true })).toBeVisible();
+});
+
+/** How much of the real photo is uncovered: 1 = all of it, 0 = none (from its clip-path's bottom inset). */
+const photoShown = (page: Page) =>
+  page.locator("[data-photo-reveal] .reveal-photo").evaluate((el) => {
+    const clip = getComputedStyle(el).clipPath;
+    const bottom = clip.match(/inset\(\S+ \S+ ([^\s)]+)/)?.[1] ?? "0";
+    return bottom.endsWith("%") ? 1 - parseFloat(bottom) / 100 : 1 - parseFloat(bottom) / el.getBoundingClientRect().height;
+  });
+
+test("about photo: the illustration resolves into the real photo once in view, and the button flips between them", async ({ page }) => {
+  test.skip(site.photo === null, "no real photo set");
+  const errors = collectErrors(page);
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.setViewportSize({ width: 375, height: 800 });
+  await page.goto("/about");
+  const reveal = page.locator("[data-photo-reveal]");
+  await expect(reveal.getByRole("img", { name: site.avatar.alt })).toBeAttached();
+  await expect(reveal.getByRole("img", { name: `Photo of ${site.name}` })).toBeAttached();
+  // Below the fold on a phone: still the illustration.
+  await expect(reveal).toHaveAttribute("data-state", "initial");
+  expect(await photoShown(page), "photo hidden before it is seen").toBeLessThan(0.05);
+
+  await reveal.scrollIntoViewIfNeeded();
+  await expect(reveal).toHaveAttribute("data-state", "photo");
+  await expect.poll(() => photoShown(page), { message: "the scan uncovers the photo" }).toBeGreaterThan(0.99);
+
+  const button = reveal.getByRole("button");
+  await expect(button).toHaveText("Show Illustration");
+  expect((await button.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  await button.click();
+  await expect(reveal).toHaveAttribute("data-state", "illustration");
+  await expect(button).toHaveText("Show Photo");
+  await expect.poll(() => photoShown(page), { message: "covered back up" }).toBeLessThan(0.01);
+  await button.press("Enter");
+  await expect(reveal).toHaveAttribute("data-state", "photo");
+  expect(errors, "console errors").toEqual([]);
+});
+
+test("about photo: with reduced motion the real photo shows at once and flips are instant", async ({ page }) => {
+  test.skip(site.photo === null, "no real photo set");
+  await page.goto("/about");
+  const reveal = page.locator("[data-photo-reveal]");
+  expect(await photoShown(page), "real photo shown at once").toBeGreaterThan(0.99);
+  await reveal.getByRole("button").click();
+  expect(await photoShown(page), "illustration at once").toBeLessThan(0.01);
+  expect(await reveal.evaluate((el) => el.getAnimations({ subtree: true }).length), "no animations").toBe(0);
 });
 
 test("every certification shows its real Credly badge in the details: saved locally, loaded, and named", async ({ page }) => {

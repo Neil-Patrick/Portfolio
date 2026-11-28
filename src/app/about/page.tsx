@@ -7,7 +7,7 @@ import { CareerTimeline } from "@/components/CareerTimeline";
 import { GitHubAchievements } from "@/components/GitHubAchievements";
 import { GitHubActivity } from "@/components/GitHubActivity";
 import { Reveal, RevealItem } from "@/components/motion/Reveal";
-import { ProfilePhoto } from "@/components/ProfilePhoto";
+import { PhotoReveal } from "@/components/PhotoReveal";
 import { SectionPage } from "@/components/SectionPage";
 import { certifications, education, featuredCertification, formatMonth } from "@/content/credentials";
 import { projects } from "@/content/projects";
@@ -50,7 +50,7 @@ export default function AboutPage() {
           {/* Profile column, open (no panel): a hairline rail on its left, caps field labels over values, printing in one by one. */}
           <aside aria-labelledby="at-a-glance" className="self-start border-l border-line pl-6">
             <div className="mb-6">
-              <ProfilePhoto sizes="(min-width: 1024px) 19rem, 90vw" />
+              <PhotoReveal sizes="(min-width: 1024px) 19rem, 90vw" />
             </div>
             <h2 id="at-a-glance" className="mb-5 hud-label text-lg text-ink">
               At a Glance
