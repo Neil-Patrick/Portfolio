@@ -49,6 +49,12 @@ export const projects: Project[] = [
       { label: "Live Site", href: "https://gadvance.vercel.app" },
       { label: "Source", href: "https://github.com/nathsuki73/gadvance" },
     ],
+    images: [
+      {
+        src: "/projects/gadvance/1.webp",
+        alt: "GADvance home page on a laptop: \"Empower. Educate. Advance Gender Equality.\" with a Get Started button above an illustration of a diverse group of people",
+      },
+    ],
   },
   {
     id: "statera",
