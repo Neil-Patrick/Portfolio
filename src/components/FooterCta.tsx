@@ -19,10 +19,11 @@ const secondary =
   "hud-notch hud-notch-edge inline-flex min-h-11 items-center gap-2 border border-line-strong py-2 pr-5 pl-4 hud-label text-sm transition-colors hover:border-accent hover:text-accent hover:[--edge:var(--color-accent)] focus-visible:-outline-offset-4";
 
 /**
- * "Let's Build", the call to action that opens the footer on every page: one
- * line on what I'm open to, then the ways to reach me: email (or copy the
- * address), LinkedIn, and the Contact page (left out on the Contact page
- * itself). Open layout: no panel, just the content on the background.
+ * "Let's Build", the call to action that opens the footer on every page but
+ * Contact (which is the full version of it): one line on what I'm open to,
+ * then the ways to reach me: email (or copy the address), LinkedIn, and the
+ * Contact page. Open layout: no panel, just the content on the background,
+ * centred on a full screen of its own with a large heading.
  */
 export function FooterCta() {
   const onContactPage = usePathname() === contact.href;
@@ -44,14 +45,20 @@ export function FooterCta() {
     }
   };
 
+  // The Contact page is the full version of this, so it isn't repeated there.
+  if (onContactPage) return null;
+
   return (
-    <section id="contact" aria-labelledby="contact-heading" className="scroll-mt-24">
-      <h2 id="contact-heading" className="font-display text-display font-bold">
+    // The full screen is the section itself (and #contact): a jump here fills the window
+    // exactly, so the footer below stays out of view until you scroll on.
+    <section id="contact" aria-labelledby="contact-heading" className="screen-section items-center text-center">
+      <span aria-hidden className="mb-8 block h-0.5 w-12 bg-accent" />
+      <h2 id="contact-heading" className="font-display text-closing font-bold text-balance">
         <DecodeText text={heading} inView />
       </h2>
-      <p className="mt-4 max-w-prose text-lg text-ink-muted">{lead}</p>
+      <p className="mt-6 max-w-prose text-lg text-ink-muted sm:text-xl">{lead}</p>
 
-      <div className="mt-8 flex flex-wrap items-center gap-3">
+      <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
         {/* The glow sits on a wrapper: the notch (clip-path) would cut it off the link itself. */}
         <span className="glow-accent inline-flex">
           <a
@@ -71,11 +78,7 @@ export function FooterCta() {
           {linkedIn.label}
           <span className="sr-only">{NEW_TAB_NOTE}</span>
         </a>
-        {!onContactPage && (
-          <span className="sm:ml-auto">
-            <ArrowLink href={contact.href} label={contact.cta} />
-          </span>
-        )}
+        <ArrowLink href={contact.href} label={contact.cta} />
       </div>
 
       <p role="status" data-testid="copy-status" className="mt-3 min-h-6 text-sm text-ink-muted">

@@ -664,12 +664,14 @@ test("Spotify player: its own block below the About panel; track index rows load
   const spotify = page.getByRole("region", { name: "Spotify" });
   await expect(spotify).toBeVisible();
 
-  // Outside the About panel, between it and the footer.
-  await expect(page.locator("article").getByRole("region", { name: "Spotify" })).toHaveCount(0);
-  const articleBottom = await page.locator("article").first().evaluate((el) => el.getBoundingClientRect().bottom);
+  // On a screen of its own, below the About console and above the footer.
   const box = (locator: ReturnType<typeof page.locator>) => locator.evaluate((el) => el.getBoundingClientRect().toJSON());
   const spotifyBox = await box(spotify);
-  expect(spotifyBox.top).toBeGreaterThanOrEqual(articleBottom);
+  const consoleBox = await box(page.getByRole("tablist").first());
+  expect(spotifyBox.top).toBeGreaterThan(consoleBox.bottom);
+  const screen = spotify.locator("xpath=ancestor::*[contains(@class,'screen-section')][1]");
+  expect(await screen.evaluate((el) => el.getBoundingClientRect().height), "its own screen").toBeGreaterThanOrEqual(900 - 64 - 1);
+  await expect(screen.getByRole("tablist"), "not sharing a screen with the console").toHaveCount(0);
   expect((await box(page.locator("footer"))).top).toBeGreaterThan(spotifyBox.top);
   // Wide screens: song info on the left, the preview panel right next to it (no wide gap), no transport buttons.
   const info = await box(spotify.locator("[data-info]"));
@@ -852,6 +854,24 @@ test("Let's Build: Email Me is a plain email link", async ({ page }) => {
     "href",
     "mailto:neilpatrick.dev@gmail.com",
   );
+});
+
+test("Let's Build: not repeated on the Contact page; jumping to it from Home fills the window, with the footer out of view", async ({ page }) => {
+  await page.goto("/contact");
+  await expect(page.locator("#contact-heading")).toHaveCount(0);
+  await expect(page.locator("footer").getByRole("link", { name: "Email" })).toBeVisible();
+
+  for (const [width, height] of [
+    [1440, 900],
+    [375, 800],
+  ]) {
+    await page.setViewportSize({ width, height });
+    await page.goto("/#contact");
+    await expect(page.locator("#contact-heading")).toBeInViewport();
+    await expect.poll(() => page.locator("#contact").evaluate((el) => Math.round(el.getBoundingClientRect().top))).toBe(64);
+    const footerTop = await page.locator("footer > div.border-t").evaluate((el) => el.getBoundingClientRect().top);
+    expect(footerTop, `footer below the fold at ${width}px`).toBeGreaterThanOrEqual(height);
+  }
 });
 
 test("Copy Email copies the address and says so", async ({ page, context }) => {
@@ -1056,6 +1076,27 @@ test("Open to Work chip: under the buttons, links to the call to action, carries
   await page.keyboard.press("Tab");
   await expect.poll(detailWidth, { message: "opens on keyboard focus" }).toBeGreaterThan(100);
   expect(await animationsIn(chip), "nothing animates with reduced motion").toEqual([]);
+});
+
+test("one section per screen: every page's sections, and the Let's Build sign-off (not on Contact), are each at least a window tall", async ({ page }) => {
+  for (const [width, height] of [
+    [1440, 900],
+    [375, 800],
+  ]) {
+    await page.setViewportSize({ width, height });
+    for (const path of ["/", "/about", "/projects", "/credentials", "/technologies", "/contact"]) {
+      await page.goto(path);
+      const heights = await page.locator(".screen-section").evaluateAll((els) =>
+        els.filter((el) => getComputedStyle(el).display !== "none").map((el) => Math.round(el.getBoundingClientRect().height)),
+      );
+      expect(heights.length, `${path} has screens`).toBeGreaterThan(0);
+      // The window's height under the 64px sticky header.
+      for (const h of heights) expect(h, `${path} at ${width}px`).toBeGreaterThanOrEqual(height - 64 - 1);
+      // Let's Build is its own screen on every page but Contact (which is the full version of it).
+      await expect(page.locator("section#contact.screen-section"), "Let's Build has its own screen").toHaveCount(path === "/contact" ? 0 : 1);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth), `${path} at ${width}px`).toBe(false);
+    }
+  }
 });
 
 test("home project cards: each shows its thumbnail inside the link, scan-wipes in when scrolled into view, and zooms with a View Project tag on hover", async ({ page }) => {

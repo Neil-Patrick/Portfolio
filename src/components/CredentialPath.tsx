@@ -2,7 +2,7 @@
 
 import { ExternalLink } from "lucide-react";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type MouseEvent, type PointerEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type MouseEvent, type PointerEvent, type ReactNode } from "react";
 import {
   badgeImage,
   certifications,
@@ -73,7 +73,7 @@ const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
  *    Credly link), grouped by field under All. The choice lives in the URL
  *    hash (/credentials#web-development). Picking a row selects it above.
  */
-export function CredentialPath() {
+export function CredentialPath({ header }: { header?: ReactNode }) {
   const [filter, setFilter] = useState<Filter>("all");
   const [selected, setSelected] = useState(N - 1);
   const strip = useRef<HTMLDivElement>(null);
@@ -362,7 +362,10 @@ export function CredentialPath() {
   const image = badgeImage(current);
 
   return (
-    <div>
+    <>
+      {/* Screen 1: the page title, the carousel and the selected credential. */}
+      <div className="screen-section">
+      {header && <div className="mb-12 sm:mb-16">{header}</div>}
       {/* 1. The looping carousel. The line is drawn in the strip's own (non-scrolling) space, behind the emblems. */}
       <div className="credential-carousel relative -mx-4 sm:mx-0">
         <svg aria-hidden className="pointer-events-none absolute inset-0 size-full">
@@ -497,8 +500,10 @@ export function CredentialPath() {
         </div>
       </section>
 
-      {/* 3. Browse by field. */}
-      <section aria-labelledby="browse-heading" className="mt-16 border-t border-line pt-10">
+      </div>
+
+      {/* 3. Browse by field, on a screen of its own. */}
+      <section aria-labelledby="browse-heading" className="screen-section">
         <h2 id="browse-heading" className="mb-5 hud-label text-lg text-ink">
           Browse by Field
         </h2>
@@ -564,6 +569,6 @@ export function CredentialPath() {
           })}
         </div>
       </section>
-    </div>
+    </>
   );
 }

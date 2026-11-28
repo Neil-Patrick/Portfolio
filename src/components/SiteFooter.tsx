@@ -23,20 +23,24 @@ async function CopyrightYear() {
 
 /**
  * The site's sign-off, on every page, in the open "Signal" layout (no panel):
- * a hairline with a short teal rule on top, then "Let's Build Something" with
- * the ways to reach me (so contact is on every page), the live availability
- * status, the page and contact links (every icon in one ink, teal on hover),
- * and the copyright and location.
+ * first "Let's Build Something" with the ways to reach me (so contact is on
+ * every page; the Contact page itself skips it), on a full screen of its own,
+ * centred; then the footer proper
+ * under a hairline with a short teal rule: the live availability status, the
+ * page and contact links (every icon in one ink, teal on hover), and the
+ * copyright and location.
  */
 export function SiteFooter() {
   return (
-    <footer className="container-page mt-16 pb-24 sm:mt-24">
-      <div className="relative border-t border-line pt-12 sm:pt-16">
+    <footer className="container-page pb-24">
+      {/* "Let's Build Something": a screen of its own, centred, before the footer proper (not on the Contact page). */}
+      <FooterCta />
+
+      {/* mt-12 keeps room under the Contact page's content, where there's no Let's Build screen. */}
+      <div className="relative mt-12 border-t border-line pt-12">
         <span aria-hidden className="absolute -top-px left-0 h-0.5 w-12 bg-accent" />
 
-        <FooterCta />
-
-        <div className="mt-12 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
           <p aria-hidden className="hud-label text-sm text-ink-muted">
             {"// End of Transmission"}
           </p>

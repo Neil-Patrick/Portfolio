@@ -20,12 +20,13 @@ type SectionProps = {
  * title (visible now, so the page reads as chapters instead of floating
  * cards), the content directly on the background, then an arrow to the
  * section's own page. Content and arrow reveal in sequence the first time
- * they scroll into view.
+ * they scroll into view. Like every section, it takes at least a full screen,
+ * its content centred (`screen-section`).
  */
 export function Section({ id, title, href, cta, children }: SectionProps) {
   const headingId = `${id}-heading`;
   return (
-    <section id={id} aria-labelledby={headingId} className="py-16 sm:py-24">
+    <section id={id} aria-labelledby={headingId} className="screen-section">
       <Reveal className="container-page grid gap-8">
         <RevealItem>
           <span aria-hidden className="mb-5 block h-0.5 w-12 bg-accent" />

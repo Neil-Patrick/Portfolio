@@ -8,7 +8,7 @@ import { GitHubAchievements } from "@/components/GitHubAchievements";
 import { GitHubActivity } from "@/components/GitHubActivity";
 import { Reveal, RevealItem } from "@/components/motion/Reveal";
 import { PhotoReveal } from "@/components/PhotoReveal";
-import { SectionPage } from "@/components/SectionPage";
+import { Screen, SectionPage } from "@/components/SectionPage";
 import { certifications, education, featuredCertification, formatMonth } from "@/content/credentials";
 import { projects } from "@/content/projects";
 import { getSection, site } from "@/content/site";
@@ -36,10 +36,58 @@ const facts = [
   },
 ];
 
+/** Screens after the opening one: the console (screen 2) and Spotify (screen 3). */
+const screens = (
+  <>
+    {/* Screen 2, the console: one HUD module at a time, picked by tab (or the URL hash). */}
+    <Screen>
+      <AboutConsole
+        panels={[
+          {
+            id: "education",
+            label: "Education",
+            content: (
+              <ConsoleModule title="Education" status={`${education.length} Records`}>
+                <EducationTrace />
+              </ConsoleModule>
+            ),
+          },
+          {
+            id: "career-timeline",
+            label: "Career Timeline",
+            content: (
+              <ConsoleModule title="Career Timeline" status={timelineStatus}>
+                <CareerTimeline points={timeline} />
+              </ConsoleModule>
+            ),
+          },
+          {
+            id: "github",
+            label: "GitHub Activity",
+            content: (
+              <ConsoleModule title="GitHub Activity" status="Synced Hourly" live>
+                <div className="grid gap-6">
+                  <GitHubActivity />
+                  <GitHubAchievements />
+                </div>
+              </ConsoleModule>
+            ),
+          },
+        ]}
+      />
+    </Screen>
+
+    {/* Screen 3, Spotify on its own: the radio tuner (if Spotify isn't set up, it and its screen are gone). */}
+    <Screen>
+      <SpotifyModule />
+    </Screen>
+  </>
+);
+
 export default function AboutPage() {
   return (
     <>
-      <SectionPage section={section}>
+      <SectionPage section={section} after={screens}>
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_22rem] xl:gap-20">
           <div className="max-w-prose space-y-5 text-lg">
             {site.about.map((paragraph) => (
@@ -70,51 +118,7 @@ export default function AboutPage() {
             </div>
           </aside>
         </div>
-
-        {/* The console: one HUD module at a time, picked by tab (or the URL hash). */}
-        <div className="mt-16 sm:mt-20">
-          <AboutConsole
-            panels={[
-              {
-                id: "education",
-                label: "Education",
-                content: (
-                  <ConsoleModule title="Education" status={`${education.length} Records`}>
-                    <EducationTrace />
-                  </ConsoleModule>
-                ),
-              },
-              {
-                id: "career-timeline",
-                label: "Career Timeline",
-                content: (
-                  <ConsoleModule title="Career Timeline" status={timelineStatus}>
-                    <CareerTimeline points={timeline} />
-                  </ConsoleModule>
-                ),
-              },
-              {
-                id: "github",
-                label: "GitHub Activity",
-                content: (
-                  <ConsoleModule title="GitHub Activity" status="Synced Hourly" live>
-                    <div className="grid gap-6">
-                      <GitHubActivity />
-                      <GitHubAchievements />
-                    </div>
-                  </ConsoleModule>
-                ),
-              },
-            ]}
-          />
-        </div>
       </SectionPage>
-
-      {/* Spotify on its own, below the About panel and above the footer:
-          the radio tuner (hidden if Spotify isn't set up). */}
-      <div className="container-page pb-12 sm:pb-16">
-        <SpotifyModule />
-      </div>
     </>
   );
 }

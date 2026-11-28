@@ -163,9 +163,9 @@ A near-neutral charcoal palette with a single teal signal. Every text pair is ch
 One wide container (max 110rem, fluid gutters `clamp(1rem, 5vw, 6rem)`), a 4rem sticky header that turns into charcoal glass on scroll, Tailwind's default breakpoints, mobile first.
 
 - **Page opening:** a 3rem teal rule, the decoding title, the lead sentence, then content directly on the background. No page panel.
-- **Sections** are separated by space and hairlines, not boxes. Home sections get a visible title like the pages.
+- **One section per screen** (`screen-section`, `--spacing-screen`): every section is at least the window's height under the header, its content centred vertically with generous room above and below, so each reads on its own and nothing feels stacked. Taller content simply runs longer; a screen whose optional content renders nothing (Spotify unset) disappears. Section pages open with the title and first content on one screen, then one screen per part (`SectionPage`'s `after`, `<Screen>`): About (bio, console, Spotify), Projects (one project each), Credentials (carousel and detail, then Browse by Field). Home: Name, Intro, Projects. Sections are separated by space and hairlines, not boxes. Home sections get a visible title like the pages.
 - **Lists** are open log rows with a 2px rail on the left and a hairline below.
-- **The footer** on every page opens with "Let's Build Something" and the contact actions, then the links, all open on the background.
+- **The footer** on every page but Contact opens with "Let's Build Something" and the contact actions on a full, centred screen of its own (`--text-closing`; the section itself is `#contact`, so a jump to it fills the window and the footer stays out of view), then the compact footer links under a hairline, all open on the background. The Contact page skips Let's Build, being the full version of it.
 - **The scroll rail** (desktop) replaces the browser's scrollbar on every page.
 
 No layout scrolls horizontally at 320px; touch targets are at least 44px.
@@ -250,7 +250,7 @@ Home cards lead with the project's first screenshot (16:9) above the name, summa
 One angular set: dark-filled shapes with a teal outline and a very soft neon glow; the arrow and hands trail a faint offset echo. The arrow everywhere; a pointing hand over clickable things; an open hand over draggable things (the credential carousel, the scroll rail) that becomes a fist while dragging; an I-beam in text fields; a slashed box on disabled controls; the arrow with an hourglass while something works (the contact form sending). 32px PNGs at 1x and 2x. Mouse pointers only; forced-colors mode keeps the system cursors.
 
 ### Footer
-Open on a hairline with a teal rule: "Let's Build Something", Email Me (primary with glow), Copy Email, LinkedIn, the arrow to Contact; then "// End of Transmission", Open to Work, page and contact links, copyright and location.
+A full screen, centred: a teal rule, "Let's Build Something" large, the lead, then Email Me (primary with glow), Copy Email, LinkedIn and the arrow to Contact. Then, on a hairline with a teal rule: "// End of Transmission", Open to Work, page and contact links, copyright and location.
 
 ### Name screen and Open to Work chip
 Home opens on a screen of its own holding only the name (`NameHero.tsx`): the page's h1, large (`--text-name`, sized to the page width) and centred, decoding in as the loader clears, with an Explore button down to the landing. Neil plans more for this section. The landing is the second screen; its headline decode and the projector's project-in wait until it is scrolled into view. Open to Work is a projected HUD chip on its own line under the two actions (`AvailabilityChip.tsx`, globals.css "Open to Work chip"):
