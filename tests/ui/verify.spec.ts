@@ -904,7 +904,7 @@ test("loading screen: plays on the first home visit with the real counts, preloa
   const overlay = page.locator("[data-intro-overlay]");
   await expect(page.locator("html")).toHaveAttribute("data-intro", "play");
   await expect(overlay).toBeVisible();
-  await expect(overlay).toContainText(site.name);
+  await expect(overlay.locator("[data-intro-logo]")).toBeVisible();
   await expect(overlay).toContainText(site.availability);
 
   // The numbers count up in CSS (drawn by ::after), so check the values they count to.
@@ -951,10 +951,17 @@ test("loading screen: plays on the first home visit with the real counts, preloa
   expect(errors, "console errors").toEqual([]);
 });
 
-test("loading screen: stays about 5 seconds, clears on its own, then the name decodes into place", async ({ context }) => {
+test("loading screen: shows the NP logo (not the name), stays about 5 seconds, clears on its own, then the name decodes into place", async ({ context }) => {
   const page = await freshPage(context, "no-preference");
   await page.goto("/", { waitUntil: "commit" });
   await expect(page.locator("html")).toHaveAttribute("data-intro", "play");
+  // The NP logo, not the name: four letter shapes that trace in, and the sparkle.
+  const overlay = page.locator("[data-intro-overlay]");
+  const logo = overlay.locator("[data-intro-logo]");
+  await expect(logo).toBeVisible();
+  await expect(logo.locator(".intro-logo-outline [data-letter]")).toHaveCount(4);
+  await expect(logo.locator("[data-sparkle]")).toHaveCount(1);
+  await expect(overlay).not.toContainText(site.name, { ignoreCase: true });
   await page.waitForTimeout(3000);
   expect(await introState(page), "still on screen after 3 seconds").toBe("play");
   await expect(page.locator("html")).toHaveAttribute("data-intro", "done", { timeout: 6000 });

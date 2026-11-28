@@ -4,6 +4,7 @@ import { site } from "@/content/site";
 import { skillGroups } from "@/content/skills";
 import { cssVars } from "@/lib/css-vars";
 import { IntroController } from "./IntroController";
+import { IntroLogo } from "./IntroLogo";
 
 /** The system check reports real counts from the content files. */
 const checks = [
@@ -26,8 +27,9 @@ const leader = <span className="min-w-4 flex-1 border-b border-dotted border-lin
  * of Home, motion allowed; src/lib/intro.ts), so the page never
  * flashes first. Rendered by the root layout, first in <body> and outside the
  * page transition (whose fade would hide it until JavaScript loads). The look and timeline
- * are CSS (globals.css, "Loading screen"): a CRT power-on, flicker, the name
- * glitching in, a system check with real numbers, "Access Granted", and a CRT
+ * are CSS (globals.css, "Loading screen"): a CRT power-on, flicker, the NP
+ * logo tracing in letter by letter, igniting and glitching, its sparkle
+ * spinning in, a system check with real numbers, "Access Granted", and a CRT
  * power-off that reveals the landing. IntroController handles skipping and
  * preloading and the handoff. It lasts about 5 seconds, or until a click or key.
  * Decorative for assistive tech: everything here is also on the page.
@@ -37,7 +39,7 @@ export function IntroLoader() {
     <>
       <div aria-hidden className="intro" data-intro-overlay>
         <div className="intro-roll" />
-        {/* Three rows: the status line at the top, the name block centered, an empty row below for balance. */}
+        {/* Three rows: the status line at the top, the logo block centered, an empty row below for balance. */}
         <div className="intro-screen relative z-1 grid h-full grid-rows-[1fr_auto_1fr] px-6 py-8 sm:px-12 sm:py-10">
           <p className="flex items-center gap-2 self-start hud-label text-xs text-ink-muted sm:text-sm">
             Establishing Connection
@@ -45,12 +47,7 @@ export function IntroLoader() {
           </p>
 
           <div className="mx-auto w-full max-w-3xl">
-            <p
-              className="intro-name font-display text-intro font-bold tracking-wide uppercase"
-              data-text={site.name}
-            >
-              {site.name}
-            </p>
+            <IntroLogo />
 
             <div className="mt-8 flex items-center gap-3 hud-label text-xs text-ink-muted sm:text-sm">
               <span className="shrink-0">Loading Portfolio</span>

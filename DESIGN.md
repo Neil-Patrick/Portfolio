@@ -284,7 +284,14 @@ Motion, driven by `data-phase` (`off` / `on` / `glitch`):
 - **Reduced motion:** the real photo shows at once and flips are instant.
 
 ### Loading Screen
-Kept: the CRT boot sequence on a full load of Home, re-tinted to the charcoal canvas. Never plays with reduced motion.
+Kept: the CRT boot sequence on a full load of Home, re-tinted to the charcoal canvas. Never plays with reduced motion. The NP logo (`IntroLogo.tsx`, `--spacing-intro-logo`) leads it in place of the name:
+- **Trace:** each letter's outline traces in teal, one after another (left stem, diagonal, right stem, P).
+- **Ignite:** the letters ignite solid with a flicker, and the outlines dim to a glow.
+- **Glitch:** two sliced teal copies glitch over it, once as it settles and once before the power-off.
+- **Scanlines:** faint scanlines run over its shape.
+- **Sparkle:** it spins in last with a flash ring and keeps pulsing.
+
+The progress bar, system check and "Access Granted" follow as before.
 
 ## Do's and Don'ts
 

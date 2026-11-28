@@ -57,9 +57,6 @@
   /* The name on its own, the home page's first screen: sized to the page width (cqi), so it always fits. */
   --text-name: clamp(2.75rem, 11cqi, 9rem);
   --text-name--line-height: 0.95;
-  /* The loading screen's glitching name. */
-  --text-intro: clamp(2.5rem, 1rem + 7vw, 6.5rem);
-  --text-intro--line-height: 1;
   /* "Let's Build Something", the full-screen sign-off before the footer on every page. */
   --text-closing: clamp(2.75rem, 1.5rem + 5.5vw, 6.5rem);
   --text-closing--line-height: 1;
@@ -77,6 +74,8 @@
 
   /* Sticky header height; also offsets anchor scrolling. */
   --spacing-header: 4rem;
+  /* The NP logo's height in the loading screen. */
+  --spacing-intro-logo: clamp(7rem, 4rem + 14vw, 12rem);
   /* Breathing room at the top and bottom of every full-screen section. */
   --spacing-screen: clamp(4rem, 2rem + 8svh, 8rem);
 
@@ -444,30 +443,62 @@
     intro-flicker 900ms steps(1, end) 420ms both,
     intro-crt-off 400ms ease-in 4600ms forwards;
 }
-/* The name: two offset copies glitch over it in slices, then settle; one more glitch near the end. */
-.intro-name {
-  position: relative;
-  animation: intro-name-in 800ms steps(1, end) 380ms both;
+/* The NP logo (src/components/intro/IntroLogo.tsx): each letter's outline traces in
+   teal (--trace-delay staggers them), the letter then ignites solid with a flicker
+   and the outline dims to a glow; two sliced copies glitch over it, in and once
+   more near the end; faint scanlines run over its shape; the sparkle comes last. */
+.intro-logo-outline path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--color-accent) 60%, transparent));
+  animation:
+    intro-trace 520ms var(--ease-out-soft) var(--trace-delay) forwards,
+    intro-outline-dim 700ms ease-out 1900ms forwards;
 }
-.intro-name::before,
-.intro-name::after {
-  content: attr(data-text);
-  position: absolute;
-  inset: 0;
+/* Hidden until its turn (backwards fill of the 0% frame), then it ends solid (the 100% frame). */
+.intro-logo-fill path {
+  animation: intro-ignite 700ms steps(1, end) calc(var(--trace-delay) + 420ms) both;
+}
+.intro-logo-glitch {
   pointer-events: none;
   clip-path: inset(50% 0 50% 0);
 }
-.intro-name::before {
+/* "forwards", not "both": holding the first frame while waiting would show a slice early. */
+.intro-logo-glitch-a {
   color: var(--color-accent);
   animation:
-    intro-glitch-a 1s steps(1, end) 380ms both,
+    intro-glitch-a 1s steps(1, end) 1500ms forwards,
     intro-glitch-b 380ms steps(1, end) 3700ms forwards;
 }
-.intro-name::after {
+.intro-logo-glitch-b {
   color: color-mix(in oklab, var(--color-accent) 35%, var(--color-ink));
   animation:
-    intro-glitch-b 1s steps(1, end) 430ms both,
+    intro-glitch-b 1s steps(1, end) 1550ms forwards,
     intro-glitch-a 380ms steps(1, end) 3740ms forwards;
+}
+.intro-logo-scan {
+  /* The logo file matches the SVG's viewBox, so "contain" lines the mask up with the letters. */
+  mask: url("/brand/np-mark-white.svg") left center / contain no-repeat;
+  background: repeating-linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--color-canvas) 55%, transparent) 0 1px,
+    transparent 1px 4px
+  );
+  opacity: 0;
+  animation: intro-scan-on 400ms ease-out 1700ms forwards;
+}
+.intro-sparkle-star {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation:
+    intro-sparkle-in 650ms cubic-bezier(0.34, 1.56, 0.64, 1) 1650ms both,
+    intro-sparkle-glow 1.4s ease-in-out 2300ms infinite;
+}
+.intro-spark-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: intro-spark-ring 750ms ease-out 1700ms both;
 }
 .intro-granted {
   opacity: 0;
@@ -551,7 +582,48 @@
     opacity: 0;
   }
 }
-@keyframes intro-name-in {
+@keyframes intro-trace {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes intro-outline-dim {
+  to {
+    opacity: 0.35;
+  }
+}
+@keyframes intro-scan-on {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes intro-sparkle-in {
+  from {
+    opacity: 0;
+    transform: scale(0) rotate(-90deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+@keyframes intro-sparkle-glow {
+  50% {
+    filter: drop-shadow(0 0 10px var(--color-accent));
+  }
+}
+@keyframes intro-spark-ring {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.2);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+/* The flicker-on steps for the logo's letters igniting; ends solid. */
+@keyframes intro-ignite {
   0% {
     opacity: 0;
   }
@@ -567,7 +639,8 @@
   55% {
     opacity: 0.5;
   }
-  62% {
+  62%,
+  100% {
     opacity: 1;
   }
 }
