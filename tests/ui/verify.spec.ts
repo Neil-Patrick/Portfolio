@@ -968,7 +968,7 @@ test("home: the name is the h1, alone on the first screen; the landing below hol
   await expect(h1).toHaveAccessibleName(site.name);
   const home = page.locator("#home");
   await expect(home.getByRole("heading", { level: 1 })).toBeInViewport();
-  await expect(home.getByRole("link"), "the name section holds only the name and the scroll cue").toHaveCount(1);
+  await expect(home.getByRole("link"), "the name section holds only the name and the Explore button").toHaveCount(1);
   await expect(page.locator("#intro").getByRole("heading", { level: 1 })).toHaveCount(0);
   await expect(page.locator("[data-landing-column]"), "the landing starts below the first screen").not.toBeInViewport();
 

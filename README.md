@@ -73,7 +73,7 @@ The Spotify variables are read only on the server (`src/lib/spotify.ts`). The br
   - Chart (About page): one marker per timeline item and a table row for each; Home, End and arrow keys move the selection; clicking selects the nearest item; the chart fits a 320px screen.
   - Home landing and "Let's Build" (in the footer): the headline lines fit their column at every width; Email Me is a plain `mailto:` link; Copy Email copies the address and says so.
   - Loading screen: it plays on a full load of Home (full motion) with the real counts, preloads and marks Assets "Ready", is still on screen at 3s and clears by itself (then the landing headline decodes), a click continues it, the page scrolls again afterwards, a reload plays it again, and with reduced motion it never shows. (Every other test sets a test-only skip mark in sessionStorage to keep it out of the way.)
-  - Home: the name is the single h1, alone on the first screen (with only a scroll cue); the landing starts below it; the hologram projector holds only the illustrated avatar (no name or status, and never the real photo); with reduced motion nothing animates and the pointer doesn't move it; with full motion it waits below the fold, projects in once scrolled into view, drifts with the cursor and a dragging finger, and a tap glitches it and re-projects, without console errors.
+  - Home: the name is the single h1, alone on the first screen (with only an Explore button); the landing starts below it; the hologram projector holds only the illustrated avatar (no name or status, and never the real photo); with reduced motion nothing animates and the pointer doesn't move it; with full motion it waits below the fold, projects in once scrolled into view, drifts with the cursor and a dragging finger, and a tap glitches it and re-projects, without console errors.
   - Open to Work chip: under the buttons, 44px tall, links to `#contact`, its link text includes the detail; the detail opens on hover and on keyboard focus; on a phone it opens below the label and stays on screen; nothing animates with reduced motion.
   - About portrait: the illustration shows until the hologram card is in view, then the scan uncovers the real photo; there's no separate text button, the portrait itself flips between them by click, Enter and Space (its name says which it will show); the card tilts toward the cursor, the hint shows on hover, and a drag to tilt never flips it; with reduced motion the card is flat and still, the photo shows at once and flips are instant.
   - Compass menu on touch: dragging a finger aims the needle (the readout follows) and letting go opens the aimed page.
@@ -112,7 +112,7 @@ src/
     background/        The background on every page: PageBackground (grid, vignette, intensity per route, pause logic),
                        WaveLines (animated), WaveFallback (static), waves.ts (shared
                        wave math, intensity), scene-utils.ts (token colors for the scene)
-    hero/              NameHero (first screen: the name), Landing (headline, actions), AvailabilityChip, HoloProjector, ScrollCue
+    hero/              NameHero (first screen: the name), Landing (headline, actions), AvailabilityChip, HoloProjector
                        (the 2D card that splits into 3D layers; holds the page's h1)
     ProfilePhoto.tsx   Profile photo in a notched frame, or a labeled placeholder until set
     HoloCard.tsx       The hologram card (tilt, depth, scanlines, sheen, brackets), holding the About portrait

@@ -235,7 +235,7 @@
 
 /* ==========================================================================
    Home landing and loading screen.
-   - load-fade, live-pulse, cue-bob: small load-time helpers (Landing.tsx).
+   - load-fade, live-pulse: small load-time helpers (Landing.tsx, NameHero.tsx).
    - System check (used by the loading screen): rows print in, one every
      --row-step after --row-start; numbers count up in CSS alone; a progress
      bar fills; a cursor blinks.
@@ -295,11 +295,6 @@
     scale: 0.7;
   }
 }
-@keyframes cue-bob {
-  50% {
-    translate: 0 0.25rem;
-  }
-}
 /* The Spotify block's signal bars (OnAirStatus in src/components/about/spotify/shared.tsx). */
 @keyframes eq-bounce {
   0%,
@@ -357,9 +352,6 @@
   }
   .live-pulse {
     animation: live-pulse 2s ease-in-out infinite;
-  }
-  .cue-bob {
-    animation: cue-bob 1.6s ease-in-out infinite;
   }
   .eq-bar {
     transform-origin: bottom;

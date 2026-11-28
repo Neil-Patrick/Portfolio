@@ -6,7 +6,6 @@ import { DecodeText } from "../motion/DecodeText";
 import { Magnetic } from "../motion/Tilt";
 import { AvailabilityChip } from "./AvailabilityChip";
 import { HoloProjector } from "./HoloProjector";
-import { ScrollCue } from "./ScrollCue";
 
 /**
  * Home's second screen, under the name (NameHero): a huge headline that decodes
@@ -59,7 +58,6 @@ export function Landing() {
         <HoloProjector />
       </div>
 
-      <ScrollCue href="#projects" to="the Projects" delay="1800ms" />
     </section>
   );
 }
