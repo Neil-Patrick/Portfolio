@@ -284,14 +284,16 @@ Motion, driven by `data-phase` (`off` / `on` / `glitch`):
 - **Reduced motion:** the real photo shows at once and flips are instant.
 
 ### Loading Screen
-Kept: the CRT boot sequence on a full load of Home, re-tinted to the charcoal canvas. Never plays with reduced motion. The NP logo (`IntroLogo.tsx`, `--spacing-intro-logo`) leads it in place of the name:
+Kept: the CRT boot sequence on a full load of Home, re-tinted to the charcoal canvas. Never plays with reduced motion. About 6 seconds in two acts after the CRT power-on:
+1. **Data:** the progress bar, the system check with real counts, and "Access Granted". Then the status line and data block jolt twice and wipe off upward.
+2. **The NP logo alone,** centred and enlarged to fit the screen (`IntroLogo.tsx`, `--spacing-intro-logo: min(52svh, 66vw)`). It blinks out at the end, before the CRT power-off reveals the page.
+
+How the logo plays:
 - **Trace:** each letter's outline traces in teal, one after another (left stem, diagonal, right stem, P).
 - **Ignite:** the letters ignite solid with a flicker, and the outlines dim to a glow.
-- **Glitch:** two sliced teal copies glitch over it, once as it settles and once before the power-off.
+- **Glitch:** two sliced teal copies glitch over it as it settles.
 - **Scanlines:** faint scanlines run over its shape.
 - **Sparkle:** it spins in last with a flash ring and keeps pulsing.
-
-The progress bar, system check and "Access Granted" follow as before.
 
 ## Do's and Don'ts
 

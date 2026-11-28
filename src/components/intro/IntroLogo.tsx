@@ -10,8 +10,8 @@ const LETTERS = [
   { id: "n-right", d: "M240,136 H296 V376 H240 Z" },
   { id: "p", d: "M296,136 H384 L416,168 V248 L384,280 H296 Z M296,192 H360 V224 H296 Z" },
 ];
-/** When each letter starts tracing, in ms from page load (the loader's CSS timeline). */
-const TRACE_DELAYS = [450, 650, 850, 1050];
+/** When each letter starts tracing, in ms from page load: act 2 of the loader's CSS timeline, after the data has gone. */
+const TRACE_DELAYS = [3150, 3280, 3410, 3540];
 const VIEW_BOX = "80 120 352 272";
 const SPARKLE = "M0,-1 Q0,0 1,0 Q0,0 0,1 Q0,0 -1,0 Q0,0 0,-1 Z";
 
@@ -28,13 +28,14 @@ const solid = (
  * The loading screen's NP logo (globals.css, "Loading screen"): each letter's
  * outline traces in teal, one after another, then the letter ignites solid
  * with a flicker and its outline dims to a glow; two sliced copies glitch over
- * it (in, and once more before the screen powers off); faint scanlines run over
+ * it as it settles; faint scanlines run over
  * the shape; last, the sparkle spins in with a flash ring and keeps pulsing.
- * Decorative, like the rest of the overlay.
+ * Centred and enlarged on its own in the loader's second act, then it blinks
+ * out before the screen powers off. Decorative, like the rest of the overlay.
  */
 export function IntroLogo() {
   return (
-    <div className="intro-logo relative h-intro-logo w-fit" data-intro-logo>
+    <div className="intro-logo intro-logo-stage relative h-intro-logo w-fit" data-intro-logo>
       <svg viewBox={VIEW_BOX} className="relative h-full w-auto overflow-visible">
         {/* Solid letters, igniting after their trace. */}
         <g className="intro-logo-fill fill-ink" fillRule="evenodd">

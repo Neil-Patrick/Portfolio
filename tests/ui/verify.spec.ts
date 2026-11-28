@@ -951,7 +951,7 @@ test("loading screen: plays on the first home visit with the real counts, preloa
   expect(errors, "console errors").toEqual([]);
 });
 
-test("loading screen: shows the NP logo (not the name), stays about 5 seconds, clears on its own, then the name decodes into place", async ({ context }) => {
+test("loading screen: data and Access Granted first, then the NP logo alone (not the name), centred and enlarged; about 6 seconds, clears on its own, then the name decodes into place", async ({ context }) => {
   const page = await freshPage(context, "no-preference");
   await page.goto("/", { waitUntil: "commit" });
   await expect(page.locator("html")).toHaveAttribute("data-intro", "play");
@@ -962,8 +962,23 @@ test("loading screen: shows the NP logo (not the name), stays about 5 seconds, c
   await expect(logo.locator(".intro-logo-outline [data-letter]")).toHaveCount(4);
   await expect(logo.locator("[data-sparkle]")).toHaveCount(1);
   await expect(overlay).not.toContainText(site.name, { ignoreCase: true });
-  await page.waitForTimeout(3000);
+
+  // Act 1, the data: Access Granted shows while the logo hasn't started.
+  const opacity = (locator: ReturnType<Page["locator"]>) => locator.evaluate((el) => Number(getComputedStyle(el).opacity));
+  await page.waitForTimeout(2650);
+  expect(await opacity(overlay.locator(".intro-granted")), "Access Granted shown in act 1").toBeGreaterThan(0.9);
+  expect(await opacity(logo.locator(".intro-logo-fill path").first()), "logo not yet").toBeLessThan(0.1);
+
+  // Act 2, the logo alone: the data has left, and the logo is centred and enlarged.
+  await page.waitForTimeout(1250);
   expect(await introState(page), "still on screen after 3 seconds").toBe("play");
+  for (const data of await overlay.locator(".intro-data").all()) expect(await opacity(data), "data gone in act 2").toBeLessThan(0.05);
+  const box = (await logo.boundingBox())!;
+  expect(Math.abs(box.x + box.width / 2 - 720), "centred across").toBeLessThan(1440 * 0.02);
+  expect(Math.abs(box.y + box.height / 2 - 450), "centred down").toBeLessThan(900 * 0.02);
+  expect(box.height, "enlarged").toBeGreaterThanOrEqual(900 * 0.4);
+  expect(box.x, "fits the screen").toBeGreaterThanOrEqual(0);
+  expect(box.x + box.width, "fits the screen").toBeLessThanOrEqual(1440);
   await expect(page.locator("html")).toHaveAttribute("data-intro", "done", { timeout: 6000 });
   await expect(page.locator("[data-intro-overlay]")).toBeHidden();
   await expect(page.locator("#home-name span[aria-hidden]")).toHaveText(site.name, { timeout: 3000 });

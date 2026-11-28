@@ -27,11 +27,13 @@ const leader = <span className="min-w-4 flex-1 border-b border-dotted border-lin
  * of Home, motion allowed; src/lib/intro.ts), so the page never
  * flashes first. Rendered by the root layout, first in <body> and outside the
  * page transition (whose fade would hide it until JavaScript loads). The look and timeline
- * are CSS (globals.css, "Loading screen"): a CRT power-on, flicker, the NP
- * logo tracing in letter by letter, igniting and glitching, its sparkle
- * spinning in, a system check with real numbers, "Access Granted", and a CRT
- * power-off that reveals the landing. IntroController handles skipping and
- * preloading and the handoff. It lasts about 5 seconds, or until a click or key.
+ * are CSS (globals.css, "Loading screen"), in two acts after a CRT power-on:
+ * first the data (the progress bar, a system check with real numbers, "Access
+ * Granted"), which then glitches and wipes off the screen; then the NP logo
+ * alone, centred and enlarged, tracing in letter by letter, igniting and
+ * glitching, its sparkle spinning in, before it blinks out and a CRT power-off
+ * reveals the landing. IntroController handles skipping and preloading and the
+ * handoff. It lasts about 6 seconds, or until a click or key.
  * Decorative for assistive tech: everything here is also on the page.
  */
 export function IntroLoader() {
@@ -39,34 +41,32 @@ export function IntroLoader() {
     <>
       <div aria-hidden className="intro" data-intro-overlay>
         <div className="intro-roll" />
-        {/* Three rows: the status line at the top, the logo block centered, an empty row below for balance. */}
+        {/* Act 1, three rows: the status line at the top, the data block centered, an empty row below for balance. */}
         <div className="intro-screen relative z-1 grid h-full grid-rows-[1fr_auto_1fr] px-6 py-8 sm:px-12 sm:py-10">
-          <p className="flex items-center gap-2 self-start hud-label text-xs text-ink-muted sm:text-sm">
+          <p className="intro-data flex items-center gap-2 self-start hud-label text-xs text-ink-muted sm:text-sm">
             Establishing Connection
             <span className="boot-cursor inline-block h-3.5 w-2 bg-accent" />
           </p>
 
-          <div className="mx-auto w-full max-w-3xl">
-            <IntroLogo />
-
-            <div className="mt-8 flex items-center gap-3 hud-label text-xs text-ink-muted sm:text-sm">
+          <div className="intro-data mx-auto w-full max-w-3xl">
+            <div className="flex items-center gap-3 hud-label text-xs text-ink-muted sm:text-sm">
               <span className="shrink-0">Loading Portfolio</span>
               <span className="relative h-1.5 flex-1 bg-line">
                 <span
                   className="boot-fill absolute inset-0 bg-accent"
-                  style={cssVars({ "--fill-delay": "500ms", "--fill-duration": "3600ms" })}
+                  style={cssVars({ "--fill-delay": "400ms", "--fill-duration": "1900ms" })}
                 />
               </span>
               <span className="shrink-0 text-accent tabular-nums">
                 <span
                   className="boot-count"
-                  style={cssVars({ "--to": 100, "--count-delay": "500ms", "--count-duration": "3600ms" })}
+                  style={cssVars({ "--to": 100, "--count-delay": "400ms", "--count-duration": "1900ms" })}
                 />
                 %
               </span>
             </div>
 
-            <dl className="mt-5 grid max-w-md gap-2" style={cssVars({ "--row-start": "900ms", "--row-step": "550ms" })}>
+            <dl className="mt-5 grid max-w-md gap-2" style={cssVars({ "--row-start": "550ms", "--row-step": "320ms" })}>
               {checks.map((check, i) => (
                 <div key={check.label} className="boot-row flex items-baseline gap-3" style={cssVars({ "--i": i })}>
                   <dt className="flex flex-1 items-baseline gap-3 hud-label text-xs text-ink-muted sm:text-sm">
@@ -100,6 +100,11 @@ export function IntroLoader() {
             <p className="intro-granted mt-6 font-display text-2xl font-bold tracking-widest text-accent uppercase sm:text-3xl">
               Access Granted
             </p>
+          </div>
+
+          {/* Act 2: the logo alone, centred and enlarged to fit the screen, once the data has gone. */}
+          <div className="pointer-events-none absolute inset-0 grid place-items-center">
+            <IntroLogo />
           </div>
         </div>
       </div>

@@ -74,8 +74,9 @@
 
   /* Sticky header height; also offsets anchor scrolling. */
   --spacing-header: 4rem;
-  /* The NP logo's height in the loading screen. */
-  --spacing-intro-logo: clamp(7rem, 4rem + 14vw, 12rem);
+  /* The NP logo's height in the loading screen's second act: enlarged, but it always fits
+     (capped by the screen's height, and by its width since the logo is 1.29 times as wide as tall). */
+  --spacing-intro-logo: min(52svh, 66vw);
   /* Breathing room at the top and bottom of every full-screen section. */
   --spacing-screen: clamp(4rem, 2rem + 8svh, 8rem);
 
@@ -375,9 +376,12 @@
 /* ---------- Loading screen (src/components/intro/, src/lib/intro.ts) ----------
    Shown only while <html data-intro> is "play" or "skip": every full load of
    Home (a refresh included), with motion allowed (decided before first paint). Timeline, about
-   5.4s (time the page uses to preload): CRT power-on, flicker, the name
-   glitching in, the system check printing, "Access Granted", CRT power-off,
-   fade out. A click or key ("skip") fades it at once. */
+   6.1s (time the page uses to preload), in two acts after a CRT power-on and flicker:
+   1. data (0.4-2.9s): the progress bar and the system check printing, "Access Granted",
+      then the data jolts and wipes off the screen;
+   2. the logo (3.1-5.5s): the NP logo alone, centred and enlarged, tracing in, igniting,
+      glitching, its sparkle spinning in, then blinking out;
+   then a CRT power-off and the fade out. A click or key ("skip") fades it at once. */
 .intro {
   display: none;
 }
@@ -392,7 +396,7 @@
   overflow: hidden;
   background-color: var(--color-canvas);
   color: var(--color-ink);
-  animation: intro-out 450ms ease-in 5000ms forwards;
+  animation: intro-out 400ms ease-in 5750ms forwards;
 }
 :root[data-intro="skip"] .intro {
   animation: intro-skip 300ms ease-out forwards;
@@ -441,7 +445,15 @@
   animation:
     intro-crt-on 450ms var(--ease-out-soft) both,
     intro-flicker 900ms steps(1, end) 420ms both,
-    intro-crt-off 400ms ease-in 4600ms forwards;
+    intro-crt-off 350ms ease-in 5550ms forwards;
+}
+/* Act 1 ends: the status line and the data block jolt twice and wipe off upward. */
+.intro-data {
+  animation: intro-data-out 400ms steps(8, end) 2850ms forwards;
+}
+/* Act 2 ends: the logo blinks out before the screen powers off. */
+.intro-logo-stage {
+  animation: intro-blink-out 450ms steps(1, end) 5100ms forwards;
 }
 /* The NP logo (src/components/intro/IntroLogo.tsx): each letter's outline traces in
    teal (--trace-delay staggers them), the letter then ignites solid with a flicker
@@ -452,12 +464,12 @@
   stroke-dashoffset: 1;
   filter: drop-shadow(0 0 6px color-mix(in oklab, var(--color-accent) 60%, transparent));
   animation:
-    intro-trace 520ms var(--ease-out-soft) var(--trace-delay) forwards,
-    intro-outline-dim 700ms ease-out 1900ms forwards;
+    intro-trace 420ms var(--ease-out-soft) var(--trace-delay) forwards,
+    intro-outline-dim 700ms ease-out 4400ms forwards;
 }
 /* Hidden until its turn (backwards fill of the 0% frame), then it ends solid (the 100% frame). */
 .intro-logo-fill path {
-  animation: intro-ignite 700ms steps(1, end) calc(var(--trace-delay) + 420ms) both;
+  animation: intro-ignite 700ms steps(1, end) calc(var(--trace-delay) + 330ms) both;
 }
 .intro-logo-glitch {
   pointer-events: none;
@@ -467,14 +479,12 @@
 .intro-logo-glitch-a {
   color: var(--color-accent);
   animation:
-    intro-glitch-a 1s steps(1, end) 1500ms forwards,
-    intro-glitch-b 380ms steps(1, end) 3700ms forwards;
+    intro-glitch-a 1s steps(1, end) 4100ms forwards;
 }
 .intro-logo-glitch-b {
   color: color-mix(in oklab, var(--color-accent) 35%, var(--color-ink));
   animation:
-    intro-glitch-b 1s steps(1, end) 1550ms forwards,
-    intro-glitch-a 380ms steps(1, end) 3740ms forwards;
+    intro-glitch-b 1s steps(1, end) 4150ms forwards;
 }
 .intro-logo-scan {
   /* The logo file matches the SVG's viewBox, so "contain" lines the mask up with the letters. */
@@ -485,24 +495,25 @@
     transparent 1px 4px
   );
   opacity: 0;
-  animation: intro-scan-on 400ms ease-out 1700ms forwards;
+  animation: intro-scan-on 400ms ease-out 4100ms forwards;
 }
 .intro-sparkle-star {
   transform-box: fill-box;
   transform-origin: center;
   animation:
-    intro-sparkle-in 650ms cubic-bezier(0.34, 1.56, 0.64, 1) 1650ms both,
-    intro-sparkle-glow 1.4s ease-in-out 2300ms infinite;
+    intro-sparkle-in 650ms cubic-bezier(0.34, 1.56, 0.64, 1) 4150ms both,
+    intro-sparkle-glow 1.4s ease-in-out 4800ms infinite;
 }
 .intro-spark-ring {
   transform-box: fill-box;
   transform-origin: center;
   opacity: 0;
-  animation: intro-spark-ring 750ms ease-out 1700ms both;
+  /* "forwards": holding the first frame (a visible ring) while waiting would show it in act 1. */
+  animation: intro-spark-ring 750ms ease-out 4200ms forwards;
 }
 .intro-granted {
   opacity: 0;
-  animation: intro-granted 500ms steps(1, end) 4100ms forwards;
+  animation: intro-granted 500ms steps(1, end) 2250ms forwards;
 }
 
 @keyframes intro-out {
@@ -579,6 +590,46 @@
   100% {
     transform: scale(0, 0.004);
     filter: brightness(6);
+    opacity: 0;
+  }
+}
+@keyframes intro-data-out {
+  0% {
+    opacity: 1;
+    translate: 0 0;
+    clip-path: inset(0);
+  }
+  20% {
+    translate: -6px 0;
+  }
+  40% {
+    opacity: 0.6;
+    translate: 5px 0;
+  }
+  100% {
+    opacity: 0;
+    translate: 0 -16px;
+    clip-path: inset(0 0 100% 0);
+  }
+}
+@keyframes intro-blink-out {
+  0% {
+    opacity: 1;
+  }
+  16% {
+    opacity: 0;
+  }
+  33% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  66% {
+    opacity: 1;
+  }
+  83%,
+  100% {
     opacity: 0;
   }
 }
