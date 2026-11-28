@@ -89,5 +89,11 @@ export const projects: Project[] = [
       { label: "Live Site", href: "https://untold-diaries.vercel.app" },
       { label: "Source", href: "https://github.com/nathsuki73/untold-diaries" },
     ],
+    images: [
+      {
+        src: "/projects/untold-diaries/1.webp",
+        alt: "Untold Diaries home page on a laptop and a phone: \"No names. No judgements. Just untold truths.\" with Share your story and Browse stories buttons and recent letters",
+      },
+    ],
   },
 ];
